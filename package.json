@@ -16,7 +16,8 @@
     "@deskpro/app-sdk": "^1.1.9",
     "polished": "^4.1.1",
     "react": "^17.0.2",
-    "react-dom": "^17.0.2"
+    "react-dom": "^17.0.2",
+    "react-router-dom": "^6.4.2"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^5.16.1",

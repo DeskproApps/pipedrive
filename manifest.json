@@ -1,28 +1,52 @@
 {
-  "name": "@deskpro-apps/my_app",
-  "title": "My App",
-  "description": "My Deskpro app",
+  "name": "@deskpro-apps/pipedrive_app",
+  "title": "Pipedrive",
+  "description": "This app allows you to interact with Pipedrive",
   "version": "1.0.0",
   "scope": "agent",
   "isSingleInstall": false,
-  "targets": [{
-    "target": "ticket_sidebar",
-    "entrypoint": "index.html"
-  }],
+  "hasDevMode": true,
+  "targets": [
+    {
+      "target": "user_sidebar",
+      "entrypoint": "index.html"
+    }
+  ],
+  "entityAssociations": {
+    "linkedPipedriveContacts": {
+      "entity": "person",
+      "type": "external_id",
+      "title": "Linked Pipedrive Contacts"
+    }
+  },
   "settings": {
-    "example": {
-      "title": "Example Setting",
-      "description": "Example backend only setting",
+    "api_key": {
+      "title": "Pipedrive API Key",
+      "description": "The API key to use to access Pipedrive",
       "type": "string",
-      "isRequired": false,
+      "isRequired": true,
+      "isBackendOnly": true
+    },
+    "instance_domain": {
+      "title": "Instance Domain",
+      "description": "The domain of your Pipedrive instance",
+      "type": "string",
+      "isRequired": true,
       "isBackendOnly": true
     }
   },
   "proxy": {
-    "whitelist": [{
-      "url": "https://example.com/.*",
-      "methods": ["GET", "POST", "PUT"],
-      "timeout": 10
-    }]
+    "whitelist": [
+      {
+        "url": "https://.*.pipedrive.com/v1/.*",
+        "methods": [
+          "GET",
+          "POST",
+          "PUT",
+          "DELETE"
+        ],
+        "timeout": 10
+      }
+    ]
   }
 }
