@@ -6,6 +6,7 @@ import { useUser } from "../context/userContext";
 import { IPipedriveUser } from "../types/pipedriveUser";
 
 export const Main = () => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [pipedriveUser, setPipedriveUser] = useState<IPipedriveUser | null>(
     null
   );
