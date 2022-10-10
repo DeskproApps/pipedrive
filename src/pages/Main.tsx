@@ -45,9 +45,11 @@ export const Main = () => {
   useInitialisedDeskproAppClient(
     async (client) => {
       if (!deskproUser) return;
-      const id = await client
-        .getEntityAssociation("linkedPipedriveContacts", deskproUser.id)
-        .get<string>("id");
+      const id = (
+        await client
+          .getEntityAssociation("linkedPipedriveContacts", deskproUser.id)
+          .list()
+      )[0];
 
       if (!id) {
         navigate("/contacts");
@@ -63,7 +65,7 @@ export const Main = () => {
             "linkedPipedriveContacts",
             deskproUser.ticket.id
           )
-          .delete("id");
+          .delete(id);
 
         navigate("/contacts");
 

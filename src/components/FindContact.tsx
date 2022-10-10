@@ -48,9 +48,19 @@ export const FindContact = () => {
   const linkContact = async () => {
     if (!deskproUser || !selectedContact) return;
 
+    const getEntityAssociationData = (await client
+      ?.getEntityAssociation("linkedPipedriveContacts", deskproUser.id)
+      .list()) as string[];
+
+    if (getEntityAssociationData.length > 0) {
+      await client
+        ?.getEntityAssociation("linkedPipedriveContacts", deskproUser.id)
+        .delete(getEntityAssociationData[0]);
+    }
+
     await client
       ?.getEntityAssociation("linkedPipedriveContacts", deskproUser.id)
-      .set("id", selectedContact);
+      .set(selectedContact);
   };
 
   return (
