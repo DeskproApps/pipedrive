@@ -1,5 +1,6 @@
 export interface IPipedriveUser {
-  email: string;
+  emails: string[];
+  primary_email: string;
   name: string;
   access: IAccess[];
   active_flag: boolean;

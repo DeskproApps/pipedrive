@@ -12,16 +12,41 @@ export const Main = () => {
 
   const navigate = useNavigate();
 
+  useInitialisedDeskproAppClient((client) => {
+    client.setTitle("Home");
+
+    client.registerElement("pipedriveHomeButton", {
+      type: "home_button",
+      payload: {
+        type: "changePage",
+        page: "/",
+      },
+    });
+    client.registerElement("pipedriveRefreshButton", {
+      type: "refresh_button",
+    });
+    client.registerElement("pipedriveMenuButton", {
+      type: "menu",
+      items: [
+        {
+          title: "Contacts",
+          payload: {
+            type: "changePage",
+            page: "/",
+          },
+        },
+      ],
+    });
+  });
+
   const deskproUser = useUser();
 
   useInitialisedDeskproAppClient(
     async (client) => {
       if (!deskproUser) return;
-      const id = (
-        await client
-          .getEntityAssociation("linkedPipedriveContacts", deskproUser.id)
-          .list()
-      )[0];
+      const id = await client
+        .getEntityAssociation("linkedPipedriveContacts", deskproUser.id)
+        .get<string>("id");
 
       if (!id) {
         navigate("/contacts");
@@ -31,13 +56,13 @@ export const Main = () => {
 
       const contact = await getContactById(client, id);
 
-      if (!contact) {
+      if (!contact.success) {
         await client
           .getEntityAssociation(
             "linkedPipedriveContacts",
             deskproUser.ticket.id
           )
-          .delete(id);
+          .delete("id");
 
         navigate("/contacts");
 
@@ -51,5 +76,5 @@ export const Main = () => {
     [deskproUser]
   );
 
-  return <H1>a{pipedriveUser}</H1>;
+  return <H1>Home page with user data</H1>;
 };

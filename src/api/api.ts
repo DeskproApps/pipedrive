@@ -47,7 +47,7 @@ const createContact = async (client: IDeskproClient, data: ICreateContact) => {
   const pFetch = await proxyFetch(client);
 
   const response = await pFetch(
-    `https://__instance_domain__.pipedrive.com/v1/users?api_token=__api_key__`,
+    `https://__instance_domain__.pipedrive.com/v1/persons?api_token=__api_key__`,
     {
       method: "POST",
       body: JSON.stringify({
