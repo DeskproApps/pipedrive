@@ -1,5 +1,5 @@
 import { DeskproAppProvider } from "@deskpro/app-sdk";
-import { Routes, BrowserRouter, Route } from "react-router-dom";
+import { Routes, HashRouter, Route } from "react-router-dom";
 
 import "flatpickr/dist/themes/light.css";
 import "tippy.js/dist/tippy.css";
@@ -14,12 +14,12 @@ import { Main } from "./pages/Main";
 function App() {
   return (
     <DeskproAppProvider>
-      <BrowserRouter>
+      <HashRouter>
         <Routes>
-          <Route path="/" element={<Main />}></Route>
+          <Route index path="/" element={<Main />}></Route>
           <Route path="/contacts" element={<Contacts />}></Route>
         </Routes>
-      </BrowserRouter>
+      </HashRouter>
     </DeskproAppProvider>
   );
 }

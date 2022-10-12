@@ -1,7 +1,9 @@
 import { IDeskproClient, proxyFetch } from "@deskpro/app-sdk";
+import { PipedriveAPIResponse } from "../types/pipedrive";
 import { ICreateContact } from "../types/createContact";
 
-import { IPipedriveUser } from "../types/pipedriveUser";
+import { IPipedriveContact } from "../types/pipedriveContact";
+import { IPipedriveOrganization } from "../types/pipedriveOrganization";
 
 const pipedriveGet = async (client: IDeskproClient, pathQuery: string) => {
   const pFetch = await proxyFetch(client);
@@ -32,14 +34,30 @@ const getContactByPrompt = async (client: IDeskproClient, prompt: string) => {
   );
 };
 
-const getContactById = async (client: IDeskproClient, id: string) => {
+const getContactById = async (
+  client: IDeskproClient,
+  id: string
+): Promise<PipedriveAPIResponse<IPipedriveContact>> => {
   return await pipedriveGet(client, `persons/${id}?api_token=__api_key__`);
 };
 
-const getOrganizations = async (client: IDeskproClient, orgId: string) => {
+const getOrganizationsByUserId = async (
+  client: IDeskproClient,
+  orgId: number
+) => {
   return await pipedriveGet(
     client,
-    `organization/${orgId}?api_token=__api_key__`
+    `organizations?user_id=${orgId}&api_token=__api_key__`
+  );
+};
+
+const getOrganizationsById = async (
+  client: IDeskproClient,
+  orgId: number
+): Promise<PipedriveAPIResponse<IPipedriveOrganization>> => {
+  return await pipedriveGet(
+    client,
+    `organizations/${orgId}?api_token=__api_key__`
   );
 };
 
@@ -65,7 +83,7 @@ const createContact = async (client: IDeskproClient, data: ICreateContact) => {
   }
 };
 
-const createUser = async (client: IDeskproClient, user: IPipedriveUser) => {
+const createUser = async (client: IDeskproClient, user: IPipedriveContact) => {
   const pFetch = await proxyFetch(client);
 
   const response = await pFetch(
@@ -93,7 +111,8 @@ export {
   getContactByPrompt,
   getUserDataPipedrive,
   getUserListPipedrive,
-  getOrganizations,
+  getOrganizationsByUserId,
+  getOrganizationsById,
   createContact,
   getUserById,
   createUser,
