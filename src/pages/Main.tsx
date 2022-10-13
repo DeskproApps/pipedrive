@@ -4,17 +4,17 @@ import {
   IDeskproClient,
   Property,
   Stack,
+  useDeskproAppClient,
   useDeskproAppEvents,
   useInitialisedDeskproAppClient,
 } from "@deskpro/app-sdk";
 import { useState } from "react";
-import { redirect, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 import {
   getContactById,
   getContactByPrompt,
   getOrganizationsById,
-  getOrganizationsByUserId,
 } from "../api/api";
 import { useUser } from "../context/userContext";
 import { IPipedriveContact } from "../types/pipedriveContact";
@@ -24,6 +24,8 @@ import { ActivitiesMainView } from "../components/ActivitiesMainView";
 import { NotesMainView } from "../components/NotesMainView";
 
 export const Main = () => {
+  const { client } = useDeskproAppClient();
+
   const [pipedriveContact, setPipedriveContact] =
     useState<IPipedriveContact | null>(null);
   const [organization, setOrganization] =
@@ -35,61 +37,72 @@ export const Main = () => {
 
   const getPipedriveContact = async (client: IDeskproClient) => {
     if (!deskproUser) return;
+
     const id = (
       await client
         .getEntityAssociation("linkedPipedriveContacts", deskproUser.id)
         .list()
     )[0];
 
-    if (!id) {
-      const pipedriveContactFromPrompt = await getContactByPrompt(
-        client,
-        deskproUser.primaryEmail
-      );
-      if (pipedriveContactFromPrompt.success) {
-        const pipedriveContact = await getContactById(
-          client,
-          pipedriveContactFromPrompt.data.items[0]?.item.id ?? null
-        );
+    if (id) {
+      const contact = await getContactById(client, id);
 
-        if (!pipedriveContact.success) {
-          navigate("/contacts");
+      if (!contact.success) {
+        await client
+          .getEntityAssociation(
+            "linkedPipedriveContacts",
+            deskproUser.ticket.id
+          )
+          .delete(id);
 
-          return;
-        }
-
-        setPipedriveContact(pipedriveContact.data);
+        navigate("/contacts");
 
         return;
       }
+
+      setPipedriveContact(contact.data);
+
+      return;
+    }
+
+    const pipedriveContactFromPrompt = await getContactByPrompt(
+      client,
+      deskproUser.primaryEmail
+    );
+
+    if (!pipedriveContactFromPrompt.success) {
       navigate("/contacts");
 
       return;
     }
 
-    const contact = await getContactById(client, id);
+    const pipedriveContact = await getContactById(
+      client,
+      pipedriveContactFromPrompt.data.items[0]?.item.id ?? null
+    );
 
-    if (!contact.success) {
-      await client
-        .getEntityAssociation("linkedPipedriveContacts", deskproUser.ticket.id)
-        .delete(id);
-
+    if (!pipedriveContact.success) {
       navigate("/contacts");
 
       return;
     }
 
-    setPipedriveContact(contact.data);
+    await client
+      .getEntityAssociation("linkedPipedriveContacts", deskproUser.id)
+      .set(pipedriveContact.data.id.toString());
+
+    setPipedriveContact(pipedriveContact.data);
+
+    return;
   };
 
   const getPipedriveOrganization = async (client: IDeskproClient) => {
     if (!pipedriveContact) return;
 
-    const id = (
-      await getOrganizationsByUserId(client, pipedriveContact.owner_id.id)
-    ).data[0].id;
-
-    const pipedriveOrganization = await getOrganizationsById(client, id);
+    const pipedriveOrganization = await getOrganizationsById(
+      client,
+      pipedriveContact.org_id.value
+    );
 
     if (!pipedriveOrganization.success) return;
 
@@ -109,7 +122,7 @@ export const Main = () => {
       type: "menu",
       items: [
         {
-          title: "Contacts",
+          title: "Unlink contact",
           payload: {
             type: "changePage",
             page: "/",
@@ -120,11 +133,28 @@ export const Main = () => {
   });
 
   useDeskproAppEvents({
-    onElementEvent(id: string) {
-      console.log(id);
+    async onElementEvent(id) {
       switch (id) {
         case "pipedriveHomeButton": {
-          redirect("/");
+          navigate("/");
+
+          break;
+        }
+        case "pipedriveMenuButton": {
+          if (!client || !deskproUser) return;
+          const id = (
+            await client
+              .getEntityAssociation("linkedPipedriveContacts", deskproUser.id)
+              .list()
+          )[0];
+
+          await client
+            .getEntityAssociation("linkedPipedriveContacts", deskproUser.id)
+            .delete(id);
+
+          navigate("/contacts");
+
+          break;
         }
       }
     },
@@ -132,6 +162,8 @@ export const Main = () => {
 
   useInitialisedDeskproAppClient(
     async (client) => {
+      if (!deskproUser) return;
+
       await getPipedriveContact(client);
     },
 
@@ -148,42 +180,58 @@ export const Main = () => {
 
   return (
     <Stack vertical style={{ marginBottom: "300px" }}>
-      <Stack>
-        <H1>{pipedriveContact?.name}</H1>
+      <Stack vertical>
+        <Stack>
+          <H1>{pipedriveContact?.name}</H1>
+        </Stack>
+        <Stack
+          style={{ marginTop: "10px", marginBottom: "10px", width: "100%" }}
+          vertical
+          gap={10}
+        >
+          {pipedriveContact?.primary_email && (
+            <Property title="Email">{pipedriveContact.primary_email}</Property>
+          )}
+          {pipedriveContact?.phone[0].value && (
+            <Property title="Phone">{pipedriveContact.phone[0].value}</Property>
+          )}
+          <HorizontalDivider
+            style={{ width: "110%", color: "#EFF0F0", marginLeft: "-10px" }}
+          />
+        </Stack>
       </Stack>
-      <Stack
-        style={{ marginTop: "10px", marginBottom: "10px", width: "100%" }}
-        vertical
-        gap={10}
-      >
-        {pipedriveContact?.name && (
-          <Property title="Name">{pipedriveContact.name}</Property>
-        )}
-        {pipedriveContact?.primary_email && (
-          <Property title="Email">{pipedriveContact.primary_email}</Property>
-        )}
-        {pipedriveContact?.phone[0].value && (
-          <Property title="Phone">{pipedriveContact.phone[0].value}</Property>
-        )}
-        <HorizontalDivider
-          style={{ width: "110%", color: "#EFF0F0", marginLeft: "-10px" }}
-        />
-      </Stack>
-      <H1 style={{ fontSize: "30px" }}>{organization?.name}</H1>
-      <Stack style={{ marginTop: "10px", width: "100%" }} vertical gap={10}>
-        {organization?.owner_name && (
-          <Property title="Owner">{organization.owner_name}</Property>
-        )}
-        {organization?.people_count.toString() && (
-          <Property title="Employees">{organization.people_count}</Property>
-        )}
-        <HorizontalDivider
-          style={{ width: "110%", color: "#EFF0F0", marginLeft: "-10px" }}
-        />
-      </Stack>
-      <DealsMainView />
-      <ActivitiesMainView />
-      <NotesMainView />
+      {organization?.name && (
+        <H1 style={{ fontSize: "30px" }}>{organization?.name}</H1>
+      )}
+      {organization && (
+        <Stack style={{ marginTop: "10px", width: "100%" }} vertical gap={10}>
+          {organization.owner_name && (
+            <Property title="Owner">{organization.owner_name}</Property>
+          )}
+          {organization.people_count && (
+            <Property title="Employees">{organization.people_count}</Property>
+          )}
+          <HorizontalDivider
+            style={{ width: "110%", color: "#EFF0F0", marginLeft: "-10px" }}
+          />
+        </Stack>
+      )}
+      {pipedriveContact && (
+        <div style={{ width: "100%" }}>
+          <DealsMainView
+            userId={pipedriveContact?.owner_id.id}
+            personId={pipedriveContact?.id}
+          />
+          <ActivitiesMainView
+            userId={pipedriveContact?.owner_id.id}
+            personId={pipedriveContact?.id}
+          />
+          <NotesMainView
+            userId={pipedriveContact?.owner_id.id}
+            personId={pipedriveContact?.id}
+          />
+        </div>
+      )}
     </Stack>
   );
 };

@@ -1,18 +1,39 @@
-import { H1, H2, HorizontalDivider, Stack } from "@deskpro/app-sdk";
+import {
+  H1,
+  H2,
+  HorizontalDivider,
+  Stack,
+  useInitialisedDeskproAppClient,
+} from "@deskpro/app-sdk";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
 
 import { LogoAndLinkButton } from "./LogoAndLinkButton";
+import { IPipedriveNote } from "../types/pipedriveNote";
+import { useState } from "react";
+import { getNotes } from "../api/api";
 
-const notes = [
-  {
-    title: "Wash catto",
-    content:
-      "Catto is dirty and needs to be washed or else his mother will get pissed",
-  },
-];
+export const NotesMainView = ({
+  userId,
+  personId,
+}: {
+  userId: number;
+  personId: number;
+}) => {
+  const [notes, setNotes] = useState<IPipedriveNote[]>([]);
 
-export const NotesMainView = () => {
+  useInitialisedDeskproAppClient(
+    async (client) => {
+      if (!userId || !personId) return;
+
+      const notesReq = await getNotes(client, personId);
+
+      if (!notesReq.success) return;
+
+      setNotes(notesReq.data.filter((e) => e.person_id === personId));
+    },
+    [userId, personId]
+  );
   return (
     <Stack vertical style={{ width: "100%" }}>
       <Stack
@@ -31,9 +52,10 @@ export const NotesMainView = () => {
         </Stack>
       </Stack>
       <Stack vertical style={{ width: "100%" }}>
-        {notes.map((note) => {
+        {notes.map((note, i) => {
           return (
             <Stack
+              key={i}
               vertical
               gap={5}
               style={{ width: "100%", marginTop: "10px" }}
@@ -45,7 +67,7 @@ export const NotesMainView = () => {
                   width: "100%",
                 }}
               >
-                <H1>{note.title}</H1>
+                <H1>Note {++i}</H1>
                 <LogoAndLinkButton></LogoAndLinkButton>
               </Stack>
               <Stack style={{ alignItems: "flex-start", marginTop: "10px" }}>

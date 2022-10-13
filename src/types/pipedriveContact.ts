@@ -2,7 +2,7 @@ export interface IPipedriveContact {
   id: number;
   company_id: number;
   owner_id: OwnerID;
-  org_id: number;
+  org_id: OrgId;
   name: string;
   first_name: string;
   last_name: string;
@@ -44,6 +44,16 @@ export interface IPipedriveContact {
   cc_email: string;
   primary_email: string;
   owner_name: string;
+}
+
+export interface OrgId {
+  value: number;
+  people_count: number;
+  owner_id: OwnerID;
+  name: string;
+  cc_email: string;
+  address: null;
+  active_flag: boolean;
 }
 
 export interface Email {

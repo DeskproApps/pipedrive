@@ -18,9 +18,12 @@ import { useUser } from "../context/userContext";
 import { IPipedriveContact } from "../types/pipedriveContact";
 import useDebounce from "../utils/debounce";
 import { LogoAndLinkButton } from "./LogoAndLinkButton";
+import { useNavigate } from "react-router-dom";
 
 export const FindContact = () => {
   const { client } = useDeskproAppClient();
+
+  const navigate = useNavigate();
 
   const [selectedContact, setSelectedContact] = useState<string>("");
   const [loading, setLoading] = useState(false);
@@ -62,6 +65,7 @@ export const FindContact = () => {
     await client
       ?.getEntityAssociation("linkedPipedriveContacts", deskproUser.id)
       .set(selectedContact);
+    navigate("/");
   };
 
   return (

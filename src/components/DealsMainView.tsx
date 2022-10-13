@@ -2,31 +2,39 @@ import {
   H1,
   HorizontalDivider,
   Stack,
+  useInitialisedDeskproAppClient,
   VerticalDivider,
 } from "@deskpro/app-sdk";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
 
 import { LogoAndLinkButton } from "./LogoAndLinkButton";
-const deals = [
-  {
-    date: "28 Apr, 2021",
-    budget: "40000",
-    id: "1",
-  },
-  {
-    date: "28 Apr, 2021",
-    budget: "40000",
-    id: "1",
-  },
-  {
-    date: "28 Apr, 2021",
-    budget: "40000",
-    id: "1",
-  },
-];
+import { useState } from "react";
+import { IPipedriveDeal } from "../types/pipedriveDeal";
+import { getDeals } from "../api/api";
 
-export const DealsMainView = () => {
+export const DealsMainView = ({
+  userId,
+  personId,
+}: {
+  userId: number;
+  personId: number;
+}) => {
+  const [deals, setDeals] = useState<IPipedriveDeal[]>([]);
+
+  useInitialisedDeskproAppClient(
+    async (client) => {
+      if (!userId || !personId) return;
+
+      const dealsReq = await getDeals(client, userId);
+
+      if (!dealsReq.success) return;
+
+      setDeals(dealsReq.data.filter((e) => e.person_id.value === personId));
+    },
+    [userId, personId]
+  );
+
   return (
     <Stack vertical style={{ width: "100%" }}>
       <Stack
@@ -49,6 +57,7 @@ export const DealsMainView = () => {
         {deals.map((deal, i) => {
           return (
             <Stack
+              key={i}
               vertical
               gap={5}
               style={{ width: "100%", marginTop: "10px" }}
@@ -61,17 +70,17 @@ export const DealsMainView = () => {
                 }}
               >
                 <h1 style={{ color: "#3A8DDE", fontSize: "12px" }}>
-                  Deal {++i}
+                  {deal.title}
                 </h1>
                 <LogoAndLinkButton />
               </Stack>
               <Stack>
-                <H1>{deal.date}</H1>
+                <H1>{deal.add_time.split(" ")[0]}</H1>
                 <Stack style={{ marginLeft: "40px" }}>
                   <VerticalDivider
                     style={{ height: "10px", width: "1px", color: "#EFF0F0" }}
                   ></VerticalDivider>
-                  <H1>{Number(deal.budget).toLocaleString("en-US")} USD</H1>
+                  <H1>{deal.formatted_weighted_value}</H1>
                 </Stack>
               </Stack>
               <HorizontalDivider

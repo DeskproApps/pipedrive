@@ -2,27 +2,38 @@ import {
   HorizontalDivider,
   Property,
   Stack,
+  useInitialisedDeskproAppClient,
   VerticalDivider,
 } from "@deskpro/app-sdk";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
 
 import { LogoAndLinkButton } from "./LogoAndLinkButton";
+import { IPipedriveActivity } from "../types/pipedriveActivity";
+import { useState } from "react";
+import { getActivitiesByUserId } from "../api/api";
 
-const activities = [
-  {
-    name: "Call Michael",
-    type: "Call",
-    Date: "15 Mar, 2021",
-  },
-  {
-    name: "Email Anderson",
-    type: "Email",
-    Date: "15 Mar, 2021",
-  },
-];
+export const ActivitiesMainView = ({
+  userId,
+  personId,
+}: {
+  userId: number;
+  personId: number;
+}) => {
+  const [activities, setActivities] = useState<IPipedriveActivity[]>([]);
 
-export const ActivitiesMainView = () => {
+  useInitialisedDeskproAppClient(
+    async (client) => {
+      if (!userId || !personId) return;
+
+      const activitiesReq = await getActivitiesByUserId(client, userId);
+
+      if (!activitiesReq.success) return;
+
+      setActivities(activitiesReq.data.filter((e) => e.person_id === personId));
+    },
+    [userId, personId]
+  );
   return (
     <Stack vertical style={{ width: "100%" }}>
       <Stack
@@ -43,9 +54,10 @@ export const ActivitiesMainView = () => {
         </Stack>
       </Stack>
       <Stack vertical style={{ width: "100%" }}>
-        {activities.map((activity) => {
+        {activities.map((activity, i) => {
           return (
             <Stack
+              key={i}
               vertical
               gap={5}
               style={{ width: "100%", marginTop: "10px" }}
@@ -57,7 +69,7 @@ export const ActivitiesMainView = () => {
                   justifyContent: "space-between",
                 }}
               >
-                <h1 style={{ fontSize: "12px" }}>{activity.name}</h1>
+                <h1 style={{ fontSize: "12px" }}>{activity.note}</h1>
                 <LogoAndLinkButton />
               </Stack>
               <Stack>
@@ -66,7 +78,7 @@ export const ActivitiesMainView = () => {
                   <VerticalDivider
                     style={{ height: "30px", width: "1px", color: "#EFF0F0" }}
                   ></VerticalDivider>
-                  <Property title="Date">{activity.Date}</Property>
+                  <Property title="Date">{activity.note}</Property>
                 </Stack>
               </Stack>
               <HorizontalDivider
