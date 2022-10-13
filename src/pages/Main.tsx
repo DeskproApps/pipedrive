@@ -17,8 +17,8 @@ import {
   getOrganizationsById,
 } from "../api/api";
 import { useUser } from "../context/userContext";
-import { IPipedriveContact } from "../types/pipedriveContact";
-import { IPipedriveOrganization } from "../types/pipedriveOrganization";
+import { IPipedriveContact } from "../types/pipedrive/pipedriveContact";
+import { IPipedriveOrganization } from "../types/pipedrive/pipedriveOrganization";
 import { DealsMainView } from "../components/DealsMainView";
 import { ActivitiesMainView } from "../components/ActivitiesMainView";
 import { NotesMainView } from "../components/NotesMainView";

@@ -12,7 +12,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
 
 import { LogoAndLinkButton } from "./LogoAndLinkButton";
-import { IPipedriveNote } from "../types/pipedriveNote";
+import { IPipedriveNote } from "../types/pipedrive/pipedriveNote";
 import { useState } from "react";
 import { getNotes } from "../api/api";
 import { timeSince } from "../utils/utils";

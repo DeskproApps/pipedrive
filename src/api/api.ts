@@ -1,12 +1,13 @@
 import { IDeskproClient, proxyFetch } from "@deskpro/app-sdk";
-import { PipedriveAPIResponse } from "../types/pipedrive";
+import { PipedriveAPIResponse } from "../types/pipedrive/pipedrive";
 import { ICreateContact } from "../types/createContact";
 
-import { IPipedriveContact } from "../types/pipedriveContact";
-import { IPipedriveOrganization } from "../types/pipedriveOrganization";
-import { IPipedriveDeal } from "../types/pipedriveDeal";
-import { IPipedriveActivity } from "../types/pipedriveActivity";
-import { IPipedriveNote } from "../types/pipedriveNote";
+import { IPipedriveContact } from "../types/pipedrive/pipedriveContact";
+import { IPipedriveOrganization } from "../types/pipedrive/pipedriveOrganization";
+import { IPipedriveDeal } from "../types/pipedrive/pipedriveDeal";
+import { IPipedriveActivity } from "../types/pipedrive/pipedriveActivity";
+import { IPipedriveNote } from "../types/pipedrive/pipedriveNote";
+import { IPipedriveUser } from "../types/pipedrive/pipedriveUser";
 
 const pipedriveGet = async (client: IDeskproClient, pathQuery: string) => {
   const pFetch = await proxyFetch(client);
@@ -35,6 +36,18 @@ const getContactByPrompt = async (client: IDeskproClient, prompt: string) => {
     client,
     `persons/search?term=${prompt}&api_token=__api_key__`
   );
+};
+
+const getAllUsers = async (
+  client: IDeskproClient
+): Promise<PipedriveAPIResponse<IPipedriveUser[]>> => {
+  return await pipedriveGet(client, `users?api_token=__api_key__`);
+};
+
+const getAllOrganizations = async (
+  client: IDeskproClient
+): Promise<PipedriveAPIResponse<IPipedriveOrganization[]>> => {
+  return await pipedriveGet(client, `organizations?api_token=__api_key__`);
 };
 
 const getContactById = async (
@@ -140,6 +153,8 @@ const createUser = async (client: IDeskproClient, user: IPipedriveContact) => {
 };
 
 export {
+  getAllUsers,
+  getAllOrganizations,
   getNotes,
   getActivitiesByUserId,
   getContactById,

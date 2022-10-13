@@ -10,7 +10,7 @@ import { faPlus } from "@fortawesome/free-solid-svg-icons";
 
 import { LogoAndLinkButton } from "./LogoAndLinkButton";
 import { useState } from "react";
-import { IPipedriveDeal } from "../types/pipedriveDeal";
+import { IPipedriveDeal } from "../types/pipedrive/pipedriveDeal";
 import { getDeals } from "../api/api";
 
 export const DealsMainView = ({

@@ -9,7 +9,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
 
 import { LogoAndLinkButton } from "./LogoAndLinkButton";
-import { IPipedriveActivity } from "../types/pipedriveActivity";
+import { IPipedriveActivity } from "../types/pipedrive/pipedriveActivity";
 import { useState } from "react";
 import { getActivitiesByUserId } from "../api/api";
 
