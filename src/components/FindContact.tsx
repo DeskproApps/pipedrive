@@ -77,10 +77,10 @@ export const FindContact = () => {
         type="text"
         leftIcon={faMagnifyingGlass}
       />
-      <Stack vertical style={{ marginTop: "5px" }}>
-        <Stack vertical style={{ width: "100%", marginBottom: "10px" }}>
+      <Stack vertical style={{ width: "100%" }}>
+        <Stack vertical style={{ width: "100%", marginBottom: "5px" }}>
           <Button
-            style={{ marginTop: "5px" }}
+            style={{ marginTop: "7px", marginBottom: "5px" }}
             text="Link Contact"
             onClick={() => linkContact()}
           ></Button>
@@ -89,7 +89,9 @@ export const FindContact = () => {
           />
         </Stack>
         {loading ? (
-          <Spinner size="extra-large" />
+          <Stack style={{ margin: "auto" }}>
+            <Spinner size="extra-large" />
+          </Stack>
         ) : (
           contacts.map((contact, i) => (
             <div style={{ width: "100%" }} key={i}>
