@@ -132,33 +132,35 @@ export const Main = () => {
     });
   });
 
-  useDeskproAppEvents({
-    async onElementEvent(id) {
-      switch (id) {
-        case "pipedriveHomeButton": {
-          navigate("/");
+  useDeskproAppEvents(
+    {
+      async onElementEvent(id) {
+        switch (id) {
+          case "pipedriveHomeButton": {
+            navigate("/");
 
-          break;
-        }
-        case "pipedriveMenuButton": {
-          if (!client || !deskproUser) return;
-          const id = (
+            break;
+          }
+          case "pipedriveMenuButton": {
+            if (!client || !deskproUser) return;
+            const id = (
+              await client
+                .getEntityAssociation("linkedPipedriveContacts", deskproUser.id)
+                .list()
+            )[0];
+
             await client
               .getEntityAssociation("linkedPipedriveContacts", deskproUser.id)
-              .list()
-          )[0];
+              .delete(id);
+            navigate("/contacts");
 
-          await client
-            .getEntityAssociation("linkedPipedriveContacts", deskproUser.id)
-            .delete(id);
-
-          navigate("/contacts");
-
-          break;
+            break;
+          }
         }
-      }
+      },
     },
-  });
+    [client, deskproUser]
+  );
 
   useInitialisedDeskproAppClient(
     async (client) => {

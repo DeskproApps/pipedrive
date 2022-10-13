@@ -5,6 +5,9 @@ import {
   Stack,
   useInitialisedDeskproAppClient,
 } from "@deskpro/app-sdk";
+
+import { Avatar } from "@deskpro/deskpro-ui";
+
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
 
@@ -12,6 +15,7 @@ import { LogoAndLinkButton } from "./LogoAndLinkButton";
 import { IPipedriveNote } from "../types/pipedriveNote";
 import { useState } from "react";
 import { getNotes } from "../api/api";
+import { timeSince } from "../utils/utils";
 
 export const NotesMainView = ({
   userId,
@@ -34,6 +38,7 @@ export const NotesMainView = ({
     },
     [userId, personId]
   );
+
   return (
     <Stack vertical style={{ width: "100%" }}>
       <Stack
@@ -73,13 +78,18 @@ export const NotesMainView = ({
               <Stack style={{ alignItems: "flex-start", marginTop: "10px" }}>
                 <Stack
                   vertical
+                  gap={3}
                   style={{
                     marginLeft: "5px",
                     alignItems: "center",
                   }}
                 >
-                  <img src="/notelogo.png" />
-                  <H1>10 mos</H1>
+                  <Avatar
+                    size={22}
+                    name={note.person.name.split(" ").slice(0, 2).join(" ")}
+                  ></Avatar>
+
+                  <H2>{timeSince(new Date(note.add_time)).slice(0, 5)}</H2>
                 </Stack>
                 <div style={{ maxWidth: "20ch", marginLeft: "10px" }}>
                   <H2>{note.content}</H2>

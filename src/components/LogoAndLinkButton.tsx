@@ -14,7 +14,7 @@ export const LogoAndLinkButton = () => {
       }}
     >
       <img
-        src="../../icon.svg"
+        src="/icon.svg"
         style={{ width: "16px", alignSelf: "center" }}
         alt=""
       />
