@@ -1,7 +1,8 @@
 import { Stack } from "@deskpro/app-sdk";
-
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowUpRightFromSquare } from "@fortawesome/free-solid-svg-icons";
+
+import { PipedriveLogo } from "./PipedriveLogo";
 
 export const LogoAndLinkButton = () => {
   return (
@@ -13,11 +14,7 @@ export const LogoAndLinkButton = () => {
         marginLeft: "10px",
       }}
     >
-      <img
-        src="/icon.svg"
-        style={{ width: "16px", alignSelf: "center" }}
-        alt=""
-      />
+      <PipedriveLogo />
       <FontAwesomeIcon
         icon={faArrowUpRightFromSquare}
         style={{ marginLeft: "10px", alignSelf: "center" }}
