@@ -15,7 +15,11 @@ export const LogoAndLinkButton = ({ endpoint }: { endpoint: string }) => {
         borderRadius: "10px",
         padding: "2px 5px 2px 5px",
         marginLeft: "10px",
+        cursor: "pointer",
       }}
+      onClick={() =>
+        window.open(`https://${deskproUser?.orgName}.pipedrive.com/${endpoint}`)
+      }
     >
       <PipedriveLogo />
       <FontAwesomeIcon
@@ -24,13 +28,7 @@ export const LogoAndLinkButton = ({ endpoint }: { endpoint: string }) => {
           marginLeft: "10px",
           alignSelf: "center",
           width: "10px",
-          cursor: "pointer",
         }}
-        onClick={() =>
-          window.open(
-            `https://${deskproUser?.orgName}.pipedrive.com/${endpoint}`
-          )
-        }
       ></FontAwesomeIcon>
     </Stack>
   );

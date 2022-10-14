@@ -70,7 +70,7 @@ export const ActivitiesMainView = ({
               key={i}
               vertical
               gap={5}
-              style={{ width: "100%", marginTop: "10px" }}
+              style={{ width: "100%", marginTop: "5px" }}
             >
               <Stack
                 style={{
@@ -91,7 +91,12 @@ export const ActivitiesMainView = ({
                 </Property>
                 <Stack style={{ marginLeft: "40px" }}>
                   <VerticalDivider
-                    style={{ height: "35px", width: "1px", color: "#EFF0F0" }}
+                    style={{
+                      height: "35px",
+                      width: "1px",
+                      color: "#EFF0F0",
+                      marginBottom: "5px",
+                    }}
                   ></VerticalDivider>
                   <Property title="Date">{`${date.getDay()} ${date
                     .toLocaleString("default", { month: "long" })

@@ -63,7 +63,7 @@ export const DealsMainView = ({
               key={i}
               vertical
               gap={5}
-              style={{ width: "100%", marginTop: "10px" }}
+              style={{ width: "100%", marginTop: "5px" }}
             >
               <Stack
                 style={{
@@ -87,7 +87,12 @@ export const DealsMainView = ({
                 </Stack>
               </Stack>
               <HorizontalDivider
-                style={{ width: "110%", color: "#EFF0F0", marginLeft: "-10px" }}
+                style={{
+                  width: "110%",
+                  color: "#EFF0F0",
+                  marginLeft: "-10px",
+                  marginBottom: "5px",
+                }}
               />
             </Stack>
           );
