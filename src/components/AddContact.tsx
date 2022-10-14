@@ -1,11 +1,10 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import {
   Button,
   DivAsInput,
   Dropdown,
-  DropdownItemType,
   DropdownTargetProps,
-  DropdownValueType,
   H1,
   Input,
   Label,
@@ -15,62 +14,67 @@ import {
 } from "@deskpro/app-sdk";
 
 import { useMemo, useState } from "react";
-import { faCheck, faExternalLinkAlt } from "@fortawesome/free-solid-svg-icons";
+import {
+  faCheck,
+  faExternalLinkAlt,
+  faCaretDown,
+} from "@fortawesome/free-solid-svg-icons";
 
-import { getAllOrganizations, getAllUsers } from "../api/api";
+import { createContact, getAllOrganizations, getAllUsers } from "../api/api";
 import { ICreateContact } from "../types/createContact";
 import { EventTarget } from "../types/eventTarget";
 import { IPipedriveOrganization } from "../types/pipedrive/pipedriveOrganization";
 import { IPipedriveUser } from "../types/pipedrive/pipedriveUser";
 import { Status } from "../types/status";
+import { useUser } from "../context/userContext";
+import { useNavigate } from "react-router-dom";
 
 export const AddContact = () => {
-  const plans = {
-    essential: {
-      "1": "Owner & Followers",
-      "2": "Entire company",
-    },
-    professional: {
-      "1": "Owner only",
-      "2": "Owner's visibility group",
-      "3": "	Owner's visibility group and sub-groups",
-      "4": "Entire company",
-    },
-  };
   const { client } = useDeskproAppClient();
+
+  const navigate = useNavigate();
 
   const [organizations, setOrganizations] = useState<IPipedriveOrganization[]>(
     []
   );
   const [users, setUsers] = useState<IPipedriveUser[]>([]);
-  const [selectedOrg, setSelectedOrg] = useState<Status | null>(null);
-  const [selectedUser, setSelectedUser] = useState<Status | null>(null);
-  const [selectedVisibility, setSelectedVisibility] = useState<number>(0);
+  const [selectedOrg, setSelectedOrg] = useState<string | Status | null>(null);
+  const [selectedUser, setSelectedUser] = useState<string | Status | null>(
+    null
+  );
+  const deskproUser = useUser();
 
-  useInitialisedDeskproAppClient(async (client) => {
-    const orgs = await getAllOrganizations(client);
+  useInitialisedDeskproAppClient(
+    async (client) => {
+      if (!deskproUser) return;
+      const orgs = await getAllOrganizations(client, deskproUser?.orgName);
 
-    setOrganizations(orgs.data);
+      setOrganizations(orgs.data);
 
-    const users = await getAllUsers(client);
+      const users = await getAllUsers(client, deskproUser.orgName);
 
-    setUsers(users.data);
-  }, []);
+      setUsers(users.data);
+    },
+    [deskproUser]
+  );
 
   const postContact = async (event: React.FormEvent<HTMLFormElement>) => {
     const targets = event.target as unknown as EventTarget<ICreateContact>;
 
-    if (!client) return;
+    if (!client || !deskproUser) return;
 
     const pipedriveContact = {
-      name: targets.name.value,
-      primary_email: targets.primary_email.value,
-      phone: targets.phone.value,
-      owner_id: "number",
-      org_id: "number",
-    } as ICreateContact; // use event.target.value to get the values from the form
+      name: targets?.name?.value,
+      email: targets?.email?.value,
+      label: targets?.label?.value,
+      phone: targets?.phone?.value,
+      owner_id: selectedUser,
+      org_id: selectedOrg,
+    } as ICreateContact;
 
-    //await createContact(client, pipedriveUser);
+    await createContact(client, deskproUser?.orgName, pipedriveContact);
+
+    //navigate("/");
   };
 
   const orgOptions = useMemo(() => {
@@ -82,24 +86,28 @@ export const AddContact = () => {
     }));
   }, [organizations]) as any;
 
-  const userOptions: Status[] = users.map((user) => ({
-    key: user.name,
-    label: <Label label={user.name}></Label>,
-    value: user.id.toString(),
-    type: "value" as const,
-  }));
+  const userOptions = users.map(
+    (user) => ({
+      key: user.name,
+      label: <Label label={user.name}></Label>,
+      value: user.id.toString(),
+      type: "value" as const,
+    }),
+    [users]
+  ) as any;
 
   const themes = {
     stackStyles: {
       marginTop: "5px",
       color: "#8B9293",
+      width: "100%",
     },
   };
-  console.log(selectedOrg);
+
   return (
     <Stack>
-      <Stack vertical gap={10}>
-        <form onSubmit={postContact}>
+      <Stack vertical gap={10} style={{ width: "100%" }}>
+        <form onSubmit={() => console.log("b")} style={{ width: "100%" }}>
           <Stack style={themes.stackStyles} vertical>
             <H1>Name</H1>
             <Input
@@ -131,8 +139,12 @@ export const AddContact = () => {
                   ref={targetRef}
                   {...targetProps}
                   variant="inline"
+                  rightIcon={faCaretDown}
                   placeholder="Enter value"
-                  value={selectedOrg}
+                  value={
+                    orgOptions.find((e: any) => e.value === selectedOrg)?.key ||
+                    ""
+                  }
                 />
               )}
             </Dropdown>
@@ -160,18 +172,40 @@ export const AddContact = () => {
             <Input
               variant="inline"
               placeholder="Enter value"
-              name="primary_email"
+              name="email"
               type="email"
             />
           </Stack>
           <Stack vertical style={themes.stackStyles}>
             <H1>Owner</H1>
-            <Input
-              variant="inline"
-              placeholder="Enter value"
-              name="owner"
-              type="text"
-            />
+            <Dropdown<Status, HTMLDivElement>
+              placement="bottom-start"
+              options={userOptions}
+              fetchMoreText={"Fetch more"}
+              autoscrollText={"Autoscroll"}
+              selectedIcon={faCheck}
+              externalLinkIcon={faExternalLinkAlt}
+              onSelectOption={(option) => {
+                setSelectedUser(option.value);
+              }}
+            >
+              {({
+                targetProps,
+                targetRef,
+              }: DropdownTargetProps<HTMLDivElement>) => (
+                <DivAsInput
+                  ref={targetRef}
+                  {...targetProps}
+                  variant="inline"
+                  placeholder="Enter value"
+                  rightIcon={faCaretDown}
+                  value={
+                    userOptions.find((e: any) => e.value === selectedUser)
+                      ?.key || ""
+                  }
+                />
+              )}
+            </Dropdown>
           </Stack>
           <Stack vertical style={themes.stackStyles}>
             <H1>Job title</H1>
@@ -182,20 +216,23 @@ export const AddContact = () => {
               type="text"
             />
           </Stack>
-          <Stack vertical style={themes.stackStyles}>
-            <H1>Visible to</H1>
-            <Input
-              variant="inline"
-              placeholder="Enter value"
-              name="visible_to"
-              type="text"
-            />
+          <Stack style={{ justifyContent: "space-between" }}>
+            <Button
+              type="submit"
+              style={{ marginTop: "10px" }}
+              text="Submit"
+            ></Button>
+            <Button
+              style={{
+                marginTop: "10px",
+                backgroundColor: "white",
+                color: "#1C3E55",
+                border: "1px solid #D3D6D7",
+              }}
+              text="Cancel"
+              onClick={() => navigate("/")}
+            ></Button>
           </Stack>
-          <Button
-            type="submit"
-            style={{ marginTop: "10px" }}
-            text="Submit"
-          ></Button>
         </form>
       </Stack>
     </Stack>

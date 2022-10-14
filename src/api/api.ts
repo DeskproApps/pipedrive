@@ -62,15 +62,21 @@ const getContactByPrompt = async (
 };
 
 const getAllUsers = async (
-  client: IDeskproClient
+  client: IDeskproClient,
+  orgName: string
 ): Promise<PipedriveAPIResponse<IPipedriveUser[]>> => {
-  return await pipedriveGet(client, `users?api_token=__api_key__`);
+  return await pipedriveGet(client, orgName, `users?api_token=__api_key__`);
 };
 
 const getAllOrganizations = async (
-  client: IDeskproClient
+  client: IDeskproClient,
+  orgName: string
 ): Promise<PipedriveAPIResponse<IPipedriveOrganization[]>> => {
-  return await pipedriveGet(client, `organizations?api_token=__api_key__`);
+  return await pipedriveGet(
+    client,
+    orgName,
+    `organizations?api_token=__api_key__`
+  );
 };
 
 const getContactById = async (
@@ -153,16 +159,13 @@ const createContact = async (
   const pFetch = await proxyFetch(client);
 
   const response = await pFetch(
-    `https://__instance_domain__.pipedrive.com/v1/persons?api_token=__api_key__`,
+    `https://${orgName}.pipedrive.com/v1/persons?api_token=__api_key__`,
     {
       method: "POST",
-      body: JSON.stringify({
-        name: data.name,
-        primary_email: data.primary_email,
-        phone: data.phone,
-        org_id: data.org_id,
-        owner_id: data.owner_id,
-      }),
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
     }
   );
 
@@ -179,7 +182,7 @@ const createUser = async (
   const pFetch = await proxyFetch(client);
 
   const response = await pFetch(
-    `https://__instance_domain__.pipedrive.com/v1/users?api_token=__api_key__`,
+    `https://${orgName}.pipedrive.com/v1/users?api_token=__api_key__`,
     {
       method: "POST",
       headers: {
@@ -190,10 +193,6 @@ const createUser = async (
       }),
     }
   );
-
-  if (!response.status.toString().startsWith("2")) {
-    throw new Error("Error creating contact");
-  }
 
   return await response.json();
 };

@@ -15,7 +15,7 @@ import { IPipedriveNote } from "../types/pipedrive/pipedriveNote";
 import { useState } from "react";
 import { getNotes } from "../api/api";
 import { timeSince } from "../utils/utils";
-import { IPipedriveContact } from "../types/pipedriveContact";
+import { IPipedriveContact } from "../types/pipedrive/pipedriveContact";
 
 export const NotesMainView = ({
   contact,

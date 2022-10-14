@@ -14,7 +14,7 @@ import { LogoAndLinkButton } from "./LogoAndLinkButton";
 import { useState } from "react";
 import { IPipedriveDeal } from "../types/pipedrive/pipedriveDeal";
 import { getDeals } from "../api/api";
-import { IPipedriveContact } from "../types/pipedriveContact";
+import { IPipedriveContact } from "../types/pipedrive/pipedriveContact";
 
 export const DealsMainView = ({
   contact,
