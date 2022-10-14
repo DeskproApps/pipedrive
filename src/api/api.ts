@@ -1,49 +1,142 @@
 import { IDeskproClient, proxyFetch } from "@deskpro/app-sdk";
+import { PipedriveAPIResponse } from "../types/pipedrive";
 import { ICreateContact } from "../types/createContact";
 
-import { IPipedriveUser } from "../types/pipedriveUser";
+import { IPipedriveContact } from "../types/pipedriveContact";
+import { IPipedriveOrganization } from "../types/pipedriveOrganization";
+import { IPipedriveDeal } from "../types/pipedriveDeal";
+import { IPipedriveActivity } from "../types/pipedriveActivity";
+import { IPipedriveNote } from "../types/pipedriveNote";
 
-const pipedriveGet = async (client: IDeskproClient, pathQuery: string) => {
+const pipedriveGet = async (
+  client: IDeskproClient,
+  orgName: string,
+  pathQuery: string
+) => {
   const pFetch = await proxyFetch(client);
 
   const response = await pFetch(
-    `https://__instance_domain__.pipedrive.com/v1/${pathQuery}`
+    `https://${orgName}.pipedrive.com/v1/${pathQuery}`
   ).then((res) => res.json());
 
   return response;
 };
 
-const getUserDataPipedrive = async (client: IDeskproClient) => {
-  return await pipedriveGet(client, `users/me?api_token=__api_key__`);
+const getUserDataPipedrive = async (
+  client: IDeskproClient,
+  orgName: string
+) => {
+  return await pipedriveGet(client, orgName, `users/me?api_token=__api_key__`);
 };
 
-const getUserListPipedrive = async (client: IDeskproClient) => {
-  return await pipedriveGet(client, `users?api_token=__api_key__`);
+const getUserListPipedrive = async (
+  client: IDeskproClient,
+  orgName: string
+) => {
+  return await pipedriveGet(client, orgName, `users?api_token=__api_key__`);
 };
 
-const getUserById = async (client: IDeskproClient, id: string) => {
-  return await pipedriveGet(client, `users/${id}?api_token=__api_key__`);
-};
-
-const getContactByPrompt = async (client: IDeskproClient, prompt: string) => {
+const getUserById = async (
+  client: IDeskproClient,
+  orgName: string,
+  id: string
+) => {
   return await pipedriveGet(
     client,
+    orgName,
+    `users/${id}?api_token=__api_key__`
+  );
+};
+
+const getContactByPrompt = async (
+  client: IDeskproClient,
+  orgName: string,
+  prompt: string
+) => {
+  return await pipedriveGet(
+    client,
+    orgName,
     `persons/search?term=${prompt}&api_token=__api_key__`
   );
 };
 
-const getContactById = async (client: IDeskproClient, id: string) => {
-  return await pipedriveGet(client, `persons/${id}?api_token=__api_key__`);
-};
-
-const getOrganizations = async (client: IDeskproClient, orgId: string) => {
+const getContactById = async (
+  client: IDeskproClient,
+  orgName: string,
+  id: string
+): Promise<PipedriveAPIResponse<IPipedriveContact>> => {
   return await pipedriveGet(
     client,
-    `organization/${orgId}?api_token=__api_key__`
+    orgName,
+    `persons/${id}?api_token=__api_key__`
   );
 };
 
-const createContact = async (client: IDeskproClient, data: ICreateContact) => {
+const getOrganizationsByUserId = async (
+  client: IDeskproClient,
+  orgName: string,
+  userId: number
+) => {
+  return await pipedriveGet(
+    client,
+    orgName,
+    `organizations?user_id=${userId}&api_token=__api_key__`
+  );
+};
+
+const getDeals = async (
+  client: IDeskproClient,
+  orgName: string,
+  personId: number
+): Promise<PipedriveAPIResponse<IPipedriveDeal[]>> => {
+  return await pipedriveGet(
+    client,
+    orgName,
+    `deals?person_id=${personId}&&api_token=__api_key__`
+  );
+};
+
+const getOrganizationsById = async (
+  client: IDeskproClient,
+  orgName: string,
+  orgId: number
+): Promise<PipedriveAPIResponse<IPipedriveOrganization>> => {
+  return await pipedriveGet(
+    client,
+    orgName,
+    `organizations/${orgId}?api_token=__api_key__`
+  );
+};
+
+const getNotes = async (
+  client: IDeskproClient,
+  orgName: string,
+  personId: number
+): Promise<PipedriveAPIResponse<IPipedriveNote[]>> => {
+  return await pipedriveGet(
+    client,
+    orgName,
+    `notes?person_id=${personId}&api_token=__api_key__`
+  );
+};
+
+const getActivitiesByUserId = async (
+  client: IDeskproClient,
+  orgName: string,
+  userId: number
+): Promise<PipedriveAPIResponse<IPipedriveActivity[]>> => {
+  return await pipedriveGet(
+    client,
+    orgName,
+    `activities?user_id=${userId}&api_token=__api_key__`
+  );
+};
+
+const createContact = async (
+  client: IDeskproClient,
+  orgName: string,
+  data: ICreateContact
+) => {
   const pFetch = await proxyFetch(client);
 
   const response = await pFetch(
@@ -65,7 +158,11 @@ const createContact = async (client: IDeskproClient, data: ICreateContact) => {
   }
 };
 
-const createUser = async (client: IDeskproClient, user: IPipedriveUser) => {
+const createUser = async (
+  client: IDeskproClient,
+  orgName: string,
+  user: IPipedriveContact
+) => {
   const pFetch = await proxyFetch(client);
 
   const response = await pFetch(
@@ -89,11 +186,15 @@ const createUser = async (client: IDeskproClient, user: IPipedriveUser) => {
 };
 
 export {
+  getNotes,
+  getActivitiesByUserId,
   getContactById,
+  getDeals,
   getContactByPrompt,
   getUserDataPipedrive,
   getUserListPipedrive,
-  getOrganizations,
+  getOrganizationsByUserId,
+  getOrganizationsById,
   createContact,
   getUserById,
   createUser,

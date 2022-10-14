@@ -13,20 +13,21 @@ export const AddContact = () => {
   const { client } = useDeskproAppClient();
 
   const postContact = async (event: React.FormEvent<HTMLFormElement>) => {
+    const { name, primary_email } = event.target as unknown as ICreateContact;
     if (!client) return;
     event;
-    const pipedriveUser = {
-      name: "",
-      primary_email: "string",
+    const pipedriveContact = {
+      name,
+      primary_email,
       phone: "string",
       owner_id: "number",
       org_id: "number",
     } as ICreateContact; // use event.target.value to get the values from the form
 
-    await createContact(client, pipedriveUser);
+    //await createContact(client, pipedriveUser);
   };
 
-  const css = {
+  const themes = {
     stackStyles: {
       marginTop: "5px",
       color: "#8B9293",
@@ -37,35 +38,41 @@ export const AddContact = () => {
     <Stack>
       <Stack vertical gap={10}>
         <form onSubmit={(e) => postContact(e)}>
-          <Stack style={css.stackStyles} vertical>
+          <Stack style={themes.stackStyles} vertical>
             <H1>Name</H1>
-            <Input required variant="inline" placeholder="Name" type="text" />
+            <Input
+              required
+              variant="inline"
+              name="namee"
+              placeholder="Name"
+              type="text"
+            />
           </Stack>
-          <Stack vertical style={css.stackStyles}>
+          <Stack vertical style={themes.stackStyles}>
             <H1>Organization</H1>
             <Input variant="inline" placeholder="Name" type="text" />
           </Stack>
-          <Stack vertical style={css.stackStyles}>
+          <Stack vertical style={themes.stackStyles}>
             <H1>Label</H1>
             <Input variant="inline" placeholder="Name" type="text" />
           </Stack>
-          <Stack vertical style={css.stackStyles}>
+          <Stack vertical style={themes.stackStyles}>
             <H1>Phone number</H1>
             <Input variant="inline" placeholder="Name" type="text" />
           </Stack>
-          <Stack vertical style={css.stackStyles}>
+          <Stack vertical style={themes.stackStyles}>
             <H1>Email</H1>
             <Input variant="inline" placeholder="Name" type="text" />
           </Stack>
-          <Stack vertical style={css.stackStyles}>
+          <Stack vertical style={themes.stackStyles}>
             <H1>Owner</H1>
             <Input variant="inline" placeholder="Name" type="text" />
           </Stack>
-          <Stack vertical style={css.stackStyles}>
+          <Stack vertical style={themes.stackStyles}>
             <H1>Job title</H1>
             <Input variant="inline" placeholder="Name" type="text" />
           </Stack>
-          <Stack vertical style={css.stackStyles}>
+          <Stack vertical style={themes.stackStyles}>
             <H1>Visible to</H1>
             <Input variant="inline" placeholder="Name" type="text" />
           </Stack>

@@ -32,7 +32,7 @@
       "description": "The domain of your Pipedrive instance",
       "type": "string",
       "isRequired": true,
-      "isBackendOnly": true
+      "isBackendOnly": false
     }
   },
   "proxy": {

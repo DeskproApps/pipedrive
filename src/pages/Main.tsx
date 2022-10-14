@@ -1,63 +1,52 @@
-import { H1, useInitialisedDeskproAppClient } from "@deskpro/app-sdk";
+import {
+  H1,
+  HorizontalDivider,
+  IDeskproClient,
+  Stack,
+  useDeskproAppClient,
+  useDeskproAppEvents,
+  useInitialisedDeskproAppClient,
+} from "@deskpro/app-sdk";
+import { Property } from "../components/Property";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { getContactById } from "../api/api";
+
+import {
+  getContactById,
+  getContactByPrompt,
+  getOrganizationsById,
+} from "../api/api";
 import { useUser } from "../context/userContext";
-import { IPipedriveUser } from "../types/pipedriveUser";
+import { IPipedriveContact } from "../types/pipedriveContact";
+import { IPipedriveOrganization } from "../types/pipedriveOrganization";
+import { DealsMainView } from "../components/DealsMainView";
+import { ActivitiesMainView } from "../components/ActivitiesMainView";
+import { NotesMainView } from "../components/NotesMainView";
+import { LogoAndLinkButton } from "../components/LogoAndLinkButton";
 
 export const Main = () => {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [pipedriveUser, setPipedriveUser] = useState<IPipedriveUser | null>(
-    null
-  );
+  const { client } = useDeskproAppClient();
+
+  const [pipedriveContact, setPipedriveContact] =
+    useState<IPipedriveContact | null>(null);
+  const [organization, setOrganization] =
+    useState<IPipedriveOrganization | null>(null);
 
   const navigate = useNavigate();
 
-  useInitialisedDeskproAppClient((client) => {
-    client.setTitle("Home");
-
-    client.registerElement("pipedriveHomeButton", {
-      type: "home_button",
-      payload: {
-        type: "changePage",
-        page: "/",
-      },
-    });
-    client.registerElement("pipedriveRefreshButton", {
-      type: "refresh_button",
-    });
-    client.registerElement("pipedriveMenuButton", {
-      type: "menu",
-      items: [
-        {
-          title: "Contacts",
-          payload: {
-            type: "changePage",
-            page: "/",
-          },
-        },
-      ],
-    });
-  });
-
   const deskproUser = useUser();
 
-  useInitialisedDeskproAppClient(
-    async (client) => {
-      if (!deskproUser) return;
-      const id = (
-        await client
-          .getEntityAssociation("linkedPipedriveContacts", deskproUser.id)
-          .list()
-      )[0];
+  const getPipedriveContact = async (client: IDeskproClient) => {
+    if (!deskproUser) return;
 
-      if (!id) {
-        navigate("/contacts");
+    const id = (
+      await client
+        .getEntityAssociation("linkedPipedriveContacts", deskproUser.id)
+        .list()
+    )[0];
 
-        return;
-      }
-
-      const contact = await getContactById(client, id);
+    if (id) {
+      const contact = await getContactById(client, deskproUser.orgName, id);
 
       if (!contact.success) {
         await client
@@ -72,12 +61,182 @@ export const Main = () => {
         return;
       }
 
-      setPipedriveUser(contact.data);
+      setPipedriveContact(contact.data);
 
-      if (!id) return;
+      return;
+    }
+
+    const pipedriveContactFromPrompt = await getContactByPrompt(
+      client,
+      deskproUser.orgName,
+      deskproUser.primaryEmail
+    );
+
+    if (!pipedriveContactFromPrompt.success) {
+      navigate("/contacts");
+
+      return;
+    }
+
+    const pipedriveContact = await getContactById(
+      client,
+      deskproUser.orgName,
+      pipedriveContactFromPrompt.data.items[0]?.item.id ?? null
+    );
+
+    if (!pipedriveContact.success) {
+      navigate("/contacts");
+
+      return;
+    }
+
+    await client
+      .getEntityAssociation("linkedPipedriveContacts", deskproUser.id)
+      .set(pipedriveContact.data.id.toString());
+
+    setPipedriveContact(pipedriveContact.data);
+
+    return;
+  };
+
+  const getPipedriveOrganization = async (client: IDeskproClient) => {
+    if (!pipedriveContact || !deskproUser) return;
+
+    const pipedriveOrganization = await getOrganizationsById(
+      client,
+      deskproUser.orgName,
+      pipedriveContact.org_id.value
+    );
+
+    if (!pipedriveOrganization.success) return;
+
+    setOrganization(pipedriveOrganization.data);
+  };
+
+  useInitialisedDeskproAppClient((client) => {
+    client.setTitle("Home");
+
+    client.registerElement("pipedriveHomeButton", {
+      type: "home_button",
+    });
+    client.registerElement("pipedriveRefreshButton", {
+      type: "refresh_button",
+    });
+    client.registerElement("pipedriveMenuButton", {
+      type: "menu",
+      items: [
+        {
+          title: "Unlink contact",
+          payload: {
+            type: "changePage",
+            page: "/",
+          },
+        },
+      ],
+    });
+  });
+
+  useDeskproAppEvents(
+    {
+      async onElementEvent(id) {
+        switch (id) {
+          case "pipedriveHomeButton": {
+            navigate("/");
+
+            break;
+          }
+          case "pipedriveMenuButton": {
+            if (!client || !deskproUser) return;
+            const id = (
+              await client
+                .getEntityAssociation("linkedPipedriveContacts", deskproUser.id)
+                .list()
+            )[0];
+
+            await client
+              .getEntityAssociation("linkedPipedriveContacts", deskproUser.id)
+              .delete(id);
+            navigate("/contacts");
+
+            break;
+          }
+        }
+      },
     },
+    [client, deskproUser]
+  );
+
+  useInitialisedDeskproAppClient(
+    async (client) => {
+      if (!deskproUser) return;
+
+      await getPipedriveContact(client);
+    },
+
     [deskproUser]
   );
 
-  return <H1>Home page with user data</H1>;
+  useInitialisedDeskproAppClient(
+    async (client) => {
+      await getPipedriveOrganization(client);
+    },
+
+    [pipedriveContact]
+  );
+
+  return (
+    <Stack vertical>
+      <Stack vertical style={{ width: "100%" }}>
+        {pipedriveContact?.name && (
+          <Stack
+            style={{
+              width: "100%",
+              alignItems: "center",
+              justifyContent: "space-between",
+            }}
+          >
+            <H1>{pipedriveContact?.name}</H1>
+            <LogoAndLinkButton endpoint={`person/${pipedriveContact?.id}`} />
+          </Stack>
+        )}
+        <Stack
+          style={{ marginTop: "10px", marginBottom: "10px", width: "100%" }}
+          vertical
+          gap={10}
+        >
+          {pipedriveContact?.primary_email && (
+            <Property title="Email">{pipedriveContact.primary_email}</Property>
+          )}
+          {pipedriveContact?.phone[0].value && (
+            <Property title="Phone">{pipedriveContact.phone[0].value}</Property>
+          )}
+          {organization?.owner_name && (
+            <Property title="Owner">{organization.owner_name}</Property>
+          )}
+          {organization?.name && (
+            <Property title="Organization">{organization.name}</Property>
+          )}
+        </Stack>
+      </Stack>
+      <HorizontalDivider
+        style={{ width: "110%", color: "#EFF0F0", marginLeft: "-10px" }}
+      />
+      {pipedriveContact && deskproUser && (
+        <div style={{ width: "100%" }}>
+          <DealsMainView
+            contact={pipedriveContact}
+            orgName={deskproUser?.orgName}
+          />
+          <ActivitiesMainView
+            contact={pipedriveContact}
+            orgName={deskproUser?.orgName}
+          />
+          <NotesMainView
+            contact={pipedriveContact}
+            orgName={deskproUser?.orgName}
+          />
+        </div>
+      )}
+    </Stack>
+  );
 };

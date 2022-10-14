@@ -1,5 +1,6 @@
 import {
   Button,
+  HorizontalDivider,
   Input,
   Label,
   Radio,
@@ -9,36 +10,46 @@ import {
   useInitialisedDeskproAppClient,
 } from "@deskpro/app-sdk";
 import { useState } from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faArrowUpRightFromSquare,
-  faMagnifyingGlass,
-} from "@fortawesome/free-solid-svg-icons";
+
+import { faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
 
 import { getContactByPrompt } from "../api/api";
 import { useUser } from "../context/userContext";
-import { IPipedriveUser } from "../types/pipedriveUser";
+import { IPipedriveContact } from "../types/pipedriveContact";
 import useDebounce from "../utils/debounce";
+import { useNavigate } from "react-router-dom";
 
 export const FindContact = () => {
   const { client } = useDeskproAppClient();
 
+  const navigate = useNavigate();
+
   const [selectedContact, setSelectedContact] = useState<string>("");
   const [loading, setLoading] = useState(false);
-  const [contacts, setContacts] = useState<IPipedriveUser[]>([]);
+  const [contacts, setContacts] = useState<IPipedriveContact[]>([]);
   const [inputText, setInputText] = useState<string>("");
   const { debouncedValue } = useDebounce(inputText, 300);
   const deskproUser = useUser();
 
   useInitialisedDeskproAppClient(
     async (client) => {
+      if (!deskproUser) return;
+
       if (debouncedValue.length > 1) {
         setLoading(true);
-        const pipedriveUsers = await getContactByPrompt(client, inputText);
+
+        const pipedriveUsers = await getContactByPrompt(
+          client,
+          deskproUser?.orgName,
+          inputText
+        );
 
         setContacts(
-          pipedriveUsers.data.items.map((e: { item: IPipedriveUser }) => e.item)
+          pipedriveUsers.data.items.map(
+            (e: { item: IPipedriveContact }) => e.item
+          )
         );
+
         setLoading(false);
       }
     },
@@ -61,6 +72,7 @@ export const FindContact = () => {
     await client
       ?.getEntityAssociation("linkedPipedriveContacts", deskproUser.id)
       .set(selectedContact);
+    navigate("/");
   };
 
   return (
@@ -72,72 +84,44 @@ export const FindContact = () => {
         type="text"
         leftIcon={faMagnifyingGlass}
       />
-      <Stack vertical style={{ marginTop: "5px" }}>
-        <Stack vertical style={{ width: "100%", marginBottom: "10px" }}>
+      <Stack vertical style={{ width: "100%" }}>
+        <Stack vertical style={{ width: "100%", marginBottom: "5px" }}>
           <Button
-            style={{ marginTop: "5px" }}
+            style={{ marginTop: "7px", marginBottom: "5px" }}
             text="Link Contact"
             onClick={() => linkContact()}
           ></Button>
-          <div
-            style={{
-              marginTop: "10px",
-              display: "block",
-              borderBottom: "0.5px solid #D3D6D7",
-              width: "130%",
-              marginLeft: "-5%",
-            }}
-          ></div>
+          <HorizontalDivider
+            style={{ width: "110%", color: "#EFF0F0", marginLeft: "-10px" }}
+          />
         </Stack>
         {loading ? (
-          <Spinner size="extra-large" />
+          <Stack style={{ margin: "auto" }}>
+            <Spinner size="extra-large" />
+          </Stack>
         ) : (
           contacts.map((contact, i) => (
             <div style={{ width: "100%" }} key={i}>
-              <Stack>
+              <Stack style={{ justifyContent: "space-between" }}>
                 <Stack vertical justify="start" key={i}>
                   <Radio
                     label={contact.name}
                     id={"option4"}
                     style={{ color: "#3A8DDE" }}
                     name={"sbtest"}
-                    checked={selectedContact === contact.id}
-                    onChange={() => setSelectedContact(contact.id)}
+                    checked={selectedContact === contact.id.toString()}
+                    onChange={() => setSelectedContact(contact.id.toString())}
                   />
                   <Label
                     style={{ marginLeft: "20px" }}
                     label={contact.primary_email}
                   ></Label>
                 </Stack>
-                <Stack
-                  style={{
-                    backgroundColor: "#EFF0F0",
-                    borderRadius: "10px",
-                    padding: "5px",
-                    alignSelf: "flex-end",
-                    marginLeft: "10px",
-                  }}
-                >
-                  <img
-                    src="../../icon.svg"
-                    style={{ width: "16px", alignSelf: "center" }}
-                    alt=""
-                  />
-                  <FontAwesomeIcon
-                    icon={faArrowUpRightFromSquare}
-                    style={{ marginLeft: "10px", alignSelf: "center" }}
-                  ></FontAwesomeIcon>
-                </Stack>
+                {/* <LogoAndLinkButton endpoint={``} /> */}
               </Stack>
-              <div
-                style={{
-                  marginTop: "5px",
-                  display: "block",
-                  borderBottom: "0.5px solid #D3D6D7",
-                  width: "105%",
-                  marginBottom: "5px",
-                }}
-              ></div>
+              <HorizontalDivider
+                style={{ width: "110%", color: "#EFF0F0", marginLeft: "-10px" }}
+              />
             </div>
           ))
         )}
