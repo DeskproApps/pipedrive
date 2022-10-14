@@ -1,10 +1,10 @@
 # Pipedrive App Setup
 
-To install the Pipedrive app you must copy your personal API token, which should be available on https://deskpro.pipedrive.com/settings/api.
+To install the Pipedrive app you must copy your personal API token, which should be available on https://mycompany.pipedrive.com/settings/api, where mycompany is the company name found in your pipedrive URL.
 
 [![](/docs/assets/setup/pipedriveApiPage.png)](/docs/assets/setup/pipedriveApiPage.png)
 
-After that, head back to Despro and navigate to the "Settings" tab of the Pipedrive app.
+After that, head back to Deskpro and navigate to the "Settings" tab of the Pipedrive app.
 
 [![](/docs/assets/setup/deskproPipedriveSecretPage.png)](/docs/assets/setup/deskproPipedriveSecretPage.png)
 
