@@ -43,7 +43,7 @@ export const AddContact = () => {
     []
   );
   const [users, setUsers] = useState<IPipedriveUser[]>([]);
-  const [selectedOrg, setSelectedOrg] = useState<number>(0);
+  const [selectedOrg, setSelectedOrg] = useState<Status | null>(null);
   const [selectedUser, setSelectedUser] = useState<Status | null>(null);
   const [selectedVisibility, setSelectedVisibility] = useState<number>(0);
 
@@ -80,16 +80,14 @@ export const AddContact = () => {
       value: org.id,
       type: "value" as const,
     }));
-  }, [organizations]);
+  }, [organizations]) as any;
 
-  const userOptions = useMemo(() => {
-    return users.map((user) => ({
-      key: user.name,
-      label: <Label label={user.name}></Label>,
-      value: user.id,
-      type: "value" as const,
-    }));
-  }, [users]);
+  const userOptions: Status[] = users.map((user) => ({
+    key: user.name,
+    label: <Label label={user.name}></Label>,
+    value: user.id.toString(),
+    type: "value" as const,
+  }));
 
   const themes = {
     stackStyles: {
@@ -114,7 +112,7 @@ export const AddContact = () => {
           </Stack>
           <Stack vertical style={themes.stackStyles}>
             <H1>Organization</H1>
-            <Dropdown
+            <Dropdown<Status, HTMLDivElement>
               placement="bottom-start"
               options={orgOptions}
               fetchMoreText={"Fetch more"}
@@ -122,7 +120,7 @@ export const AddContact = () => {
               selectedIcon={faCheck}
               externalLinkIcon={faExternalLinkAlt}
               onSelectOption={(option) => {
-                setSelectedOrg(option);
+                setSelectedOrg(option.value);
               }}
             >
               {({
