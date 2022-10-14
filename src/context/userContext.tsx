@@ -15,6 +15,8 @@ export const UserContextProvider: React.FC = ({ children }) => {
       const data = c?.data;
 
       if (data?.user) {
+        data.user.orgName = c.settings.instance_domain;
+
         setUser(data.user);
       }
     },

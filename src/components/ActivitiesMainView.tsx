@@ -1,39 +1,48 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import {
   HorizontalDivider,
-  Property,
   Stack,
   useInitialisedDeskproAppClient,
   VerticalDivider,
 } from "@deskpro/app-sdk";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
+import { Property } from "./Property";
 
 import { LogoAndLinkButton } from "./LogoAndLinkButton";
 import { IPipedriveActivity } from "../types/pipedriveActivity";
 import { useState } from "react";
 import { getActivitiesByUserId } from "../api/api";
+import { IPipedriveContact } from "../types/pipedriveContact";
 
 export const ActivitiesMainView = ({
-  userId,
-  personId,
+  contact,
+  orgName,
 }: {
-  userId: number;
-  personId: number;
+  contact: IPipedriveContact;
+  orgName: string;
 }) => {
   const [activities, setActivities] = useState<IPipedriveActivity[]>([]);
 
   useInitialisedDeskproAppClient(
     async (client) => {
-      if (!userId || !personId) return;
+      if (!contact.owner_id.id || !contact.id) return;
 
-      const activitiesReq = await getActivitiesByUserId(client, userId);
+      const activitiesReq = await getActivitiesByUserId(
+        client,
+        orgName,
+        contact.owner_id.id
+      );
 
       if (!activitiesReq.success) return;
 
-      setActivities(activitiesReq.data.filter((e) => e.person_id === personId));
+      setActivities(
+        activitiesReq.data.filter((e) => e.person_id === contact.id)
+      );
     },
-    [userId, personId]
+    [contact]
   );
+
   return (
     <Stack vertical style={{ width: "100%" }}>
       <Stack
@@ -47,14 +56,15 @@ export const ActivitiesMainView = ({
           <h1 style={{ alignSelf: "center", fontSize: "12px" }}>
             Activities ({activities.length})
           </h1>
-          <FontAwesomeIcon
+          {/* <FontAwesomeIcon
             icon={faPlus}
             style={{ alignSelf: "center", width: "12px", marginLeft: "5px" }}
-          ></FontAwesomeIcon>
+          ></FontAwesomeIcon> */}
         </Stack>
       </Stack>
       <Stack vertical style={{ width: "100%" }}>
         {activities.map((activity, i) => {
+          const date = new Date(activity.due_date);
           return (
             <Stack
               key={i}
@@ -70,15 +80,22 @@ export const ActivitiesMainView = ({
                 }}
               >
                 <h1 style={{ fontSize: "12px" }}>{activity.note}</h1>
-                <LogoAndLinkButton />
+                <LogoAndLinkButton
+                  endpoint={`activities/list/user/${contact.owner_id.id}`}
+                />
               </Stack>
               <Stack>
-                <Property title="Type">{activity.type}</Property>
+                <Property title="Type">
+                  {activity.type.charAt(0).toUpperCase() +
+                    activity.type.slice(1)}
+                </Property>
                 <Stack style={{ marginLeft: "40px" }}>
                   <VerticalDivider
-                    style={{ height: "30px", width: "1px", color: "#EFF0F0" }}
+                    style={{ height: "35px", width: "1px", color: "#EFF0F0" }}
                   ></VerticalDivider>
-                  <Property title="Date">{activity.note}</Property>
+                  <Property title="Date">{`${date.getDay()} ${date
+                    .toLocaleString("default", { month: "long" })
+                    .slice(0, 3)}, ${date.getFullYear()}`}</Property>
                 </Stack>
               </Stack>
               <HorizontalDivider

@@ -2,12 +2,12 @@ import {
   H1,
   HorizontalDivider,
   IDeskproClient,
-  Property,
   Stack,
   useDeskproAppClient,
   useDeskproAppEvents,
   useInitialisedDeskproAppClient,
 } from "@deskpro/app-sdk";
+import { Property } from "../components/Property";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -22,6 +22,7 @@ import { IPipedriveOrganization } from "../types/pipedriveOrganization";
 import { DealsMainView } from "../components/DealsMainView";
 import { ActivitiesMainView } from "../components/ActivitiesMainView";
 import { NotesMainView } from "../components/NotesMainView";
+import { LogoAndLinkButton } from "../components/LogoAndLinkButton";
 
 export const Main = () => {
   const { client } = useDeskproAppClient();
@@ -45,7 +46,7 @@ export const Main = () => {
     )[0];
 
     if (id) {
-      const contact = await getContactById(client, id);
+      const contact = await getContactById(client, deskproUser.orgName, id);
 
       if (!contact.success) {
         await client
@@ -67,6 +68,7 @@ export const Main = () => {
 
     const pipedriveContactFromPrompt = await getContactByPrompt(
       client,
+      deskproUser.orgName,
       deskproUser.primaryEmail
     );
 
@@ -78,6 +80,7 @@ export const Main = () => {
 
     const pipedriveContact = await getContactById(
       client,
+      deskproUser.orgName,
       pipedriveContactFromPrompt.data.items[0]?.item.id ?? null
     );
 
@@ -97,10 +100,11 @@ export const Main = () => {
   };
 
   const getPipedriveOrganization = async (client: IDeskproClient) => {
-    if (!pipedriveContact) return;
+    if (!pipedriveContact || !deskproUser) return;
 
     const pipedriveOrganization = await getOrganizationsById(
       client,
+      deskproUser.orgName,
       pipedriveContact.org_id.value
     );
 
@@ -181,11 +185,20 @@ export const Main = () => {
   );
 
   return (
-    <Stack vertical style={{ marginBottom: "300px" }}>
-      <Stack vertical>
-        <Stack>
-          <H1>{pipedriveContact?.name}</H1>
-        </Stack>
+    <Stack vertical>
+      <Stack vertical style={{ width: "100%" }}>
+        {pipedriveContact?.name && (
+          <Stack
+            style={{
+              width: "100%",
+              alignItems: "center",
+              justifyContent: "space-between",
+            }}
+          >
+            <H1>{pipedriveContact?.name}</H1>
+            <LogoAndLinkButton endpoint={`person/${pipedriveContact?.id}`} />
+          </Stack>
+        )}
         <Stack
           style={{ marginTop: "10px", marginBottom: "10px", width: "100%" }}
           vertical
@@ -197,40 +210,30 @@ export const Main = () => {
           {pipedriveContact?.phone[0].value && (
             <Property title="Phone">{pipedriveContact.phone[0].value}</Property>
           )}
-          <HorizontalDivider
-            style={{ width: "110%", color: "#EFF0F0", marginLeft: "-10px" }}
-          />
-        </Stack>
-      </Stack>
-      {organization?.name && (
-        <H1 style={{ fontSize: "30px" }}>{organization?.name}</H1>
-      )}
-      {organization && (
-        <Stack style={{ marginTop: "10px", width: "100%" }} vertical gap={10}>
-          {organization.owner_name && (
+          {organization?.owner_name && (
             <Property title="Owner">{organization.owner_name}</Property>
           )}
-          {organization.people_count && (
-            <Property title="Employees">{organization.people_count}</Property>
+          {organization?.name && (
+            <Property title="Organization">{organization.name}</Property>
           )}
-          <HorizontalDivider
-            style={{ width: "110%", color: "#EFF0F0", marginLeft: "-10px" }}
-          />
         </Stack>
-      )}
-      {pipedriveContact && (
+      </Stack>
+      <HorizontalDivider
+        style={{ width: "110%", color: "#EFF0F0", marginLeft: "-10px" }}
+      />
+      {pipedriveContact && deskproUser && (
         <div style={{ width: "100%" }}>
           <DealsMainView
-            userId={pipedriveContact?.owner_id.id}
-            personId={pipedriveContact?.id}
+            contact={pipedriveContact}
+            orgName={deskproUser?.orgName}
           />
           <ActivitiesMainView
-            userId={pipedriveContact?.owner_id.id}
-            personId={pipedriveContact?.id}
+            contact={pipedriveContact}
+            orgName={deskproUser?.orgName}
           />
           <NotesMainView
-            userId={pipedriveContact?.owner_id.id}
-            personId={pipedriveContact?.id}
+            contact={pipedriveContact}
+            orgName={deskproUser?.orgName}
           />
         </div>
       )}

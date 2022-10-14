@@ -1,5 +1,7 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import {
   H1,
+  H2,
   HorizontalDivider,
   Stack,
   useInitialisedDeskproAppClient,
@@ -12,27 +14,28 @@ import { LogoAndLinkButton } from "./LogoAndLinkButton";
 import { useState } from "react";
 import { IPipedriveDeal } from "../types/pipedriveDeal";
 import { getDeals } from "../api/api";
+import { IPipedriveContact } from "../types/pipedriveContact";
 
 export const DealsMainView = ({
-  userId,
-  personId,
+  contact,
+  orgName,
 }: {
-  userId: number;
-  personId: number;
+  contact: IPipedriveContact;
+  orgName: string;
 }) => {
   const [deals, setDeals] = useState<IPipedriveDeal[]>([]);
 
   useInitialisedDeskproAppClient(
     async (client) => {
-      if (!userId || !personId) return;
+      if (!contact.owner_id.id || !contact.id) return;
 
-      const dealsReq = await getDeals(client, userId);
+      const dealsReq = await getDeals(client, orgName, contact.owner_id.id);
 
       if (!dealsReq.success) return;
 
-      setDeals(dealsReq.data.filter((e) => e.person_id.value === personId));
+      setDeals(dealsReq.data.filter((e) => e.person_id.value === contact.id));
     },
-    [userId, personId]
+    [contact]
   );
 
   return (
@@ -44,14 +47,14 @@ export const DealsMainView = ({
           justifyContent: "space-between",
         }}
       >
-        <Stack gap={"2px"} style={{ alignItems: "center" }}>
+        <Stack gap={2} style={{ alignItems: "center" }}>
           <h1 style={{ fontSize: "12px" }}>Deals ({deals.length})</h1>
-          <FontAwesomeIcon
+          {/* <FontAwesomeIcon
             icon={faPlus}
             style={{ width: "12px", marginLeft: "5px" }}
-          ></FontAwesomeIcon>
+          ></FontAwesomeIcon> */}
         </Stack>
-        <LogoAndLinkButton />
+        <LogoAndLinkButton endpoint={`deals/user/${contact.owner_id.id}`} />
       </Stack>
       <Stack vertical style={{ width: "100%" }}>
         {deals.map((deal, i) => {
@@ -69,18 +72,18 @@ export const DealsMainView = ({
                   justifyContent: "space-between",
                 }}
               >
-                <h1 style={{ color: "#3A8DDE", fontSize: "12px" }}>
+                <h1 style={{ color: "#4C4F50", fontSize: "12px" }}>
                   {deal.title}
                 </h1>
-                <LogoAndLinkButton />
+                <LogoAndLinkButton endpoint={`deal/${deal.id}`} />
               </Stack>
               <Stack>
-                <H1>{deal.add_time.split(" ")[0]}</H1>
+                <H2 style={{ color: "blue" }}>{deal.add_time.split(" ")[0]}</H2>
                 <Stack style={{ marginLeft: "40px" }}>
                   <VerticalDivider
-                    style={{ height: "10px", width: "1px", color: "#EFF0F0" }}
+                    style={{ height: "15px", width: "1px", color: "#EFF0F0" }}
                   ></VerticalDivider>
-                  <H1>{deal.formatted_weighted_value}</H1>
+                  <H2>{deal.formatted_weighted_value}</H2>
                 </Stack>
               </Stack>
               <HorizontalDivider

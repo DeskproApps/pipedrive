@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import {
   H1,
   H2,
@@ -5,9 +6,7 @@ import {
   Stack,
   useInitialisedDeskproAppClient,
 } from "@deskpro/app-sdk";
-
 import { Avatar } from "@deskpro/deskpro-ui";
-
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
 
@@ -16,27 +15,28 @@ import { IPipedriveNote } from "../types/pipedriveNote";
 import { useState } from "react";
 import { getNotes } from "../api/api";
 import { timeSince } from "../utils/utils";
+import { IPipedriveContact } from "../types/pipedriveContact";
 
 export const NotesMainView = ({
-  userId,
-  personId,
+  contact,
+  orgName,
 }: {
-  userId: number;
-  personId: number;
+  contact: IPipedriveContact;
+  orgName: string;
 }) => {
   const [notes, setNotes] = useState<IPipedriveNote[]>([]);
 
   useInitialisedDeskproAppClient(
     async (client) => {
-      if (!userId || !personId) return;
+      if (!contact.owner_id.id || !contact.id) return;
 
-      const notesReq = await getNotes(client, personId);
+      const notesReq = await getNotes(client, orgName, contact.id);
 
       if (!notesReq.success) return;
 
-      setNotes(notesReq.data.filter((e) => e.person_id === personId));
+      setNotes(notesReq?.data?.filter((e) => e.person_id === contact.id) || []);
     },
-    [userId, personId]
+    [contact]
   );
 
   return (
@@ -50,10 +50,10 @@ export const NotesMainView = ({
       >
         <Stack gap={"2px"} style={{ alignItems: "center" }}>
           <h1 style={{ fontSize: "12px" }}>Notes ({notes.length})</h1>
-          <FontAwesomeIcon
+          {/* <FontAwesomeIcon
             icon={faPlus}
             style={{ width: "12px", marginLeft: "5px" }}
-          ></FontAwesomeIcon>
+          ></FontAwesomeIcon> */}
         </Stack>
       </Stack>
       <Stack vertical style={{ width: "100%" }}>
@@ -73,7 +73,7 @@ export const NotesMainView = ({
                 }}
               >
                 <H1>Note {++i}</H1>
-                <LogoAndLinkButton></LogoAndLinkButton>
+                <LogoAndLinkButton endpoint={`person/${contact.id}`} />
               </Stack>
               <Stack style={{ alignItems: "flex-start", marginTop: "10px" }}>
                 <Stack

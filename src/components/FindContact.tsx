@@ -17,7 +17,6 @@ import { getContactByPrompt } from "../api/api";
 import { useUser } from "../context/userContext";
 import { IPipedriveContact } from "../types/pipedriveContact";
 import useDebounce from "../utils/debounce";
-import { LogoAndLinkButton } from "./LogoAndLinkButton";
 import { useNavigate } from "react-router-dom";
 
 export const FindContact = () => {
@@ -34,15 +33,23 @@ export const FindContact = () => {
 
   useInitialisedDeskproAppClient(
     async (client) => {
+      if (!deskproUser) return;
+
       if (debouncedValue.length > 1) {
         setLoading(true);
-        const pipedriveUsers = await getContactByPrompt(client, inputText);
+
+        const pipedriveUsers = await getContactByPrompt(
+          client,
+          deskproUser?.orgName,
+          inputText
+        );
 
         setContacts(
           pipedriveUsers.data.items.map(
             (e: { item: IPipedriveContact }) => e.item
           )
         );
+
         setLoading(false);
       }
     },
@@ -110,7 +117,7 @@ export const FindContact = () => {
                     label={contact.primary_email}
                   ></Label>
                 </Stack>
-                <LogoAndLinkButton />
+                {/* <LogoAndLinkButton endpoint={``} /> */}
               </Stack>
               <HorizontalDivider
                 style={{ width: "110%", color: "#EFF0F0", marginLeft: "-10px" }}

@@ -4,6 +4,7 @@ export default interface IDeskproUser {
   id: string;
   lastName: string;
   primaryEmail: string;
+  orgName: string;
   ticket: {
     id: string;
   };

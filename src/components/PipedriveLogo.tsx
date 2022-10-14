@@ -2,8 +2,8 @@ export const PipedriveLogo = () => (
   <svg
     version="1.0"
     xmlns="http://www.w3.org/2000/svg"
-    width="12.000000pt"
-    height="12.000000pt"
+    width="11.000000pt"
+    height="11.000000pt"
     viewBox="0 0 20.000000 20.000000"
     preserveAspectRatio="xMidYMid meet"
     style={{ alignSelf: "center" }}
