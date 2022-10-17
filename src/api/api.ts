@@ -8,6 +8,8 @@ import { IPipedriveDeal } from "../types/pipedrive/pipedriveDeal";
 import { IPipedriveActivity } from "../types/pipedrive/pipedriveActivity";
 import { IPipedriveNote } from "../types/pipedrive/pipedriveNote";
 import { IPipedriveUser } from "../types/pipedrive/pipedriveUser";
+import { IPipedrivePipeline } from "../types/pipedrive/pipedrivePipeline";
+import { IPipedriveStage } from "../types/pipedrive/pipedriveStage";
 
 const pipedriveGet = async (
   client: IDeskproClient,
@@ -176,6 +178,42 @@ const createContact = async (
   return response.json();
 };
 
+const getDealById = async (
+  client: IDeskproClient,
+  orgName: string,
+  dealId: number
+): Promise<PipedriveAPIResponse<IPipedriveDeal>> => {
+  return await pipedriveGet(
+    client,
+    orgName,
+    `deals/${dealId}?api_token=__api_key__`
+  );
+};
+
+const getPipelineById = async (
+  client: IDeskproClient,
+  orgName: string,
+  pipelineId: number
+): Promise<PipedriveAPIResponse<IPipedrivePipeline>> => {
+  return await pipedriveGet(
+    client,
+    orgName,
+    `pipelines/${pipelineId}?api_token=__api_key__`
+  );
+};
+
+const getStageById = async (
+  client: IDeskproClient,
+  orgName: string,
+  stageId: number
+): Promise<PipedriveAPIResponse<IPipedriveStage>> => {
+  return await pipedriveGet(
+    client,
+    orgName,
+    `stages/${stageId}?api_token=__api_key__`
+  );
+};
+
 const createUser = async (
   client: IDeskproClient,
   orgName: string,
@@ -200,6 +238,9 @@ const createUser = async (
 };
 
 export {
+  getStageById,
+  getPipelineById,
+  getDealById,
   getAllUsers,
   getAllOrganizations,
   getNotes,
