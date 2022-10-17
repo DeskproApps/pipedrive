@@ -2,7 +2,7 @@
   "name": "@deskpro-apps/pipedrive_app",
   "title": "Pipedrive",
   "description": "This app allows you to interact with Pipedrive",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "scope": "agent",
   "isSingleInstall": false,
   "hasDevMode": true,

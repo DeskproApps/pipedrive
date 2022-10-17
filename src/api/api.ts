@@ -155,7 +155,7 @@ const createContact = async (
   client: IDeskproClient,
   orgName: string,
   data: ICreateContact
-) => {
+): Promise<PipedriveAPIResponse<IPipedriveContact>> => {
   const pFetch = await proxyFetch(client);
 
   const response = await pFetch(
@@ -169,9 +169,11 @@ const createContact = async (
     }
   );
 
-  if (response.status.toString().startsWith("2")) {
+  if (!response.status.toString().startsWith("2")) {
     throw new Error("Error creating contact");
   }
+
+  return response.json();
 };
 
 const createUser = async (

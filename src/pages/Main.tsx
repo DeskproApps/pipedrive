@@ -37,7 +37,7 @@ export const Main = () => {
   const deskproUser = useUser();
 
   const getPipedriveContact = async (client: IDeskproClient) => {
-    if (!deskproUser) return;
+    if (!deskproUser || !deskproUser.orgName) return;
 
     const id = (
       await client
@@ -72,7 +72,10 @@ export const Main = () => {
       deskproUser.primaryEmail
     );
 
-    if (!pipedriveContactFromPrompt.success) {
+    if (
+      !pipedriveContactFromPrompt.success ||
+      pipedriveContactFromPrompt.data.items.length === 0
+    ) {
       navigate("/contacts");
 
       return;

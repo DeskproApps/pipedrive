@@ -5,7 +5,7 @@ import {
 import { useState } from "react";
 import { faMagnifyingGlass, faPlus } from "@fortawesome/free-solid-svg-icons";
 
-import { AddContact } from "../components/AddContact";
+import { CreateContact } from "../components/CreateContact";
 import { FindContact } from "../components/FindContact";
 export const Contacts = () => {
   const [currentPage, setcurrentPage] = useState("Find Contact");
@@ -26,7 +26,7 @@ export const Contacts = () => {
         twoOnClick={() => setcurrentPage("Create Contact")}
       ></TwoButtonGroup>
 
-      {currentPage === "Find Contact" ? <FindContact /> : <AddContact />}
+      {currentPage === "Find Contact" ? <FindContact /> : <CreateContact />}
     </div>
   );
 };
