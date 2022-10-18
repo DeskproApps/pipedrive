@@ -13,7 +13,7 @@ import {
   useDeskproAppClient,
   useInitialisedDeskproAppClient,
 } from "@deskpro/app-sdk";
-import { useForm, SubmitHandler } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { useMemo, useState } from "react";
 import {
   faCheck,
@@ -32,13 +32,19 @@ import { useNavigate } from "react-router-dom";
 
 export const CreateContact = () => {
   const { client } = useDeskproAppClient();
+  const deskproUser = useUser();
 
   const {
     handleSubmit,
     register,
     formState: { errors },
     setError,
-  } = useForm<ICreateContact>();
+  } = useForm<ICreateContact>({
+    defaultValues: {
+      name: `${deskproUser?.firstName} ${deskproUser?.lastName}`,
+      email: deskproUser?.primaryEmail,
+    },
+  });
 
   const navigate = useNavigate();
 
@@ -50,16 +56,25 @@ export const CreateContact = () => {
   const [selectedUser, setSelectedUser] = useState<string | Status | null>(
     null
   );
-  const deskproUser = useUser();
 
   useInitialisedDeskproAppClient(
     async (client) => {
       if (!deskproUser) return;
       const orgs = await getAllOrganizations(client, deskproUser?.orgName);
 
-      setOrganizations(orgs.data);
+      if (!orgs.success) {
+        setOrganizations([]);
+      } else {
+        setOrganizations(orgs.data);
+      }
 
       const users = await getAllUsers(client, deskproUser.orgName);
+
+      if (!users.success) {
+        setUsers([]);
+      } else {
+        setUsers(users.data);
+      }
 
       setUsers(users.data);
     },

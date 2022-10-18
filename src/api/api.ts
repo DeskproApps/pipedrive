@@ -20,10 +20,6 @@ const pipedriveGet = async (
     `https://${orgName}.pipedrive.com/v1/${pathQuery}`
   );
 
-  if (!response.status.toString().startsWith("2")) {
-    throw new Error("Error getting " + pathQuery);
-  }
-
   return await response.json();
 };
 
