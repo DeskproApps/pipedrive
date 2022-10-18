@@ -3,6 +3,7 @@
   "title": "Pipedrive",
   "description": "This app allows you to interact with Pipedrive",
   "version": "1.0.1",
+  "description": "Integrate with with Pipedrive and view and update information from your CRM while in Deskpro tickets",
   "scope": "agent",
   "isSingleInstall": false,
   "hasDevMode": true,
@@ -28,8 +29,8 @@
       "isBackendOnly": true
     },
     "instance_domain": {
-      "title": "Instance Domain",
-      "description": "The domain of your Pipedrive instance",
+      "title": "Domain Prefix",
+      "description": "The domain of your Pipedrive company",
       "type": "string",
       "isRequired": true,
       "isBackendOnly": false
