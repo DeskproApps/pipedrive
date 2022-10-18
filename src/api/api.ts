@@ -18,9 +18,13 @@ const pipedriveGet = async (
 
   const response = await pFetch(
     `https://${orgName}.pipedrive.com/v1/${pathQuery}`
-  ).then((res) => res.json());
+  );
 
-  return response;
+  if (!response.status.toString().startsWith("2")) {
+    throw new Error("Error getting " + pathQuery);
+  }
+
+  return await response.json();
 };
 
 const getUserDataPipedrive = async (
