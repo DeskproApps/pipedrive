@@ -34,7 +34,7 @@ export const NotesMainView = ({
 
       if (!notesReq.success) return;
 
-      setNotes(notesReq?.data?.filter((e) => e.person_id === contact.id) || []);
+      setNotes(notesReq?.data?.filter((e) => e.person_id === contact.id) ?? []);
     },
     [contact]
   );

@@ -13,6 +13,7 @@ import { Main } from "./pages/Main";
 
 import { DealDetails } from "./pages/DealDetails";
 import { Redirect } from "./pages/Redirect";
+import { CreateDeal } from "./pages/CreateDeal";
 
 function App() {
   return (
@@ -23,6 +24,7 @@ function App() {
           <Route path="/dealdetails/:dealId" element={<DealDetails />}></Route>
           <Route path="/contacts" element={<Contacts />}></Route>
           <Route path="/redirect/" element={<Redirect />}></Route>
+          <Route path="/createdeal" element={<CreateDeal />}></Route>
         </Routes>
       </HashRouter>
     </DeskproAppProvider>

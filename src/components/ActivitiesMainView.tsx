@@ -35,7 +35,7 @@ export const ActivitiesMainView = ({
       if (!activitiesReq.success) return;
 
       setActivities(
-        activitiesReq.data.filter((e) => e.person_id === contact.id)
+        activitiesReq?.data?.filter((e) => e.person_id === contact.id) ?? []
       );
     },
     [contact]

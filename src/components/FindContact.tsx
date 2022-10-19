@@ -44,6 +44,14 @@ export const FindContact = () => {
           inputText
         );
 
+        if (!pipedriveUsers.success) {
+          setContacts([]);
+
+          setLoading(false);
+
+          return;
+        }
+
         setContacts(
           pipedriveUsers.data.items.map(
             (e: { item: IPipedriveContact }) => e.item

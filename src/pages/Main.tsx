@@ -12,8 +12,8 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import {
+  getContactByEmail,
   getContactById,
-  getContactByPrompt,
   getOrganizationsById,
 } from "../api/api";
 import { useUser } from "../context/userContext";
@@ -66,44 +66,25 @@ export const Main = () => {
       return;
     }
 
-    const pipedriveContactFromPrompt = await getContactByPrompt(
+    const contact = await getContactByEmail(
       client,
       deskproUser.orgName,
       deskproUser.primaryEmail
     );
 
-    if (
-      !pipedriveContactFromPrompt.success ||
-      pipedriveContactFromPrompt.data.items.length === 0
-    ) {
+    if (!contact) {
       navigate("/contacts");
 
       return;
     }
 
-    const pipedriveContact = await getContactById(
-      client,
-      deskproUser.orgName,
-      pipedriveContactFromPrompt.data.items[0]?.item.id ?? null
-    );
-
-    if (!pipedriveContact.success) {
-      navigate("/contacts");
-
-      return;
-    }
-
-    await client
-      .getEntityAssociation("linkedPipedriveContacts", deskproUser.id)
-      .set(pipedriveContact.data.id.toString());
-
-    setPipedriveContact(pipedriveContact.data);
+    setPipedriveContact(contact);
 
     return;
   };
 
   const getPipedriveOrganization = async (client: IDeskproClient) => {
-    if (!pipedriveContact || !deskproUser) return;
+    if (!pipedriveContact?.org_id || !deskproUser) return;
 
     const pipedriveOrganization = await getOrganizationsById(
       client,
