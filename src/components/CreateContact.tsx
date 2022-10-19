@@ -60,7 +60,7 @@ export const CreateContact = () => {
       setOrganizations(orgs.data ?? []);
 
       const users = await getAllUsers(client, deskproUser.orgName);
-      console.log(users);
+
       setUsers(users.data);
     },
     [deskproUser]
@@ -91,6 +91,10 @@ export const CreateContact = () => {
 
       return;
     }
+
+    await client
+      ?.getEntityAssociation("linkedPipedriveContacts", deskproUser.id)
+      .set(response.data.id.toString());
 
     navigate("/");
   };

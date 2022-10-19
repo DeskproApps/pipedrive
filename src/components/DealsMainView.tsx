@@ -76,7 +76,14 @@ export const DealsMainView = ({
                   justifyContent: "space-between",
                 }}
               >
-                <h1 style={{ color: "#4C4F50", fontSize: "12px" }}>
+                <h1
+                  style={{
+                    color: "#3A8DDE",
+                    fontSize: "12px",
+                    cursor: "pointer",
+                  }}
+                  onClick={() => navigate("/dealdetails/" + deal.id)}
+                >
                   {deal.title}
                 </h1>
                 <LogoAndLinkButton endpoint={`deal/${deal.id}`} />
@@ -87,7 +94,11 @@ export const DealsMainView = ({
                   <VerticalDivider
                     style={{ height: "15px", width: "1px", color: "#EFF0F0" }}
                   ></VerticalDivider>
-                  <H2>{deal.formatted_weighted_value}</H2>
+                  <H2>
+                    {Intl.NumberFormat("en-IN").format(deal.value) +
+                      " " +
+                      deal.currency}
+                  </H2>
                 </Stack>
               </Stack>
               <HorizontalDivider

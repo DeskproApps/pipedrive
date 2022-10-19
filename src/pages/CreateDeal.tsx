@@ -219,7 +219,17 @@ export const CreateDeal = () => {
   return (
     <form onSubmit={handleSubmit(postDeal)} style={{ width: "100%" }}>
       <Stack vertical gap={5}>
-        <H1 style={{}}>Details</H1>
+        <H1>Details</H1>
+        <Stack vertical style={themes.stackStyles}>
+          <H1>Title</H1>
+          <Input
+            style={errors?.title && { borderColor: "red" }}
+            variant="inline"
+            placeholder="Enter value"
+            type="title"
+            {...register("title", { required: true })}
+          />
+        </Stack>
         <Stack vertical style={themes.stackStyles}>
           <H1>Contact Person</H1>
           <Dropdown<Status, HTMLDivElement>
@@ -284,16 +294,6 @@ export const CreateDeal = () => {
               />
             )}
           </Dropdown>
-        </Stack>
-        <Stack vertical style={themes.stackStyles}>
-          <H1>Title</H1>
-          <Input
-            style={errors?.title && { borderColor: "red" }}
-            variant="inline"
-            placeholder="Enter value"
-            type="title"
-            {...register("title", { required: true })}
-          />
         </Stack>
         <Stack vertical style={themes.stackStyles}>
           <H1>Value</H1>
