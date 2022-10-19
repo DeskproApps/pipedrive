@@ -96,17 +96,17 @@ export const DealDetails = () => {
     </Stack>
   ) : (
     <Stack vertical gap={10}>
+      {deal?.title && <Property title="Deal Title">{deal?.title}</Property>}
       {deal?.person_id.name && (
         <Property title="Contact person">{deal?.person_id.name}</Property>
       )}
       {deal?.org_id?.name && (
         <Property title="Organization">{deal?.org_id?.name}</Property>
       )}
-      {deal?.title && <Property title="Deal Title">{deal?.title}</Property>}
       {pipeline && <Property title="Pipeline">{pipeline}</Property>}
       {stage && <Property title="Stage">{stage}</Property>}
-      {deal?.value && (
-        <Property title="Value">{deal?.value.toString()}</Property>
+      {deal?.formatted_weighted_value && (
+        <Property title="Value">{deal?.formatted_weighted_value}</Property>
       )}
       {deal?.owner_name && (
         <Property title="Owner">{deal?.owner_name}</Property>
