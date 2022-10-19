@@ -78,7 +78,7 @@ export const Main = () => {
       return;
     }
 
-    setPipedriveContact(pipedriveContact);
+    setPipedriveContact(contact);
 
     return;
   };
