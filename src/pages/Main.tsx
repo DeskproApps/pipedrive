@@ -119,12 +119,16 @@ export const Main = () => {
   useInitialisedDeskproAppClient((client) => {
     client.setTitle("Home");
 
+    client.deregisterElement("pipedriveLink");
+
     client.registerElement("pipedriveHomeButton", {
       type: "home_button",
     });
+
     client.registerElement("pipedriveRefreshButton", {
       type: "refresh_button",
     });
+
     client.registerElement("pipedriveMenuButton", {
       type: "menu",
       items: [
@@ -144,8 +148,7 @@ export const Main = () => {
       async onElementEvent(id) {
         switch (id) {
           case "pipedriveHomeButton": {
-            navigate("/");
-
+            navigate("/redirect");
             break;
           }
           case "pipedriveMenuButton": {
