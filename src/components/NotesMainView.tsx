@@ -9,6 +9,7 @@ import {
 import { Avatar } from "@deskpro/deskpro-ui";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
+import parse from "html-react-parser";
 
 import { LogoAndLinkButton } from "./LogoAndLinkButton";
 import { IPipedriveNote } from "../types/pipedrive/pipedriveNote";
@@ -86,13 +87,12 @@ export const NotesMainView = ({
                 >
                   <Avatar
                     size={22}
-                    name={note.person.name.split(" ").slice(0, 2).join(" ")}
+                    name={note.user.name.split(" ").slice(0, 2).join(" ")}
                   ></Avatar>
-
                   <H2>{timeSince(new Date(note.add_time)).slice(0, 5)}</H2>
                 </Stack>
                 <div style={{ maxWidth: "20ch", marginLeft: "10px" }}>
-                  <H2>{note.content}</H2>
+                  <H2>{parse(note.content)}</H2>
                 </div>
               </Stack>
               <HorizontalDivider
