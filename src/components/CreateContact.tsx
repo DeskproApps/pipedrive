@@ -13,8 +13,7 @@ import {
   useDeskproAppClient,
   useInitialisedDeskproAppClient,
 } from "@deskpro/app-sdk";
-import { useForm, SubmitHandler } from "react-hook-form";
-
+import { useForm } from "react-hook-form";
 import { useMemo, useState } from "react";
 import {
   faCheck,
@@ -22,6 +21,7 @@ import {
   faCaretDown,
 } from "@fortawesome/free-solid-svg-icons";
 
+import "./removeScrollInput.css";
 import { createContact, getAllOrganizations, getAllUsers } from "../api/api";
 import { ICreateContact } from "../types/createContact";
 import { IPipedriveOrganization } from "../types/pipedrive/pipedriveOrganization";
@@ -32,13 +32,19 @@ import { useNavigate } from "react-router-dom";
 
 export const CreateContact = () => {
   const { client } = useDeskproAppClient();
+  const deskproUser = useUser();
 
   const {
     handleSubmit,
     register,
     formState: { errors },
     setError,
-  } = useForm<ICreateContact>();
+  } = useForm<ICreateContact>({
+    defaultValues: {
+      name: `${deskproUser?.firstName} ${deskproUser?.lastName}`,
+      email: deskproUser?.primaryEmail,
+    },
+  });
 
   const navigate = useNavigate();
 
@@ -50,16 +56,25 @@ export const CreateContact = () => {
   const [selectedUser, setSelectedUser] = useState<string | Status | null>(
     null
   );
-  const deskproUser = useUser();
 
   useInitialisedDeskproAppClient(
     async (client) => {
       if (!deskproUser) return;
       const orgs = await getAllOrganizations(client, deskproUser?.orgName);
 
-      setOrganizations(orgs.data);
+      if (!orgs.success) {
+        setOrganizations([]);
+      } else {
+        setOrganizations(orgs.data);
+      }
 
       const users = await getAllUsers(client, deskproUser.orgName);
+
+      if (!users.success) {
+        setUsers([]);
+      } else {
+        setUsers(users.data);
+      }
 
       setUsers(users.data);
     },
@@ -72,7 +87,6 @@ export const CreateContact = () => {
     const pipedriveContact = {
       name: values.name,
       email: values.email,
-      label: values.label,
       phone: values.phone,
       owner_id: selectedUser,
       org_id: selectedOrg,
@@ -91,6 +105,23 @@ export const CreateContact = () => {
 
       return;
     }
+
+    const id = (
+      await client
+        .getEntityAssociation("linkedPipedriveContacts", deskproUser.id)
+        .list()
+    )[0];
+
+    if (id) {
+      await client
+        .getEntityAssociation("linkedPipedriveContacts", deskproUser.id)
+        .delete(id);
+      navigate("/contacts");
+    }
+
+    await client
+      .getEntityAssociation("linkedPipedriveContacts", deskproUser.id)
+      .set(response.data.id.toString());
 
     navigate("/");
   };
@@ -123,7 +154,7 @@ export const CreateContact = () => {
   };
 
   return (
-    <Stack vertical gap={10}>
+    <Stack vertical gap={10} style={{}}>
       <form onSubmit={handleSubmit(postContact)} style={{ width: "100%" }}>
         <Stack style={themes.stackStyles} vertical>
           <H1>Name</H1>
@@ -169,20 +200,12 @@ export const CreateContact = () => {
           </Dropdown>
         </Stack>
         <Stack vertical style={themes.stackStyles}>
-          <H1>Label</H1>
-          <Input
-            variant="inline"
-            placeholder="Enter value"
-            type="text"
-            {...register("label", { required: false })}
-          />
-        </Stack>
-        <Stack vertical style={themes.stackStyles}>
           <H1>Phone number</H1>
           <Input
             variant="inline"
             placeholder="Enter value"
             type="number"
+            style={{ WebkitAppearance: "none", MozAppearance: "none" }}
             {...register("phone", { required: false })}
           />
         </Stack>
