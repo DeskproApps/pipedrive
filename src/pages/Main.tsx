@@ -17,8 +17,8 @@ import {
   getOrganizationsById,
 } from "../api/api";
 import { useUser } from "../context/userContext";
-import { IPipedriveContact } from "../types/pipedriveContact";
-import { IPipedriveOrganization } from "../types/pipedriveOrganization";
+import { IPipedriveContact } from "../types/pipedrive/pipedriveContact";
+import { IPipedriveOrganization } from "../types/pipedrive/pipedriveOrganization";
 import { DealsMainView } from "../components/DealsMainView";
 import { ActivitiesMainView } from "../components/ActivitiesMainView";
 import { NotesMainView } from "../components/NotesMainView";
@@ -37,7 +37,7 @@ export const Main = () => {
   const deskproUser = useUser();
 
   const getPipedriveContact = async (client: IDeskproClient) => {
-    if (!deskproUser) return;
+    if (!deskproUser || !deskproUser.orgName) return;
 
     const id = (
       await client
@@ -72,7 +72,10 @@ export const Main = () => {
       deskproUser.primaryEmail
     );
 
-    if (!pipedriveContactFromPrompt.success) {
+    if (
+      !pipedriveContactFromPrompt.success ||
+      pipedriveContactFromPrompt.data.items.length === 0
+    ) {
       navigate("/contacts");
 
       return;
@@ -116,12 +119,16 @@ export const Main = () => {
   useInitialisedDeskproAppClient((client) => {
     client.setTitle("Home");
 
+    client.deregisterElement("pipedriveLink");
+
     client.registerElement("pipedriveHomeButton", {
       type: "home_button",
     });
+
     client.registerElement("pipedriveRefreshButton", {
       type: "refresh_button",
     });
+
     client.registerElement("pipedriveMenuButton", {
       type: "menu",
       items: [
@@ -141,8 +148,7 @@ export const Main = () => {
       async onElementEvent(id) {
         switch (id) {
           case "pipedriveHomeButton": {
-            navigate("/");
-
+            navigate("/redirect");
             break;
           }
           case "pipedriveMenuButton": {

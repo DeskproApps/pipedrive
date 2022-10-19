@@ -12,9 +12,10 @@ import { faPlus } from "@fortawesome/free-solid-svg-icons";
 
 import { LogoAndLinkButton } from "./LogoAndLinkButton";
 import { useState } from "react";
-import { IPipedriveDeal } from "../types/pipedriveDeal";
+import { IPipedriveDeal } from "../types/pipedrive/pipedriveDeal";
 import { getDeals } from "../api/api";
-import { IPipedriveContact } from "../types/pipedriveContact";
+import { IPipedriveContact } from "../types/pipedrive/pipedriveContact";
+import { useNavigate } from "react-router-dom";
 
 export const DealsMainView = ({
   contact,
@@ -23,6 +24,8 @@ export const DealsMainView = ({
   contact: IPipedriveContact;
   orgName: string;
 }) => {
+  const navigate = useNavigate();
+
   const [deals, setDeals] = useState<IPipedriveDeal[]>([]);
 
   useInitialisedDeskproAppClient(
@@ -72,7 +75,14 @@ export const DealsMainView = ({
                   justifyContent: "space-between",
                 }}
               >
-                <h1 style={{ color: "#4C4F50", fontSize: "12px" }}>
+                <h1
+                  style={{
+                    color: "#3A8DDE",
+                    fontSize: "12px",
+                    cursor: "pointer",
+                  }}
+                  onClick={() => navigate("/dealdetails/" + deal.id)}
+                >
                   {deal.title}
                 </h1>
                 <LogoAndLinkButton endpoint={`deal/${deal.id}`} />

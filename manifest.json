@@ -2,7 +2,7 @@
   "name": "@deskpro-apps/pipedrive_app",
   "title": "Pipedrive",
   "description": "Integrate with with Pipedrive and view and update information from your CRM while in Deskpro tickets",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "scope": "agent",
   "isSingleInstall": false,
   "hasDevMode": true,

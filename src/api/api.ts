@@ -1,12 +1,15 @@
 import { IDeskproClient, proxyFetch } from "@deskpro/app-sdk";
-import { PipedriveAPIResponse } from "../types/pipedrive";
+import { PipedriveAPIResponse } from "../types/pipedrive/pipedrive";
 import { ICreateContact } from "../types/createContact";
 
-import { IPipedriveContact } from "../types/pipedriveContact";
-import { IPipedriveOrganization } from "../types/pipedriveOrganization";
-import { IPipedriveDeal } from "../types/pipedriveDeal";
-import { IPipedriveActivity } from "../types/pipedriveActivity";
-import { IPipedriveNote } from "../types/pipedriveNote";
+import { IPipedriveContact } from "../types/pipedrive/pipedriveContact";
+import { IPipedriveOrganization } from "../types/pipedrive/pipedriveOrganization";
+import { IPipedriveDeal } from "../types/pipedrive/pipedriveDeal";
+import { IPipedriveActivity } from "../types/pipedrive/pipedriveActivity";
+import { IPipedriveNote } from "../types/pipedrive/pipedriveNote";
+import { IPipedriveUser } from "../types/pipedrive/pipedriveUser";
+import { IPipedrivePipeline } from "../types/pipedrive/pipedrivePipeline";
+import { IPipedriveStage } from "../types/pipedrive/pipedriveStage";
 
 const pipedriveGet = async (
   client: IDeskproClient,
@@ -57,6 +60,24 @@ const getContactByPrompt = async (
     client,
     orgName,
     `persons/search?term=${prompt}&api_token=__api_key__`
+  );
+};
+
+const getAllUsers = async (
+  client: IDeskproClient,
+  orgName: string
+): Promise<PipedriveAPIResponse<IPipedriveUser[]>> => {
+  return await pipedriveGet(client, orgName, `users?api_token=__api_key__`);
+};
+
+const getAllOrganizations = async (
+  client: IDeskproClient,
+  orgName: string
+): Promise<PipedriveAPIResponse<IPipedriveOrganization[]>> => {
+  return await pipedriveGet(
+    client,
+    orgName,
+    `organizations?api_token=__api_key__`
   );
 };
 
@@ -136,26 +157,61 @@ const createContact = async (
   client: IDeskproClient,
   orgName: string,
   data: ICreateContact
-) => {
+): Promise<PipedriveAPIResponse<IPipedriveContact>> => {
   const pFetch = await proxyFetch(client);
 
   const response = await pFetch(
-    `https://__instance_domain__.pipedrive.com/v1/persons?api_token=__api_key__`,
+    `https://${orgName}.pipedrive.com/v1/persons?api_token=__api_key__`,
     {
       method: "POST",
-      body: JSON.stringify({
-        name: data.name,
-        primary_email: data.primary_email,
-        phone: data.phone,
-        org_id: data.org_id,
-        owner_id: data.owner_id,
-      }),
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
     }
   );
 
-  if (response.status.toString().startsWith("2")) {
+  if (!response.status.toString().startsWith("2")) {
     throw new Error("Error creating contact");
   }
+
+  return response.json();
+};
+
+const getDealById = async (
+  client: IDeskproClient,
+  orgName: string,
+  dealId: number
+): Promise<PipedriveAPIResponse<IPipedriveDeal>> => {
+  return await pipedriveGet(
+    client,
+    orgName,
+    `deals/${dealId}?api_token=__api_key__`
+  );
+};
+
+const getPipelineById = async (
+  client: IDeskproClient,
+  orgName: string,
+  pipelineId: number
+): Promise<PipedriveAPIResponse<IPipedrivePipeline>> => {
+  return await pipedriveGet(
+    client,
+    orgName,
+    `pipelines/${pipelineId}?api_token=__api_key__`
+  );
+};
+
+const getStageById = async (
+  client: IDeskproClient,
+  orgName: string,
+  stageId: number
+): Promise<PipedriveAPIResponse<IPipedriveStage>> => {
+  return await pipedriveGet(
+    client,
+    orgName,
+    `stages/${stageId}?api_token=__api_key__`
+  );
 };
 
 const createUser = async (
@@ -166,7 +222,7 @@ const createUser = async (
   const pFetch = await proxyFetch(client);
 
   const response = await pFetch(
-    `https://__instance_domain__.pipedrive.com/v1/users?api_token=__api_key__`,
+    `https://${orgName}.pipedrive.com/v1/users?api_token=__api_key__`,
     {
       method: "POST",
       headers: {
@@ -178,14 +234,15 @@ const createUser = async (
     }
   );
 
-  if (!response.status.toString().startsWith("2")) {
-    throw new Error("Error creating contact");
-  }
-
   return await response.json();
 };
 
 export {
+  getStageById,
+  getPipelineById,
+  getDealById,
+  getAllUsers,
+  getAllOrganizations,
   getNotes,
   getActivitiesByUserId,
   getContactById,
