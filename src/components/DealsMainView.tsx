@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import {
-  H1,
   H2,
   HorizontalDivider,
   Stack,
@@ -9,6 +8,7 @@ import {
 } from "@deskpro/app-sdk";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
+import { useNavigate } from "react-router-dom";
 
 import { LogoAndLinkButton } from "./LogoAndLinkButton";
 import { useState } from "react";
@@ -23,6 +23,7 @@ export const DealsMainView = ({
   contact: IPipedriveContact;
   orgName: string;
 }) => {
+  const navigate = useNavigate();
   const [deals, setDeals] = useState<IPipedriveDeal[]>([]);
 
   useInitialisedDeskproAppClient(
@@ -33,7 +34,9 @@ export const DealsMainView = ({
 
       if (!dealsReq.success) return;
 
-      setDeals(dealsReq?.data?.filter((e) => e.person_id.value === contact.id) ?? []);
+      setDeals(
+        dealsReq?.data?.filter((e) => e.person_id.value === contact.id) ?? []
+      );
     },
     [contact]
   );

@@ -50,6 +50,18 @@ export const CreateDeal = () => {
 
   const navigate = useNavigate();
 
+  useInitialisedDeskproAppClient((client) => {
+    client.setTitle("Home");
+
+    client.deregisterElement("pipedriveLink");
+
+    client.deregisterElement("pipedriveMenuButton");
+
+    client.registerElement("pipedriveHomeButton", {
+      type: "home_button",
+    });
+  });
+
   const [contact, setContact] = useState<ICurrentAndList<IPipedriveContact>>({
     current: null,
     list: [],
