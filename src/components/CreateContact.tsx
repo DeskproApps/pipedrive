@@ -23,7 +23,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 
 import { createContact, getAllOrganizations, getAllUsers } from "../api/api";
-import { ICreateContact } from "../types/createContact";
+import { IPipedriveCreateContact } from "../types/pipedrive/pipedriveCreateContact";
 import { IPipedriveOrganization } from "../types/pipedrive/pipedriveOrganization";
 import { IPipedriveUser } from "../types/pipedrive/pipedriveUser";
 import { Status } from "../types/status";
@@ -38,7 +38,7 @@ export const CreateContact = () => {
     register,
     formState: { errors },
     setError,
-  } = useForm<ICreateContact>();
+  } = useForm<IPipedriveCreateContact>();
 
   const navigate = useNavigate();
 
@@ -57,16 +57,16 @@ export const CreateContact = () => {
       if (!deskproUser) return;
       const orgs = await getAllOrganizations(client, deskproUser?.orgName);
 
-      setOrganizations(orgs.data);
+      setOrganizations(orgs.data ?? []);
 
       const users = await getAllUsers(client, deskproUser.orgName);
-
+      console.log(users);
       setUsers(users.data);
     },
     [deskproUser]
   );
 
-  const postContact = async (values: ICreateContact) => {
+  const postContact = async (values: IPipedriveCreateContact) => {
     if (!client || !deskproUser) return;
 
     const pipedriveContact = {
@@ -76,7 +76,7 @@ export const CreateContact = () => {
       phone: values.phone,
       owner_id: selectedUser,
       org_id: selectedOrg,
-    } as ICreateContact;
+    } as IPipedriveCreateContact;
 
     const response = await createContact(
       client,
@@ -161,7 +161,7 @@ export const CreateContact = () => {
                 rightIcon={faCaretDown}
                 placeholder="Enter value"
                 value={
-                  orgOptions.find((e: any) => e.value === selectedOrg)?.key ||
+                  orgOptions.find((e: any) => e.value === selectedOrg)?.key ??
                   ""
                 }
               />
@@ -220,7 +220,7 @@ export const CreateContact = () => {
                 placeholder="Enter value"
                 rightIcon={faCaretDown}
                 value={
-                  userOptions.find((e: any) => e.value === selectedUser)?.key ||
+                  userOptions.find((e: any) => e.value === selectedUser)?.key ??
                   ""
                 }
               />

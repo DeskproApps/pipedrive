@@ -36,7 +36,7 @@ export const DealsMainView = ({
 
       if (!dealsReq.success) return;
 
-      setDeals(dealsReq.data.filter((e) => e.person_id.value === contact.id));
+      setDeals(dealsReq?.data?.filter((e) => e.person_id.value === contact.id) ?? []);
     },
     [contact]
   );
@@ -52,10 +52,11 @@ export const DealsMainView = ({
       >
         <Stack gap={2} style={{ alignItems: "center" }}>
           <h1 style={{ fontSize: "12px" }}>Deals ({deals.length})</h1>
-          {/* <FontAwesomeIcon
+          <FontAwesomeIcon
             icon={faPlus}
-            style={{ width: "12px", marginLeft: "5px" }}
-          ></FontAwesomeIcon> */}
+            style={{ width: "12px", marginLeft: "5px", cursor: "pointer" }}
+            onClick={() => navigate("/createdeal")}
+          ></FontAwesomeIcon>
         </Stack>
         <LogoAndLinkButton endpoint={`deals/user/${contact.owner_id.id}`} />
       </Stack>

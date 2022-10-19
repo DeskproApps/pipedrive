@@ -1,6 +1,6 @@
 import { IDeskproClient, proxyFetch } from "@deskpro/app-sdk";
 import { PipedriveAPIResponse } from "../types/pipedrive/pipedrive";
-import { ICreateContact } from "../types/createContact";
+import { IPipedriveCreateContact } from "../types/pipedrive/pipedriveCreateContact";
 
 import { IPipedriveContact } from "../types/pipedrive/pipedriveContact";
 import { IPipedriveOrganization } from "../types/pipedrive/pipedriveOrganization";
@@ -10,6 +10,7 @@ import { IPipedriveNote } from "../types/pipedrive/pipedriveNote";
 import { IPipedriveUser } from "../types/pipedrive/pipedriveUser";
 import { IPipedrivePipeline } from "../types/pipedrive/pipedrivePipeline";
 import { IPipedriveStage } from "../types/pipedrive/pipedriveStage";
+import { IPipedriveCreateDeal } from "../types/pipedrive/pipedriveCreateDeal";
 
 const pipedriveGet = async (
   client: IDeskproClient,
@@ -156,7 +157,7 @@ const getActivitiesByUserId = async (
 const createContact = async (
   client: IDeskproClient,
   orgName: string,
-  data: ICreateContact
+  data: IPipedriveCreateContact
 ): Promise<PipedriveAPIResponse<IPipedriveContact>> => {
   const pFetch = await proxyFetch(client);
 
@@ -170,10 +171,6 @@ const createContact = async (
       body: JSON.stringify(data),
     }
   );
-
-  if (!response.status.toString().startsWith("2")) {
-    throw new Error("Error creating contact");
-  }
 
   return response.json();
 };
@@ -214,6 +211,27 @@ const getStageById = async (
   );
 };
 
+const createDeal = async (
+  client: IDeskproClient,
+  orgName: string,
+  data: IPipedriveCreateDeal
+): Promise<PipedriveAPIResponse<IPipedriveDeal>> => {
+  const pFetch = await proxyFetch(client);
+
+  const response = await pFetch(
+    `https://${orgName}.pipedrive.com/v1/deals?api_token=__api_key__`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    }
+  );
+
+  return response.json();
+};
+
 const createUser = async (
   client: IDeskproClient,
   orgName: string,
@@ -237,7 +255,56 @@ const createUser = async (
   return await response.json();
 };
 
+const getContactByEmail = async (
+  client: IDeskproClient,
+  orgName: string,
+  email: string
+): Promise<IPipedriveContact | null> => {
+  const pipedriveContactFromPrompt = await getContactByPrompt(
+    client,
+    orgName,
+    email
+  );
+
+  if (
+    !pipedriveContactFromPrompt.success ||
+    pipedriveContactFromPrompt.data.items.length === 0
+  ) {
+    return null;
+  }
+
+  const pipedriveContact = await getContactById(
+    client,
+    orgName,
+    pipedriveContactFromPrompt.data.items[0]?.item.id ?? null
+  );
+
+  if (!pipedriveContact.success) {
+    return null;
+  }
+
+  return pipedriveContact.data;
+};
+
+const getAllPipelines = async (
+  client: IDeskproClient,
+  orgName: string
+): Promise<PipedriveAPIResponse<IPipedrivePipeline[]>> => {
+  return await pipedriveGet(client, orgName, `pipelines?api_token=__api_key__`);
+};
+
+const getAllContacts = async (
+  client: IDeskproClient,
+  orgName: string
+): Promise<PipedriveAPIResponse<IPipedriveContact[]>> => {
+  return await pipedriveGet(client, orgName, `persons?api_token=__api_key__`);
+};
+
 export {
+  getAllContacts,
+  getAllPipelines,
+  createDeal,
+  getContactByEmail,
   getStageById,
   getPipelineById,
   getDealById,

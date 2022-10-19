@@ -1,4 +1,4 @@
-export interface ICreateContact {
+export interface IPipedriveCreateContact {
   name: string;
   email: string;
   phone: string;
