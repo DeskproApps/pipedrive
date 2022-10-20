@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import {
-  H1,
   H2,
   HorizontalDivider,
   Stack,
@@ -9,12 +8,13 @@ import {
 } from "@deskpro/app-sdk";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
+import { useNavigate } from "react-router-dom";
 
 import { LogoAndLinkButton } from "./LogoAndLinkButton";
 import { useState } from "react";
-import { IPipedriveDeal } from "../types/pipedriveDeal";
+import { IPipedriveDeal } from "../types/pipedrive/pipedriveDeal";
 import { getDeals } from "../api/api";
-import { IPipedriveContact } from "../types/pipedriveContact";
+import { IPipedriveContact } from "../types/pipedrive/pipedriveContact";
 
 export const DealsMainView = ({
   contact,
@@ -23,6 +23,7 @@ export const DealsMainView = ({
   contact: IPipedriveContact;
   orgName: string;
 }) => {
+  const navigate = useNavigate();
   const [deals, setDeals] = useState<IPipedriveDeal[]>([]);
 
   useInitialisedDeskproAppClient(
@@ -33,7 +34,9 @@ export const DealsMainView = ({
 
       if (!dealsReq.success) return;
 
-      setDeals(dealsReq.data.filter((e) => e.person_id.value === contact.id));
+      setDeals(
+        dealsReq?.data?.filter((e) => e.person_id.value === contact.id) ?? []
+      );
     },
     [contact]
   );
@@ -49,10 +52,11 @@ export const DealsMainView = ({
       >
         <Stack gap={2} style={{ alignItems: "center" }}>
           <h1 style={{ fontSize: "12px" }}>Deals ({deals.length})</h1>
-          {/* <FontAwesomeIcon
+          <FontAwesomeIcon
             icon={faPlus}
-            style={{ width: "12px", marginLeft: "5px" }}
-          ></FontAwesomeIcon> */}
+            style={{ width: "12px", marginLeft: "5px", cursor: "pointer" }}
+            onClick={() => navigate("/createdeal")}
+          ></FontAwesomeIcon>
         </Stack>
         <LogoAndLinkButton endpoint={`deals/user/${contact.owner_id.id}`} />
       </Stack>
@@ -72,7 +76,14 @@ export const DealsMainView = ({
                   justifyContent: "space-between",
                 }}
               >
-                <h1 style={{ color: "#4C4F50", fontSize: "12px" }}>
+                <h1
+                  style={{
+                    color: "#3A8DDE",
+                    fontSize: "12px",
+                    cursor: "pointer",
+                  }}
+                  onClick={() => navigate("/dealdetails/" + deal.id)}
+                >
                   {deal.title}
                 </h1>
                 <LogoAndLinkButton endpoint={`deal/${deal.id}`} />
@@ -83,7 +94,11 @@ export const DealsMainView = ({
                   <VerticalDivider
                     style={{ height: "15px", width: "1px", color: "#EFF0F0" }}
                   ></VerticalDivider>
-                  <H2>{deal.formatted_weighted_value}</H2>
+                  <H2>
+                    {Intl.NumberFormat("en-IN").format(deal.value) +
+                      " " +
+                      deal.currency}
+                  </H2>
                 </Stack>
               </Stack>
               <HorizontalDivider

@@ -15,7 +15,7 @@ import { faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
 
 import { getContactByPrompt } from "../api/api";
 import { useUser } from "../context/userContext";
-import { IPipedriveContact } from "../types/pipedriveContact";
+import { IPipedriveContact } from "../types/pipedrive/pipedriveContact";
 import useDebounce from "../utils/debounce";
 import { useNavigate } from "react-router-dom";
 
@@ -43,6 +43,14 @@ export const FindContact = () => {
           deskproUser?.orgName,
           inputText
         );
+
+        if (!pipedriveUsers.success) {
+          setContacts([]);
+
+          setLoading(false);
+
+          return;
+        }
 
         setContacts(
           pipedriveUsers.data.items.map(

@@ -11,14 +11,20 @@ import "@deskpro/deskpro-ui/dist/deskpro-custom-icons.css";
 import { Contacts } from "./pages/Contact";
 import { Main } from "./pages/Main";
 
+import { DealDetails } from "./pages/DealDetails";
+import { Redirect } from "./pages/Redirect";
+import { CreateDeal } from "./pages/CreateDeal";
+
 function App() {
   return (
     <DeskproAppProvider>
       <HashRouter>
         <Routes>
           <Route index path="/" element={<Main />}></Route>
-
+          <Route path="/dealdetails/:dealId" element={<DealDetails />}></Route>
           <Route path="/contacts" element={<Contacts />}></Route>
+          <Route path="/redirect/" element={<Redirect />}></Route>
+          <Route path="/createdeal" element={<CreateDeal />}></Route>
         </Routes>
       </HashRouter>
     </DeskproAppProvider>

@@ -12,13 +12,13 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import {
+  getContactByEmail,
   getContactById,
-  getContactByPrompt,
   getOrganizationsById,
 } from "../api/api";
 import { useUser } from "../context/userContext";
-import { IPipedriveContact } from "../types/pipedriveContact";
-import { IPipedriveOrganization } from "../types/pipedriveOrganization";
+import { IPipedriveContact } from "../types/pipedrive/pipedriveContact";
+import { IPipedriveOrganization } from "../types/pipedrive/pipedriveOrganization";
 import { DealsMainView } from "../components/DealsMainView";
 import { ActivitiesMainView } from "../components/ActivitiesMainView";
 import { NotesMainView } from "../components/NotesMainView";
@@ -37,7 +37,7 @@ export const Main = () => {
   const deskproUser = useUser();
 
   const getPipedriveContact = async (client: IDeskproClient) => {
-    if (!deskproUser) return;
+    if (!deskproUser || !deskproUser.orgName) return;
 
     const id = (
       await client
@@ -66,41 +66,25 @@ export const Main = () => {
       return;
     }
 
-    const pipedriveContactFromPrompt = await getContactByPrompt(
+    const contact = await getContactByEmail(
       client,
       deskproUser.orgName,
       deskproUser.primaryEmail
     );
 
-    if (!pipedriveContactFromPrompt.success) {
+    if (!contact) {
       navigate("/contacts");
 
       return;
     }
 
-    const pipedriveContact = await getContactById(
-      client,
-      deskproUser.orgName,
-      pipedriveContactFromPrompt.data.items[0]?.item.id ?? null
-    );
-
-    if (!pipedriveContact.success) {
-      navigate("/contacts");
-
-      return;
-    }
-
-    await client
-      .getEntityAssociation("linkedPipedriveContacts", deskproUser.id)
-      .set(pipedriveContact.data.id.toString());
-
-    setPipedriveContact(pipedriveContact.data);
+    setPipedriveContact(contact);
 
     return;
   };
 
   const getPipedriveOrganization = async (client: IDeskproClient) => {
-    if (!pipedriveContact || !deskproUser) return;
+    if (!pipedriveContact?.org_id || !deskproUser) return;
 
     const pipedriveOrganization = await getOrganizationsById(
       client,
@@ -116,12 +100,16 @@ export const Main = () => {
   useInitialisedDeskproAppClient((client) => {
     client.setTitle("Home");
 
+    client.deregisterElement("pipedriveLink");
+
     client.registerElement("pipedriveHomeButton", {
       type: "home_button",
     });
+
     client.registerElement("pipedriveRefreshButton", {
       type: "refresh_button",
     });
+
     client.registerElement("pipedriveMenuButton", {
       type: "menu",
       items: [
@@ -141,8 +129,7 @@ export const Main = () => {
       async onElementEvent(id) {
         switch (id) {
           case "pipedriveHomeButton": {
-            navigate("/");
-
+            navigate("/redirect");
             break;
           }
           case "pipedriveMenuButton": {
