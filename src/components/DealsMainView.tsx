@@ -58,7 +58,6 @@ export const DealsMainView = ({
             onClick={() => navigate("/createdeal")}
           ></FontAwesomeIcon>
         </Stack>
-        <LogoAndLinkButton endpoint={`deals/user/${contact.owner_id.id}`} />
       </Stack>
       <Stack vertical style={{ width: "100%" }}>
         {deals.map((deal, i) => {

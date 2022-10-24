@@ -77,17 +77,19 @@ export const ActivitiesMainView = ({
                   justifyContent: "space-between",
                 }}
               >
-                <h1 style={{ fontSize: "12px" }}>{activity.note}</h1>
+                <h1 style={{ fontSize: "12px" }}>{activity.deal_title}</h1>
                 <LogoAndLinkButton
                   endpoint={`activities/list/user/${contact.owner_id.id}`}
                 />
               </Stack>
               <Stack>
-                <Property title="Type">
-                  {activity.type.charAt(0).toUpperCase() +
-                    activity.type.slice(1)}
-                </Property>
-                <Stack style={{ marginLeft: "40px" }}>
+                <div style={{ width: "13ch" }}>
+                  <Property title="Type">
+                    {activity.type.charAt(0).toUpperCase() +
+                      activity.type.slice(1)}
+                  </Property>
+                </div>
+                <Stack>
                   <VerticalDivider
                     style={{
                       height: "35px",
