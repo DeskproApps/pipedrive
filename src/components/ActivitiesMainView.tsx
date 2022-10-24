@@ -5,6 +5,9 @@ import {
   useInitialisedDeskproAppClient,
   VerticalDivider,
 } from "@deskpro/app-sdk";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faPlus } from "@fortawesome/free-solid-svg-icons";
+import { useNavigate } from "react-router-dom";
 
 import { Property } from "./Property";
 import { LogoAndLinkButton } from "./LogoAndLinkButton";
@@ -20,6 +23,8 @@ export const ActivitiesMainView = ({
   contact: IPipedriveContact;
   orgName: string;
 }) => {
+  const navigate = useNavigate();
+
   const [activities, setActivities] = useState<IPipedriveActivity[]>([]);
 
   useInitialisedDeskproAppClient(
@@ -50,14 +55,15 @@ export const ActivitiesMainView = ({
           justifyContent: "space-between",
         }}
       >
-        <Stack gap={"2px"}>
+        <Stack gap={"2px"} style={{ alignItems: "center" }}>
           <h1 style={{ alignSelf: "center", fontSize: "12px" }}>
             Activities ({activities.length})
           </h1>
-          {/* <FontAwesomeIcon
+          <FontAwesomeIcon
             icon={faPlus}
-            style={{ alignSelf: "center", width: "12px", marginLeft: "5px" }}
-          ></FontAwesomeIcon> */}
+            style={{ width: "12px", marginLeft: "5px", cursor: "pointer" }}
+            onClick={() => navigate("/createactivity")}
+          ></FontAwesomeIcon>
         </Stack>
       </Stack>
       <Stack vertical style={{ width: "100%" }}>

@@ -33,6 +33,14 @@ const getUserDataPipedrive = async (
   return await pipedriveGet(client, orgName, `users/me?api_token=__api_key__`);
 };
 
+const getActivityTypes = async (client: IDeskproClient, orgName: string) => {
+  return await pipedriveGet(
+    client,
+    orgName,
+    `activityTypes?api_token=__api_key__`
+  );
+};
+
 const getUserListPipedrive = async (
   client: IDeskproClient,
   orgName: string
@@ -300,7 +308,16 @@ const getAllContacts = async (
   return await pipedriveGet(client, orgName, `persons?api_token=__api_key__`);
 };
 
+const getAllDeals = async (
+  client: IDeskproClient,
+  orgName: string
+): Promise<PipedriveAPIResponse<IPipedriveDeal[]>> => {
+  return await pipedriveGet(client, orgName, `deals?api_token=__api_key__`);
+};
+
 export {
+  getAllDeals,
+  getActivityTypes,
   getAllContacts,
   getAllPipelines,
   createDeal,
@@ -322,4 +339,5 @@ export {
   createContact,
   getUserById,
   createUser,
+  pipedriveGet,
 };
