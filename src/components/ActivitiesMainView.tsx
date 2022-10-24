@@ -12,6 +12,7 @@ import { IPipedriveActivity } from "../types/pipedrive/pipedriveActivity";
 import { useState } from "react";
 import { getActivitiesByUserId } from "../api/api";
 import { IPipedriveContact } from "../types/pipedrive/pipedriveContact";
+import { TwoColumn } from "./TwoColumn";
 
 export const ActivitiesMainView = ({
   contact,
@@ -82,27 +83,16 @@ export const ActivitiesMainView = ({
                   endpoint={`activities/list/user/${contact.owner_id.id}`}
                 />
               </Stack>
-              <Stack>
-                <div style={{ width: "13ch" }}>
-                  <Property title="Type">
-                    {activity.type.charAt(0).toUpperCase() +
-                      activity.type.slice(1)}
-                  </Property>
-                </div>
-                <Stack>
-                  <VerticalDivider
-                    style={{
-                      height: "35px",
-                      width: "1px",
-                      color: "#EFF0F0",
-                      marginBottom: "5px",
-                    }}
-                  ></VerticalDivider>
-                  <Property title="Date">{`${date.getDay()} ${date
-                    .toLocaleString("default", { month: "long" })
-                    .slice(0, 3)}, ${date.getFullYear()}`}</Property>
-                </Stack>
-              </Stack>
+              <TwoColumn
+                leftLabel="Type"
+                leftText={
+                  activity.type.charAt(0).toUpperCase() + activity.type.slice(1)
+                }
+                rightLabel="Date"
+                rightText={`${date.getDay()} ${date
+                  .toLocaleString("default", { month: "long" })
+                  .slice(0, 3)}, ${date.getFullYear()}`}
+              ></TwoColumn>
               <HorizontalDivider
                 style={{ width: "110%", color: "#EFF0F0", marginLeft: "-10px" }}
               />
