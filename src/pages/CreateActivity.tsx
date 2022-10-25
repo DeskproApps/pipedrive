@@ -92,8 +92,6 @@ export const CreateActivity = () => {
       type: activityType.current,
     } as unknown as IPipedriveCreateActivity;
 
-    console.log(activity);
-
     const response = await createActivity(
       client,
       deskproUser?.orgName,
