@@ -266,6 +266,58 @@ const createActivity = async (
   return response.json();
 };
 
+const uploadImage = async (
+  client: IDeskproClient,
+  orgName: string,
+  image: File
+) => {
+  const pFetch = await proxyFetch(client);
+
+  const response = await pFetch(
+    `https://${orgName}.pipedrive.com/v1/files?api_token=__api_key__`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+      body: image,
+    }
+  );
+
+  return response.json();
+};
+
+const createNote = async (
+  client: IDeskproClient,
+  orgName: string,
+  image: File | null,
+  note: string
+): Promise<PipedriveAPIResponse<IPipedriveNote>> => {
+  const pFetch = await proxyFetch(client);
+
+  let imageResponse = null;
+
+  if (image) {
+    imageResponse = await uploadImage(client, orgName, image);
+  }
+
+  const noteResponse = await pFetch(
+    `https://${orgName}.pipedrive.com/v1/notes?api_token=__api_key__`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        content: note,
+        file_id: imageResponse.data.id,
+      }),
+    }
+  );
+
+  return noteResponse.json();
+};
+
 const createUser = async (
   client: IDeskproClient,
   orgName: string,
@@ -342,6 +394,7 @@ const getAllDeals = async (
 };
 
 export {
+  createNote,
   createActivity,
   getAllDeals,
   getActivityTypes,
