@@ -11,6 +11,8 @@ import { IPipedriveUser } from "../types/pipedrive/pipedriveUser";
 import { IPipedrivePipeline } from "../types/pipedrive/pipedrivePipeline";
 import { IPipedriveStage } from "../types/pipedrive/pipedriveStage";
 import { IPipedriveCreateDeal } from "../types/pipedrive/pipedriveCreateDeal";
+import { IPipedriveActivityType } from "../types/pipedrive/pipedriveActivityTypes";
+import { IPipedriveCreateActivity } from "../types/pipedrive/pipedriveCreateActivity";
 
 const pipedriveGet = async (
   client: IDeskproClient,
@@ -33,7 +35,10 @@ const getUserDataPipedrive = async (
   return await pipedriveGet(client, orgName, `users/me?api_token=__api_key__`);
 };
 
-const getActivityTypes = async (client: IDeskproClient, orgName: string) => {
+const getActivityTypes = async (
+  client: IDeskproClient,
+  orgName: string
+): Promise<PipedriveAPIResponse<IPipedriveActivityType[]>> => {
   return await pipedriveGet(
     client,
     orgName,
@@ -240,6 +245,27 @@ const createDeal = async (
   return response.json();
 };
 
+const createActivity = async (
+  client: IDeskproClient,
+  orgName: string,
+  data: IPipedriveCreateActivity
+): Promise<PipedriveAPIResponse<IPipedriveActivity>> => {
+  const pFetch = await proxyFetch(client);
+
+  const response = await pFetch(
+    `https://${orgName}.pipedrive.com/v1/activities?api_token=__api_key__`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    }
+  );
+
+  return response.json();
+};
+
 const createUser = async (
   client: IDeskproClient,
   orgName: string,
@@ -316,6 +342,7 @@ const getAllDeals = async (
 };
 
 export {
+  createActivity,
   getAllDeals,
   getActivityTypes,
   getAllContacts,

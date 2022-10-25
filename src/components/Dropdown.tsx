@@ -12,24 +12,37 @@ import {
   faCaretDown,
 } from "@fortawesome/free-solid-svg-icons";
 import { useMemo } from "react";
+import { ICurrentAndList } from "../types/currentAndList";
 import { Status } from "../types/status";
 
-type Props = {
-  data: any;
-  setter: any;
+type Props<T> = {
+  data: ICurrentAndList<T>;
+  setter: React.Dispatch<React.SetStateAction<ICurrentAndList<T>>>;
   title: string;
-  errors: any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  errors: any; // cant find fieldsErrorImpl
+  keyName: keyof T;
+  valueName: keyof T;
 };
-
-export const Dropdown = ({ data, setter, title, errors }: Props) => {
-  const dataOptions = useMemo(() => {
-    return data.list.map((dataInList: any) => ({
-      key: dataInList.name,
-      label: <Label label={dataInList.name}></Label>,
-      value: dataInList.id,
+//change this
+export const Dropdown = <T,>({
+  data,
+  setter,
+  title,
+  errors,
+  keyName,
+  valueName,
+}: Props<T>) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const dataOptions = useMemo<any>(() => {
+    return data.list.map((dataInList) => ({
+      key: dataInList[keyName],
+      label: <Label label={dataInList[valueName]}></Label>,
+      value: dataInList[valueName],
       type: "value" as const,
     }));
-  }, [data]) as any;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [data]);
   return (
     <Stack
       vertical
@@ -44,7 +57,7 @@ export const Dropdown = ({ data, setter, title, errors }: Props) => {
         selectedIcon={faCheck}
         externalLinkIcon={faExternalLinkAlt}
         onSelectOption={(option) => {
-          setter({ ...data, current: option.value });
+          setter({ ...data, current: option.key });
         }}
       >
         {({ targetProps, targetRef }: DropdownTargetProps<HTMLDivElement>) => (
@@ -56,7 +69,9 @@ export const Dropdown = ({ data, setter, title, errors }: Props) => {
             rightIcon={faCaretDown}
             placeholder="Enter value"
             value={
-              dataOptions.find((e: any) => e.value === data.current)?.key ?? ""
+              dataOptions.find(
+                (e: { value: string; key: string }) => e.key === data.current
+              )?.value ?? ""
             }
           />
         )}

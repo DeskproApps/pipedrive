@@ -7,6 +7,7 @@ export interface IPipedriveCreateActivity {
   org_id: number;
   note: string;
   location: string;
+  activity_subject: string;
   public_description: string;
   subject: string;
   type: string;
@@ -15,4 +16,5 @@ export interface IPipedriveCreateActivity {
   busy_flag: boolean;
   attendees: string[];
   done: number;
+  submit: string;
 }
