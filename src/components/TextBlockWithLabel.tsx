@@ -1,7 +1,6 @@
 import { FC, ReactElement, isValidElement } from "react";
 import styled from "styled-components";
 import { P8, P5/*, Stack*/ } from "@deskpro/app-sdk";
-import React from "react";
 
 export type Props = {
     label?: string | ReactElement,

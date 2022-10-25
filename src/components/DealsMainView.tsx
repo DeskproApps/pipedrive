@@ -91,7 +91,12 @@ export const DealsMainView = ({
                 <H2 style={{ color: "blue" }}>{deal.add_time.split(" ")[0]}</H2>
                 <Stack style={{ marginLeft: "40px" }}>
                   <VerticalDivider
-                    style={{ height: "15px", width: "1px", color: "#EFF0F0" }}
+                    style={{
+                      height: "15px",
+                      width: "1px",
+                      color: "#EFF0F0",
+                      marginLeft: "15px",
+                    }}
                   ></VerticalDivider>
                   <H2>
                     {Intl.NumberFormat("en-IN").format(deal.value) +
