@@ -10,6 +10,7 @@ import { Avatar } from "@deskpro/deskpro-ui";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
 import parse from "html-react-parser";
+
 import { LogoAndLinkButton } from "./LogoAndLinkButton";
 import { IPipedriveNote } from "../types/pipedrive/pipedriveNote";
 import { useState } from "react";
@@ -17,8 +18,6 @@ import { getNotes } from "../api/api";
 import { timeSince } from "../utils/utils";
 import { IPipedriveContact } from "../types/pipedrive/pipedriveContact";
 import { useNavigate } from "react-router-dom";
-import styled from "styled-components";
-import "./image.css";
 
 export const NotesMainView = ({
   contact,
@@ -42,14 +41,6 @@ export const NotesMainView = ({
     },
     [contact]
   );
-
-  const cssImage = styled.div`
-    max-width: 20ch;
-    margin-left: 10px;
-    &:img {
-      object-fit: contain;
-    }
-  `;
 
   return (
     <Stack vertical style={{ width: "100%" }}>
