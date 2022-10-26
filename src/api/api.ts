@@ -269,18 +269,25 @@ const createActivity = async (
 const uploadImage = async (
   client: IDeskproClient,
   orgName: string,
-  image: File
+  image: File,
+  contactId: string
 ) => {
   const pFetch = await proxyFetch(client);
+
+  const formData = new FormData();
+
+  formData.set(
+    "file",
+    new Blob([await image.arrayBuffer()], { type: image.type }),
+    image.name
+  );
+  formData.set("person_id", contactId);
 
   const response = await pFetch(
     `https://${orgName}.pipedrive.com/v1/files?api_token=__api_key__`,
     {
       method: "POST",
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-      body: image,
+      body: formData,
     }
   );
 
@@ -291,14 +298,19 @@ const createNote = async (
   client: IDeskproClient,
   orgName: string,
   image: File | null,
-  note: string
+  note: string,
+  contactId: string
 ): Promise<PipedriveAPIResponse<IPipedriveNote>> => {
   const pFetch = await proxyFetch(client);
 
-  let imageResponse = null;
+  let requestNote = null;
 
   if (image) {
-    imageResponse = await uploadImage(client, orgName, image);
+    const imageResponse = await uploadImage(client, orgName, image, contactId);
+
+    requestNote = `${note}<br><a href="cid:${imageResponse?.data?.id}" target="_blank" data-pipecid="cid:${imageResponse?.data?.id}"><img src="cid:${imageResponse?.data?.id}" data-pipecid="cid:${imageResponse?.data?.id}" style="width: 64px; height: 64px;"></a>`;
+  } else {
+    requestNote = note;
   }
 
   const noteResponse = await pFetch(
@@ -309,8 +321,8 @@ const createNote = async (
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        content: note,
-        file_id: imageResponse.data.id,
+        content: requestNote,
+        person_id: contactId,
       }),
     }
   );
