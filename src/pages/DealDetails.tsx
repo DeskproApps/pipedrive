@@ -31,6 +31,10 @@ export const DealDetails = () => {
 
       client.deregisterElement("pipedriveMenuButton");
 
+      client.registerElement("pipedriveEditButton", {
+        type: "edit_button",
+      });
+
       client.registerElement("pipedriveLink", {
         type: "cta_external_link",
         url: `https://${user?.orgName}.pipedrive.com/deal/${dealId}`,
@@ -76,6 +80,11 @@ export const DealDetails = () => {
       switch (id) {
         case "pipedriveHomeButton": {
           navigate("/redirect");
+
+          break;
+        }
+        case "pipedriveEditButton": {
+          navigate(`/editdeal/${dealId}`);
 
           break;
         }

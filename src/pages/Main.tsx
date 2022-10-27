@@ -100,6 +100,8 @@ export const Main = () => {
   useInitialisedDeskproAppClient((client) => {
     client.setTitle("Home");
 
+    client.deregisterElement("pipedriveEditButton");
+
     client.deregisterElement("pipedriveLink");
 
     client.registerElement("pipedriveHomeButton", {

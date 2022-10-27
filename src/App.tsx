@@ -1,6 +1,6 @@
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck
-// Added this because the ErrorBoundary throws a TS error, 
+// Added this because the ErrorBoundary throws a TS error,
 // even though it's completely acceptable.
 import { DeskproAppProvider } from "@deskpro/app-sdk";
 import { Routes, HashRouter, Route } from "react-router-dom";
@@ -22,6 +22,7 @@ import { CreateActivity } from "./pages/CreateActivity";
 import { CreateNote } from "./pages/CreateNote";
 import { ErrorBoundary } from "react-error-boundary";
 import { ErrorFallback } from "./components/ErrorFallback";
+import { EditDeal } from "./pages/EditDeal";
 
 function App() {
   return (
@@ -37,6 +38,7 @@ function App() {
             <Route path="/contacts" element={<Contacts />}></Route>
             <Route path="/redirect/" element={<Redirect />}></Route>
             <Route path="/createdeal" element={<CreateDeal />}></Route>
+            <Route path="/editdeal/:dealId" element={<EditDeal />}></Route>
             <Route path="/createactivity" element={<CreateActivity />}></Route>
             <Route path="/createnote" element={<CreateNote />}></Route>
           </Routes>

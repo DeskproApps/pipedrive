@@ -245,6 +245,28 @@ const createDeal = async (
   return response.json();
 };
 
+const editDeal = async (
+  client: IDeskproClient,
+  orgName: string,
+  data: IPipedriveCreateDeal,
+  dealId: string
+): Promise<PipedriveAPIResponse<IPipedriveDeal>> => {
+  const pFetch = await proxyFetch(client);
+
+  const response = await pFetch(
+    `https://${orgName}.pipedrive.com/v1/deals/${dealId}?api_token=__api_key__`,
+    {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    }
+  );
+
+  return response.json();
+};
+
 const createActivity = async (
   client: IDeskproClient,
   orgName: string,
@@ -406,6 +428,7 @@ const getAllDeals = async (
 };
 
 export {
+  editDeal,
   createNote,
   createActivity,
   getAllDeals,
