@@ -5,6 +5,7 @@ import {
   Label,
   H1,
   Stack,
+  useDeskproAppTheme,
 } from "@deskpro/app-sdk";
 import {
   faCheck,
@@ -33,6 +34,7 @@ export const Dropdown = <T,>({
   keyName,
   valueName,
 }: Props<T>) => {
+  const { theme } = useDeskproAppTheme();
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const dataOptions = useMemo<any>(() => {
     return data.list.map((dataInList) => ({
@@ -42,11 +44,11 @@ export const Dropdown = <T,>({
       type: "value" as const,
     }));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [data]);
+  }, [data, valueName]);
   return (
     <Stack
       vertical
-      style={{ marginTop: "5px", color: "#8B9293", width: "100%" }}
+      style={{ marginTop: "5px", color: theme.colors.grey80, width: "100%" }}
     >
       <H1>{title}</H1>
       <DropdownComponent<Status, HTMLDivElement>
@@ -62,7 +64,7 @@ export const Dropdown = <T,>({
       >
         {({ targetProps, targetRef }: DropdownTargetProps<HTMLDivElement>) => (
           <DivAsInput
-            style={errors?.person_id && { borderColor: "red" }}
+            error={Boolean(errors?.person_id)}
             ref={targetRef}
             {...targetProps}
             variant="inline"
