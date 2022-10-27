@@ -14,6 +14,7 @@ import { Main } from "./pages/Main";
 import { DealDetails } from "./pages/DealDetails";
 import { Redirect } from "./pages/Redirect";
 import { CreateDeal } from "./pages/CreateDeal";
+import { CreateActivity } from "./pages/CreateActivity";
 
 function App() {
   return (
@@ -25,6 +26,7 @@ function App() {
           <Route path="/contacts" element={<Contacts />}></Route>
           <Route path="/redirect/" element={<Redirect />}></Route>
           <Route path="/createdeal" element={<CreateDeal />}></Route>
+          <Route path="/createactivity" element={<CreateActivity />}></Route>
         </Routes>
       </HashRouter>
     </DeskproAppProvider>
