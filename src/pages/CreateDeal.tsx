@@ -10,6 +10,7 @@ import {
   Label,
   Stack,
   useDeskproAppClient,
+  useDeskproAppTheme,
   useInitialisedDeskproAppClient,
 } from "@deskpro/app-sdk";
 import { useForm } from "react-hook-form";
@@ -40,7 +41,7 @@ import { IPipedriveUser } from "../types/pipedrive/pipedriveUser";
 
 export const CreateDeal = () => {
   const { client } = useDeskproAppClient();
-
+  const { theme } = useDeskproAppTheme();
   const {
     handleSubmit,
     register,
