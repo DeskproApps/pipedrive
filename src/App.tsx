@@ -23,6 +23,7 @@ import { CreateNote } from "./pages/CreateNote";
 import { ErrorBoundary } from "react-error-boundary";
 import { ErrorFallback } from "./components/ErrorFallback";
 import { EditDeal } from "./pages/EditDeal";
+import { EditContact } from "./pages/EditContact";
 
 function App() {
   return (
@@ -41,6 +42,10 @@ function App() {
             <Route path="/editdeal/:dealId" element={<EditDeal />}></Route>
             <Route path="/createactivity" element={<CreateActivity />}></Route>
             <Route path="/createnote" element={<CreateNote />}></Route>
+            <Route
+              path="/editcontact/:contactId"
+              element={<EditContact />}
+            ></Route>
           </Routes>
         </ErrorBoundary>
       </HashRouter>
