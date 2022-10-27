@@ -4,6 +4,7 @@ import {
   Input,
   Stack,
   useDeskproAppClient,
+  useDeskproAppTheme,
   useInitialisedDeskproAppClient,
 } from "@deskpro/app-sdk";
 import { useState } from "react";
@@ -40,6 +41,7 @@ export const CreateActivity = () => {
     formState: { errors },
     setError,
   } = useForm<IPipedriveCreateActivity>();
+  const { theme } = useDeskproAppTheme();
 
   const deskproUser = useUser();
   const [activityType, setActivityType] = useState<
@@ -189,11 +191,15 @@ export const CreateActivity = () => {
         ></Dropdown>
         <Stack
           vertical
-          style={{ marginTop: "5px", color: "#8B9293", width: "100%" }}
+          style={{
+            marginTop: "5px",
+            color: theme.colors.grey80,
+            width: "100%",
+          }}
         >
           <H1>Activity Subject</H1>
           <Input
-            style={errors?.activity_subject && { borderColor: "red" }}
+            error={Boolean(errors?.activity_subject)}
             variant="inline"
             placeholder="Enter value"
             type="title"
@@ -202,11 +208,18 @@ export const CreateActivity = () => {
         </Stack>
         <Stack
           vertical
-          style={{ marginTop: "5px", color: "#8B9293", width: "100%" }}
+          style={{
+            marginTop: "5px",
+            color: theme.colors.grey80,
+            width: "100%",
+          }}
         >
           <H1>Date</H1>
           <Input
-            style={errors?.due_date && { borderColor: "red" }}
+            style={{
+              color: theme.colors.grey80,
+            }}
+            error={Boolean(errors?.due_date)}
             variant="inline"
             placeholder="Enter value"
             type="date"
@@ -263,7 +276,11 @@ export const CreateActivity = () => {
         ></Dropdown>
         <Stack
           vertical
-          style={{ marginTop: "5px", color: "#8B9293", width: "100%" }}
+          style={{
+            marginTop: "5px",
+            color: theme.colors.grey80,
+            width: "100%",
+          }}
         >
           <H1>Note</H1>
           <Input
