@@ -64,7 +64,7 @@ export const Dropdown = <T,>({
       >
         {({ targetProps, targetRef }: DropdownTargetProps<HTMLDivElement>) => (
           <DivAsInput
-            error={Boolean(errors?.person_id)}
+            error={Boolean(errors?.[keyName])}
             ref={targetRef}
             {...targetProps}
             variant="inline"

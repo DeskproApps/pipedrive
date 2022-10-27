@@ -10,13 +10,15 @@ import { Avatar } from "@deskpro/deskpro-ui";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
 import parse from "html-react-parser";
-
 import { LogoAndLinkButton } from "./LogoAndLinkButton";
-import { IPipedriveNote } from "../types/pipedrive/pipedriveNote";
 import { useState } from "react";
+
+import { IPipedriveNote } from "../types/pipedrive/pipedriveNote";
 import { getNotes } from "../api/api";
 import { timeSince } from "../utils/utils";
 import { IPipedriveContact } from "../types/pipedrive/pipedriveContact";
+import { useNavigate } from "react-router-dom";
+import "./image.css";
 
 export const NotesMainView = ({
   contact,
@@ -25,6 +27,7 @@ export const NotesMainView = ({
   contact: IPipedriveContact;
   orgName: string;
 }) => {
+  const navigate = useNavigate();
   const [notes, setNotes] = useState<IPipedriveNote[]>([]);
 
   useInitialisedDeskproAppClient(
@@ -51,10 +54,11 @@ export const NotesMainView = ({
       >
         <Stack gap={"2px"} style={{ alignItems: "center" }}>
           <h1 style={{ fontSize: "12px" }}>Notes ({notes.length})</h1>
-          {/* <FontAwesomeIcon
+          <FontAwesomeIcon
             icon={faPlus}
-            style={{ width: "12px", marginLeft: "5px" }}
-          ></FontAwesomeIcon> */}
+            style={{ width: "12px", marginLeft: "5px", cursor: "pointer" }}
+            onClick={() => navigate("/createnote")}
+          ></FontAwesomeIcon>
         </Stack>
       </Stack>
       <Stack vertical style={{ width: "100%" }}>

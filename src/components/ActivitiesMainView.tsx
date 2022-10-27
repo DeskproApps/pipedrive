@@ -50,9 +50,9 @@ export const ActivitiesMainView = ({
   return (
     <Stack vertical style={{ width: "100%" }}>
       <Stack
+        align="center"
         style={{
           width: "100%",
-          alignItems: "center",
           justifyContent: "space-between",
         }}
       >
