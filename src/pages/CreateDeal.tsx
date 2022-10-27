@@ -12,35 +12,34 @@ import {
   useDeskproAppClient,
   useInitialisedDeskproAppClient,
 } from "@deskpro/app-sdk";
-import { useForm } from "react-hook-form";
-import { useMemo, useState } from "react";
 import {
+  faCaretDown,
   faCheck,
   faExternalLinkAlt,
-  faCaretDown,
 } from "@fortawesome/free-solid-svg-icons";
+import { useMemo, useState } from "react";
+import { useForm } from "react-hook-form";
 
-import "../components/removeScrollInput.css";
+import { useNavigate } from "react-router-dom";
 import {
-  getAllOrganizations,
+  createDeal,
   getAllContacts,
+  getAllOrganizations,
   getAllPipelines,
   getAllUsers,
-  createDeal,
 } from "../api/api";
-import { Status } from "../types/status";
+import "../components/removeScrollInput.css";
 import { useUser } from "../context/userContext";
-import { useNavigate } from "react-router-dom";
+import { ICurrentAndList } from "../types/currentAndList";
 import { IPipedriveContact } from "../types/pipedrive/pipedriveContact";
 import { IPipedriveCreateDeal } from "../types/pipedrive/pipedriveCreateDeal";
-import { IPipedrivePipeline } from "../types/pipedrive/pipedrivePipeline";
-import { ICurrentAndList } from "../types/currentAndList";
 import { IPipedriveOrganization } from "../types/pipedrive/pipedriveOrganization";
+import { IPipedrivePipeline } from "../types/pipedrive/pipedrivePipeline";
 import { IPipedriveUser } from "../types/pipedrive/pipedriveUser";
+import { Status } from "../types/status";
 
 export const CreateDeal = () => {
   const { client } = useDeskproAppClient();
-
   const {
     handleSubmit,
     register,
