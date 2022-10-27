@@ -44,7 +44,7 @@ export const Dropdown = <T,>({
       type: "value" as const,
     }));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [data]);
+  }, [data, valueName]);
   return (
     <Stack
       vertical
