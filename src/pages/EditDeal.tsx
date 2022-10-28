@@ -1,15 +1,18 @@
 import {
   Button,
   H1,
+  H2,
   Input,
   Stack,
   useDeskproAppClient,
   useDeskproAppEvents,
+  useDeskproAppTheme,
   useInitialisedDeskproAppClient,
 } from "@deskpro/app-sdk";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate, useParams } from "react-router-dom";
+
 import {
   editDeal,
   getAllContacts,
@@ -28,6 +31,7 @@ import { IPipedriveUser } from "../types/pipedrive/pipedriveUser";
 
 export const EditDeal = () => {
   const { client } = useDeskproAppClient();
+  const { theme } = useDeskproAppTheme();
   const navigate = useNavigate();
   const deskproUser = useUser();
   const { dealId } = useParams();
@@ -132,12 +136,6 @@ export const EditDeal = () => {
       pipeline_id: pipeline.current,
     } as IPipedriveCreateDeal;
 
-    Object.keys(pipedriveDeal).forEach((key) => {
-      if (!pipedriveDeal[key as keyof typeof pipedriveDeal]) {
-        delete pipedriveDeal[key as keyof typeof pipedriveDeal];
-      }
-    });
-
     const response = await editDeal(
       client,
       deskproUser?.orgName,
@@ -159,7 +157,7 @@ export const EditDeal = () => {
   const themes = {
     stackStyles: {
       marginTop: "5px",
-      color: "#8B9293",
+      color: theme.colors.grey80,
       width: "100%",
     },
   };
@@ -178,67 +176,68 @@ export const EditDeal = () => {
               {...register("title")}
             />
           </Stack>
+
+          <Dropdown
+            title="Contact Person"
+            data={contact}
+            setter={setContact}
+            errors={errors}
+            keyName="id"
+            valueName="name"
+          ></Dropdown>
+          <Dropdown
+            title="Organization"
+            data={organization}
+            setter={setOrganization}
+            errors={errors}
+            keyName="id"
+            valueName="name"
+          ></Dropdown>
           <Stack vertical style={themes.stackStyles}>
-            <Dropdown
-              title="Contact Person"
-              data={contact}
-              setter={setContact}
-              errors={errors}
-              keyName="id"
-              valueName="name"
-            ></Dropdown>
-            <Dropdown
-              title="Organization"
-              data={organization}
-              setter={setOrganization}
-              errors={errors}
-              keyName="id"
-              valueName="name"
-            ></Dropdown>
-            <Stack vertical style={themes.stackStyles}>
-              <H1>Value</H1>
-              <Input
-                variant="inline"
-                placeholder="Enter value"
-                type="number"
-                {...register("value")}
-              />
-            </Stack>
-            <Dropdown
-              title="Pipeline"
-              data={pipeline}
-              setter={setPipeline}
-              errors={errors}
-              keyName="id"
-              valueName="name"
-            ></Dropdown>
-            <Stack vertical style={themes.stackStyles}>
-              <H1>Excepted close date</H1>
-              <Input
-                variant="inline"
-                placeholder="Enter value"
-                type="date"
-                {...register("expected_close_date")}
-              />
-            </Stack>
-            <Dropdown
-              title="Owner"
-              data={user}
-              setter={setUser}
-              errors={errors}
-              keyName="id"
-              valueName="name"
-            ></Dropdown>
+            <H1>Value</H1>
+            <Input
+              variant="inline"
+              placeholder="Enter value"
+              type="number"
+              {...register("value")}
+            />
           </Stack>
-          <Button
-            type="submit"
-            style={{ marginTop: "10px" }}
-            text="Create"
-          ></Button>
-          {errors?.submit && (
-            <h2 style={{ marginTop: "10px" }}>Error editing contact</h2>
-          )}
+          <Dropdown
+            title="Pipeline"
+            data={pipeline}
+            setter={setPipeline}
+            errors={errors}
+            keyName="id"
+            valueName="name"
+          ></Dropdown>
+          <Stack vertical style={themes.stackStyles}>
+            <H1>Excepted close date</H1>
+            <Input
+              variant="inline"
+              placeholder="Enter value"
+              type="date"
+              {...register("expected_close_date")}
+            />
+          </Stack>
+          <Dropdown
+            title="Owner"
+            data={user}
+            setter={setUser}
+            errors={errors}
+            keyName="id"
+            valueName="name"
+          ></Dropdown>
         </Stack>
+        <Button
+          type="submit"
+          style={{ marginTop: "10px" }}
+          text="Save"
+        ></Button>
+        {errors?.submit && (
+          <Stack style={{ marginTop: "10px" }}>
+            <H2>Error editing contact</H2>
+          </Stack>
+        )}
       </form>
     </Stack>
   );
