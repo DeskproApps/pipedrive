@@ -13,31 +13,31 @@ import {
   faCaretDown,
 } from "@fortawesome/free-solid-svg-icons";
 import { useMemo } from "react";
-import { ICurrentAndList } from "../types/currentAndList";
 import { Status } from "../types/status";
 
 type Props<T> = {
-  data: ICurrentAndList<T>;
-  setter: React.Dispatch<React.SetStateAction<ICurrentAndList<T>>>;
+  data: T[];
+  onChange: (key: string) => void;
   title: string;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  errors: any; // cant find fieldsErrorImpl
+  value: string;
+  error?: boolean;
   keyName: keyof T;
   valueName: keyof T;
 };
 //change this
 export const Dropdown = <T,>({
   data,
-  setter,
+  onChange,
   title,
-  errors,
+  value,
+  error,
   keyName,
   valueName,
 }: Props<T>) => {
   const { theme } = useDeskproAppTheme();
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const dataOptions = useMemo<any>(() => {
-    return data.list.map((dataInList) => ({
+    return data.map((dataInList) => ({
       key: dataInList[keyName],
       label: <Label label={dataInList[valueName]}></Label>,
       value: dataInList[valueName],
@@ -58,13 +58,11 @@ export const Dropdown = <T,>({
         autoscrollText={"Autoscroll"}
         selectedIcon={faCheck}
         externalLinkIcon={faExternalLinkAlt}
-        onSelectOption={(option) => {
-          setter({ ...data, current: option.key });
-        }}
+        onSelectOption={(option) => onChange(option.key)}
       >
         {({ targetProps, targetRef }: DropdownTargetProps<HTMLDivElement>) => (
           <DivAsInput
-            error={Boolean(errors?.[keyName])}
+            error={error}
             ref={targetRef}
             {...targetProps}
             variant="inline"
@@ -72,7 +70,7 @@ export const Dropdown = <T,>({
             placeholder="Enter value"
             value={
               dataOptions.find(
-                (e: { value: string; key: string }) => e.key === data.current
+                (e: { value: string; key: string }) => e.key === value
               )?.value ?? ""
             }
           />

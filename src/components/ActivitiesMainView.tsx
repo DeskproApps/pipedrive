@@ -9,7 +9,6 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
 import { useNavigate } from "react-router-dom";
 
-import { Property } from "./Property";
 import { LogoAndLinkButton } from "./LogoAndLinkButton";
 import { IPipedriveActivity } from "../types/pipedrive/pipedriveActivity";
 import { useState } from "react";

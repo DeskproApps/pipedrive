@@ -2,66 +2,54 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import {
   Button,
-  DivAsInput,
-  Dropdown,
-  DropdownTargetProps,
   H1,
-  H2,
   Input,
-  Label,
   Stack,
   useDeskproAppClient,
+  useDeskproAppTheme,
   useInitialisedDeskproAppClient,
 } from "@deskpro/app-sdk";
-import { useForm, SubmitHandler } from "react-hook-form";
+import { useForm } from "react-hook-form";
+import { useState } from "react";
 
-import { useMemo, useState } from "react";
-import {
-  faCheck,
-  faExternalLinkAlt,
-  faCaretDown,
-} from "@fortawesome/free-solid-svg-icons";
-
+import { Dropdown } from "./Dropdown";
 import { createContact, getAllOrganizations, getAllUsers } from "../api/api";
 import { IPipedriveCreateContact } from "../types/pipedrive/pipedriveCreateContact";
 import { IPipedriveOrganization } from "../types/pipedrive/pipedriveOrganization";
 import { IPipedriveUser } from "../types/pipedrive/pipedriveUser";
-import { Status } from "../types/status";
 import { useUser } from "../context/userContext";
 import { useNavigate } from "react-router-dom";
 
 export const CreateContact = () => {
   const { client } = useDeskproAppClient();
+  const { theme } = useDeskproAppTheme();
 
   const {
     handleSubmit,
     register,
     formState: { errors },
     setError,
+    setValue,
+    watch,
   } = useForm<IPipedriveCreateContact>();
-
   const navigate = useNavigate();
+
+  const [orgId, ownerId] = watch(["org_id", "owner_id"]);
 
   const [organizations, setOrganizations] = useState<IPipedriveOrganization[]>(
     []
   );
   const [users, setUsers] = useState<IPipedriveUser[]>([]);
-  const [selectedOrg, setSelectedOrg] = useState<string | Status | null>(null);
-  const [selectedUser, setSelectedUser] = useState<string | Status | null>(
-    null
-  );
   const deskproUser = useUser();
 
   useInitialisedDeskproAppClient(
     async (client) => {
       if (!deskproUser) return;
       const orgs = await getAllOrganizations(client, deskproUser?.orgName);
-
       setOrganizations(orgs.data ?? []);
 
       const users = await getAllUsers(client, deskproUser.orgName);
-
-      setUsers(users.data);
+      setUsers(users.data ?? []);
     },
     [deskproUser]
   );
@@ -74,8 +62,8 @@ export const CreateContact = () => {
       email: values.email,
       label: values.label,
       phone: values.phone,
-      owner_id: selectedUser,
-      org_id: selectedOrg,
+      owner_id: ownerId,
+      org_id: orgId,
     } as IPipedriveCreateContact;
 
     const response = await createContact(
@@ -99,29 +87,10 @@ export const CreateContact = () => {
     navigate("/");
   };
 
-  const orgOptions = useMemo(() => {
-    return organizations.map((org) => ({
-      key: org.name,
-      label: <Label label={org.name}></Label>,
-      value: org.id,
-      type: "value" as const,
-    }));
-  }, [organizations]) as any;
-
-  const userOptions = users.map(
-    (user) => ({
-      key: user.name,
-      label: <Label label={user.name}></Label>,
-      value: user.id.toString(),
-      type: "value" as const,
-    }),
-    [users]
-  ) as any;
-
   const themes = {
     stackStyles: {
       marginTop: "5px",
-      color: "#8B9293",
+      color: theme.colors.grey80,
       width: "100%",
     },
   };
@@ -141,37 +110,15 @@ export const CreateContact = () => {
             })}
           />
         </Stack>
-        <Stack vertical style={themes.stackStyles}>
-          <H1>Organization</H1>
-          <Dropdown<Status, HTMLDivElement>
-            placement="bottom-start"
-            options={orgOptions}
-            fetchMoreText={"Fetch more"}
-            autoscrollText={"Autoscroll"}
-            selectedIcon={faCheck}
-            externalLinkIcon={faExternalLinkAlt}
-            onSelectOption={(option) => {
-              setSelectedOrg(option.value);
-            }}
-          >
-            {({
-              targetProps,
-              targetRef,
-            }: DropdownTargetProps<HTMLDivElement>) => (
-              <DivAsInput
-                ref={targetRef}
-                {...targetProps}
-                variant="inline"
-                rightIcon={faCaretDown}
-                placeholder="Enter value"
-                value={
-                  orgOptions.find((e: any) => e.value === selectedOrg)?.key ??
-                  ""
-                }
-              />
-            )}
-          </Dropdown>
-        </Stack>
+        <Dropdown
+          title="Organization"
+          data={organizations}
+          onChange={(e) => setValue("org_id", e)}
+          value={orgId}
+          error={!!errors?.org_id}
+          keyName="id"
+          valueName="name"
+        />
         <Stack vertical style={themes.stackStyles}>
           <H1>Label</H1>
           <Input
@@ -200,37 +147,15 @@ export const CreateContact = () => {
             {...register("email", { required: true })}
           />
         </Stack>
-        <Stack vertical style={themes.stackStyles}>
-          <H1>Owner</H1>
-          <Dropdown<Status, HTMLDivElement>
-            placement="bottom-start"
-            options={userOptions}
-            fetchMoreText={"Fetch more"}
-            autoscrollText={"Autoscroll"}
-            selectedIcon={faCheck}
-            externalLinkIcon={faExternalLinkAlt}
-            onSelectOption={(option) => {
-              setSelectedUser(option.value);
-            }}
-          >
-            {({
-              targetProps,
-              targetRef,
-            }: DropdownTargetProps<HTMLDivElement>) => (
-              <DivAsInput
-                ref={targetRef}
-                {...targetProps}
-                variant="inline"
-                placeholder="Enter value"
-                rightIcon={faCaretDown}
-                value={
-                  userOptions.find((e: any) => e.value === selectedUser)?.key ??
-                  ""
-                }
-              />
-            )}
-          </Dropdown>
-        </Stack>
+        <Dropdown
+          title="Owner"
+          data={users}
+          value={ownerId}
+          onChange={(e) => setValue("owner_id", e)}
+          error={!!errors?.owner_id}
+          keyName="id"
+          valueName="name"
+        />
         <Stack style={{ justifyContent: "space-between" }}>
           <Button
             type="submit"

@@ -22,7 +22,6 @@ import {
 } from "../api/api";
 import { Dropdown } from "../components/Dropdown";
 import { useUser } from "../context/userContext";
-import { ICurrentAndList } from "../types/currentAndList";
 import { IPipedriveContact } from "../types/pipedrive/pipedriveContact";
 import { IPipedriveCreateDeal } from "../types/pipedrive/pipedriveCreateDeal";
 import { IPipedriveOrganization } from "../types/pipedrive/pipedriveOrganization";
@@ -34,35 +33,29 @@ export const EditDeal = () => {
   const { theme } = useDeskproAppTheme();
   const navigate = useNavigate();
   const deskproUser = useUser();
-  const { theme } = useDeskproAppTheme();
   const { dealId } = useParams();
   const {
     handleSubmit,
     register,
     formState: { errors },
     setError,
+    watch,
+    setValue,
   } = useForm<IPipedriveCreateDeal>();
 
-  const [contact, setContact] = useState<ICurrentAndList<IPipedriveContact>>({
-    current: null,
-    list: [],
-  });
-  const [organization, setOrganization] = useState<
-    ICurrentAndList<IPipedriveOrganization>
-  >({
-    current: null,
-    list: [],
-  });
-  const [pipeline, setPipeline] = useState<ICurrentAndList<IPipedrivePipeline>>(
-    {
-      current: null,
-      list: [],
-    }
+  const [orgId, personId, pipelineId, userId] = watch([
+    "org_id",
+    "person_id",
+    "pipeline_id",
+    "user_id",
+  ]);
+
+  const [contacts, setContact] = useState<IPipedriveContact[]>([]);
+  const [organizations, setOrganizations] = useState<IPipedriveOrganization[]>(
+    []
   );
-  const [user, setUser] = useState<ICurrentAndList<IPipedriveUser>>({
-    current: null,
-    list: [],
-  });
+  const [pipelines, setPipelines] = useState<IPipedrivePipeline[]>([]);
+  const [users, setUsers] = useState<IPipedriveUser[]>([]);
 
   useInitialisedDeskproAppClient(
     async (client) => {
@@ -71,35 +64,22 @@ export const EditDeal = () => {
       await Promise.all([
         (async () => {
           const contacts = await getAllContacts(client, deskproUser.orgName);
-
-          setContact({ current: null, list: contacts.data ?? [] });
+          setContact(contacts.data ?? []);
         })(),
         (async () => {
           const organizations = await getAllOrganizations(
             client,
             deskproUser.orgName
           );
-
-          setOrganization({
-            current: null,
-            list: organizations.data ?? [],
-          });
+          setOrganizations(organizations.data ?? []);
         })(),
         (async () => {
           const pipelines = await getAllPipelines(client, deskproUser.orgName);
-
-          setPipeline({
-            current: null,
-            list: pipelines.data ?? [],
-          });
+          setPipelines(pipelines.data ?? []);
         })(),
         (async () => {
           const users = await getAllUsers(client, deskproUser.orgName);
-
-          setUser({
-            current: null,
-            list: users.data ?? [],
-          });
+          setUsers(users.data ?? []);
         })(),
       ]);
     },
@@ -125,16 +105,16 @@ export const EditDeal = () => {
   );
 
   const submitEditDeal = async (values: IPipedriveCreateDeal) => {
-    if (!client || !deskproUser || !contact || !dealId) return;
+    if (!client || !deskproUser || !contacts || !dealId) return;
 
     const pipedriveDeal = {
       title: values.title,
       value: values.value,
-      org_id: organization.current,
-      person_id: contact.current,
-      user_id: user.current,
+      org_id: orgId,
+      person_id: personId,
+      user_id: userId,
       expected_close_date: values.expected_close_date,
-      pipeline_id: pipeline.current,
+      pipeline_id: pipelineId,
     } as IPipedriveCreateDeal;
 
     const response = await editDeal(
@@ -180,20 +160,22 @@ export const EditDeal = () => {
 
           <Dropdown
             title="Contact Person"
-            data={contact}
-            setter={setContact}
-            errors={errors}
+            data={contacts}
+            value={personId}
+            onChange={(e) => setValue("person_id", e)}
+            error={!!errors?.person_id}
             keyName="id"
             valueName="name"
-          ></Dropdown>
+          />
           <Dropdown
             title="Organization"
-            data={organization}
-            setter={setOrganization}
-            errors={errors}
+            data={organizations}
+            onChange={(e) => setValue("org_id", e)}
+            value={orgId}
+            error={!!errors?.org_id}
             keyName="id"
             valueName="name"
-          ></Dropdown>
+          />
           <Stack vertical style={themes.stackStyles}>
             <H1>Value</H1>
             <Input
@@ -205,12 +187,13 @@ export const EditDeal = () => {
           </Stack>
           <Dropdown
             title="Pipeline"
-            data={pipeline}
-            setter={setPipeline}
-            errors={errors}
+            data={pipelines}
+            value={pipelineId}
+            onChange={(e) => setValue("pipeline_id", e)}
+            error={!!errors?.pipeline_id}
             keyName="id"
             valueName="name"
-          ></Dropdown>
+          />
           <Stack vertical style={themes.stackStyles}>
             <H1>Excepted close date</H1>
             <Input
@@ -221,13 +204,14 @@ export const EditDeal = () => {
             />
           </Stack>
           <Dropdown
-            title="Owner"
-            data={user}
-            setter={setUser}
-            errors={errors}
+            title="User"
+            data={users}
+            value={userId}
+            onChange={(e) => setValue("user_id", e)}
+            error={!!errors?.user_id}
             keyName="id"
             valueName="name"
-          ></Dropdown>
+          />
         </Stack>
         <Button
           type="submit"

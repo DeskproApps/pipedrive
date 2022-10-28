@@ -21,7 +21,6 @@ import {
 } from "../api/api";
 import { Dropdown } from "../components/Dropdown";
 import { useUser } from "../context/userContext";
-import { ICurrentAndList } from "../types/currentAndList";
 import { IPipedriveContact } from "../types/pipedrive/pipedriveContact";
 import { IPipedriveCreateContact } from "../types/pipedrive/pipedriveCreateContact";
 import { IPipedriveOrganization } from "../types/pipedrive/pipedriveOrganization";
@@ -38,23 +37,17 @@ export const EditContact = () => {
     register,
     formState: { errors },
     setError,
+    setValue,
+    watch,
   } = useForm<IPipedriveCreateContact>();
 
-  const [contact, setContact] = useState<ICurrentAndList<IPipedriveContact>>({
-    current: null,
-    list: [],
-  });
-  const [organization, setOrganization] = useState<
-    ICurrentAndList<IPipedriveOrganization>
-  >({
-    current: null,
-    list: [],
-  });
+  const [orgId, ownerId] = watch(["org_id", "owner_id"]);
 
-  const [user, setUser] = useState<ICurrentAndList<IPipedriveUser>>({
-    current: null,
-    list: [],
-  });
+  const [contact, setContact] = useState<IPipedriveContact[]>([]);
+  const [organizations, setOrganizations] = useState<IPipedriveOrganization[]>(
+    []
+  );
+  const [users, setUsers] = useState<IPipedriveUser[]>([]);
 
   useInitialisedDeskproAppClient(
     async (client) => {
@@ -64,7 +57,7 @@ export const EditContact = () => {
         (async () => {
           const contacts = await getAllContacts(client, deskproUser.orgName);
 
-          setContact({ current: null, list: contacts.data ?? [] });
+          setContact(contacts.data ?? []);
         })(),
         (async () => {
           const organizations = await getAllOrganizations(
@@ -72,18 +65,12 @@ export const EditContact = () => {
             deskproUser.orgName
           );
 
-          setOrganization({
-            current: null,
-            list: organizations.data ?? [],
-          });
+          setOrganizations(organizations.data ?? []);
         })(),
         (async () => {
           const users = await getAllUsers(client, deskproUser.orgName);
 
-          setUser({
-            current: null,
-            list: users.data ?? [],
-          });
+          setUsers(users.data ?? []);
         })(),
       ]);
     },
@@ -116,8 +103,8 @@ export const EditContact = () => {
       email: values.email,
       label: values.label,
       phone: values.phone,
-      owner_id: user.current,
-      org_id: organization.current,
+      owner_id: ownerId,
+      org_id: orgId,
     } as IPipedriveCreateContact;
 
     Object.keys(pipedriveContact).forEach((key) => {
@@ -171,9 +158,10 @@ export const EditContact = () => {
           </Stack>
           <Dropdown
             title="Organization"
-            data={organization}
-            setter={setOrganization}
-            errors={errors}
+            data={organizations}
+            onChange={(e) => setValue("org_id", e)}
+            value={orgId}
+            error={!!errors?.org_id}
             keyName="id"
             valueName="name"
           ></Dropdown>
@@ -206,12 +194,13 @@ export const EditContact = () => {
           </Stack>
           <Dropdown
             title="Owner"
-            data={user}
-            setter={setUser}
-            errors={errors}
+            data={users}
+            value={ownerId}
+            onChange={(e) => setValue("owner_id", e)}
+            error={!!errors?.owner_id}
             keyName="id"
             valueName="name"
-          ></Dropdown>
+          />
         </Stack>
         <Button
           type="submit"

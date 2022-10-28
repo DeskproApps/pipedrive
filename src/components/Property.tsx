@@ -1,4 +1,4 @@
-import { H2 } from "@deskpro/app-sdk";
+import { H2, useDeskproAppTheme } from "@deskpro/app-sdk";
 
 export const Property = ({
   title,
@@ -7,13 +7,14 @@ export const Property = ({
   title: string;
   children: string;
 }) => {
+  const { theme } = useDeskproAppTheme();
   return (
     <div>
       <h2
         style={{
           fontSize: "12px",
           margin: "1px",
-          color: "#8B9293",
+          color: theme.colors.grey80,
           fontWeight: "normal",
           marginBottom: "3px",
         }}
