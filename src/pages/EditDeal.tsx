@@ -5,6 +5,7 @@ import {
   Stack,
   useDeskproAppClient,
   useDeskproAppEvents,
+  useDeskproAppTheme,
   useInitialisedDeskproAppClient,
 } from "@deskpro/app-sdk";
 import { useState } from "react";
@@ -30,6 +31,7 @@ export const EditDeal = () => {
   const { client } = useDeskproAppClient();
   const navigate = useNavigate();
   const deskproUser = useUser();
+  const { theme } = useDeskproAppTheme();
   const { dealId } = useParams();
   const {
     handleSubmit,
@@ -159,7 +161,7 @@ export const EditDeal = () => {
   const themes = {
     stackStyles: {
       marginTop: "5px",
-      color: "#8B9293",
+      color: theme.colors.grey80,
       width: "100%",
     },
   };
