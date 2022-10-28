@@ -188,6 +188,34 @@ const createContact = async (
   return response.json();
 };
 
+const editContact = async (
+  client: IDeskproClient,
+  orgName: string,
+  data: IPipedriveCreateContact,
+  contactId: string
+): Promise<PipedriveAPIResponse<IPipedriveContact>> => {
+  const pFetch = await proxyFetch(client);
+
+  Object.keys(data).forEach((key) => {
+    if (!data[key as keyof typeof data]) {
+      delete data[key as keyof typeof data];
+    }
+  });
+
+  const response = await pFetch(
+    `https://${orgName}.pipedrive.com/v1/persons/${contactId}?api_token=__api_key__`,
+    {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    }
+  );
+
+  return response.json();
+};
+
 const getDealById = async (
   client: IDeskproClient,
   orgName: string,
@@ -252,6 +280,12 @@ const editDeal = async (
   dealId: string
 ): Promise<PipedriveAPIResponse<IPipedriveDeal>> => {
   const pFetch = await proxyFetch(client);
+
+  Object.keys(data).forEach((key) => {
+    if (!data[key as keyof typeof data]) {
+      delete data[key as keyof typeof data];
+    }
+  });
 
   const response = await pFetch(
     `https://${orgName}.pipedrive.com/v1/deals/${dealId}?api_token=__api_key__`,
@@ -428,6 +462,7 @@ const getAllDeals = async (
 };
 
 export {
+  editContact,
   editDeal,
   createNote,
   createActivity,

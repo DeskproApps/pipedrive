@@ -14,34 +14,31 @@ import { useForm } from "react-hook-form";
 import { useNavigate, useParams } from "react-router-dom";
 
 import {
-  editDeal,
+  editContact,
   getAllContacts,
   getAllOrganizations,
-  getAllPipelines,
   getAllUsers,
 } from "../api/api";
 import { Dropdown } from "../components/Dropdown";
 import { useUser } from "../context/userContext";
 import { ICurrentAndList } from "../types/currentAndList";
 import { IPipedriveContact } from "../types/pipedrive/pipedriveContact";
-import { IPipedriveCreateDeal } from "../types/pipedrive/pipedriveCreateDeal";
+import { IPipedriveCreateContact } from "../types/pipedrive/pipedriveCreateContact";
 import { IPipedriveOrganization } from "../types/pipedrive/pipedriveOrganization";
-import { IPipedrivePipeline } from "../types/pipedrive/pipedrivePipeline";
 import { IPipedriveUser } from "../types/pipedrive/pipedriveUser";
 
-export const EditDeal = () => {
+export const EditContact = () => {
   const { client } = useDeskproAppClient();
   const { theme } = useDeskproAppTheme();
   const navigate = useNavigate();
   const deskproUser = useUser();
-  const { theme } = useDeskproAppTheme();
-  const { dealId } = useParams();
+  const { contactId } = useParams();
   const {
     handleSubmit,
     register,
     formState: { errors },
     setError,
-  } = useForm<IPipedriveCreateDeal>();
+  } = useForm<IPipedriveCreateContact>();
 
   const [contact, setContact] = useState<ICurrentAndList<IPipedriveContact>>({
     current: null,
@@ -53,12 +50,7 @@ export const EditDeal = () => {
     current: null,
     list: [],
   });
-  const [pipeline, setPipeline] = useState<ICurrentAndList<IPipedrivePipeline>>(
-    {
-      current: null,
-      list: [],
-    }
-  );
+
   const [user, setUser] = useState<ICurrentAndList<IPipedriveUser>>({
     current: null,
     list: [],
@@ -86,14 +78,6 @@ export const EditDeal = () => {
           });
         })(),
         (async () => {
-          const pipelines = await getAllPipelines(client, deskproUser.orgName);
-
-          setPipeline({
-            current: null,
-            list: pipelines.data ?? [],
-          });
-        })(),
-        (async () => {
           const users = await getAllUsers(client, deskproUser.orgName);
 
           setUser({
@@ -112,7 +96,7 @@ export const EditDeal = () => {
 
   useDeskproAppEvents(
     {
-      async onElementEvent(id) {
+      onElementEvent(id) {
         switch (id) {
           case "pipedriveHomeButton": {
             navigate("/redirect");
@@ -124,24 +108,29 @@ export const EditDeal = () => {
     [client, deskproUser]
   );
 
-  const submitEditDeal = async (values: IPipedriveCreateDeal) => {
-    if (!client || !deskproUser || !contact || !dealId) return;
+  const submitEditContact = async (values: IPipedriveCreateContact) => {
+    if (!client || !deskproUser || !contact || !contactId) return;
 
-    const pipedriveDeal = {
-      title: values.title,
-      value: values.value,
+    const pipedriveContact = {
+      name: values.name,
+      email: values.email,
+      label: values.label,
+      phone: values.phone,
+      owner_id: user.current,
       org_id: organization.current,
-      person_id: contact.current,
-      user_id: user.current,
-      expected_close_date: values.expected_close_date,
-      pipeline_id: pipeline.current,
-    } as IPipedriveCreateDeal;
+    } as IPipedriveCreateContact;
 
-    const response = await editDeal(
+    Object.keys(pipedriveContact).forEach((key) => {
+      if (!pipedriveContact[key as keyof typeof pipedriveContact]) {
+        delete pipedriveContact[key as keyof typeof pipedriveContact];
+      }
+    });
+
+    const response = await editContact(
       client,
       deskproUser?.orgName,
-      pipedriveDeal,
-      dealId
+      pipedriveContact,
+      contactId
     );
 
     if (!response.success) {
@@ -165,27 +154,21 @@ export const EditDeal = () => {
 
   return (
     <Stack>
-      <form onSubmit={handleSubmit(submitEditDeal)} style={{ width: "100%" }}>
+      <form
+        onSubmit={handleSubmit(submitEditContact)}
+        style={{ width: "100%" }}
+      >
         <Stack vertical gap={5}>
           <H1>Details</H1>
           <Stack vertical style={themes.stackStyles}>
-            <H1>Title</H1>
+            <H1>Name</H1>
             <Input
               variant="inline"
               placeholder="Enter value"
               type="title"
-              {...register("title")}
+              {...register("name")}
             />
           </Stack>
-
-          <Dropdown
-            title="Contact Person"
-            data={contact}
-            setter={setContact}
-            errors={errors}
-            keyName="id"
-            valueName="name"
-          ></Dropdown>
           <Dropdown
             title="Organization"
             data={organization}
@@ -195,29 +178,30 @@ export const EditDeal = () => {
             valueName="name"
           ></Dropdown>
           <Stack vertical style={themes.stackStyles}>
-            <H1>Value</H1>
+            <H1>Label</H1>
+            <Input
+              variant="inline"
+              placeholder="Enter value"
+              type="text"
+              {...register("label")}
+            />
+          </Stack>
+          <Stack vertical style={themes.stackStyles}>
+            <H1>Phone number</H1>
             <Input
               variant="inline"
               placeholder="Enter value"
               type="number"
-              {...register("value")}
+              {...register("phone")}
             />
           </Stack>
-          <Dropdown
-            title="Pipeline"
-            data={pipeline}
-            setter={setPipeline}
-            errors={errors}
-            keyName="id"
-            valueName="name"
-          ></Dropdown>
           <Stack vertical style={themes.stackStyles}>
-            <H1>Excepted close date</H1>
+            <H1>Email</H1>
             <Input
               variant="inline"
               placeholder="Enter value"
-              type="date"
-              {...register("expected_close_date")}
+              type="email"
+              {...register("email")}
             />
           </Stack>
           <Dropdown

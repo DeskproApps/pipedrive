@@ -100,9 +100,11 @@ export const Main = () => {
   useInitialisedDeskproAppClient((client) => {
     client.setTitle("Home");
 
-    client.deregisterElement("pipedriveEditButton");
-
     client.deregisterElement("pipedriveLink");
+
+    client.registerElement("pipedriveEditButton", {
+      type: "edit_button",
+    });
 
     client.registerElement("pipedriveHomeButton", {
       type: "home_button",
@@ -134,6 +136,11 @@ export const Main = () => {
             navigate("/redirect");
             break;
           }
+          case "pipedriveEditButton": {
+            if (!pipedriveContact) return;
+            navigate(`/editcontact/${pipedriveContact.id}`);
+            break;
+          }
           case "pipedriveMenuButton": {
             if (!client || !deskproUser) return;
             const id = (
@@ -152,7 +159,7 @@ export const Main = () => {
         }
       },
     },
-    [client, deskproUser]
+    [client, deskproUser, pipedriveContact]
   );
 
   useInitialisedDeskproAppClient(
