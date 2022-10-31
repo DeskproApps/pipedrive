@@ -9,15 +9,15 @@ import {
   useDeskproAppTheme,
   useInitialisedDeskproAppClient,
 } from "@deskpro/app-sdk";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate, useParams } from "react-router-dom";
 
 import {
   editContact,
-  getAllContacts,
   getAllOrganizations,
   getAllUsers,
+  getContactById,
 } from "../api/api";
 import { Dropdown } from "../components/Dropdown";
 import { useUser } from "../context/userContext";
@@ -39,11 +39,11 @@ export const EditContact = () => {
     setError,
     setValue,
     watch,
+    reset,
   } = useForm<IPipedriveCreateContact>();
 
   const [orgId, ownerId] = watch(["org_id", "owner_id"]);
-
-  const [contact, setContact] = useState<IPipedriveContact[]>([]);
+  const [contact, setContact] = useState<IPipedriveContact | null>(null);
   const [organizations, setOrganizations] = useState<IPipedriveOrganization[]>(
     []
   );
@@ -51,13 +51,17 @@ export const EditContact = () => {
 
   useInitialisedDeskproAppClient(
     async (client) => {
-      if (!deskproUser) return;
+      if (!deskproUser || !contactId) return;
 
       await Promise.all([
         (async () => {
-          const contacts = await getAllContacts(client, deskproUser.orgName);
+          const contactRes = await getContactById(
+            client,
+            deskproUser.orgName,
+            contactId
+          );
 
-          setContact(contacts.data ?? []);
+          setContact(contactRes.data);
         })(),
         (async () => {
           const organizations = await getAllOrganizations(
@@ -76,6 +80,19 @@ export const EditContact = () => {
     },
     [deskproUser]
   );
+
+  useEffect(() => {
+    if (!contact) return;
+
+    reset({
+      name: contact.name,
+      email: contact.email[0].value,
+      phone: contact.phone[0].value,
+      owner_id: contact.owner_id?.value.toString(),
+      org_id: contact.org_id?.value.toString(),
+      label: contact.label ?? "",
+    });
+  }, [contact, reset]);
 
   useInitialisedDeskproAppClient((client) => {
     client.deregisterElement("pipedriveEditButton");
@@ -96,7 +113,7 @@ export const EditContact = () => {
   );
 
   const submitEditContact = async (values: IPipedriveCreateContact) => {
-    if (!client || !deskproUser || !contact || !contactId) return;
+    if (!client || !deskproUser || !contactId) return;
 
     const pipedriveContact = {
       name: values.name,
@@ -179,7 +196,7 @@ export const EditContact = () => {
             <Input
               variant="inline"
               placeholder="Enter value"
-              type="number"
+              type="tel"
               {...register("phone")}
             />
           </Stack>

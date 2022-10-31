@@ -9,7 +9,7 @@ import {
   useDeskproAppTheme,
   useInitialisedDeskproAppClient,
 } from "@deskpro/app-sdk";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate, useParams } from "react-router-dom";
 
@@ -19,11 +19,13 @@ import {
   getAllOrganizations,
   getAllPipelines,
   getAllUsers,
+  getDealById,
 } from "../api/api";
 import { Dropdown } from "../components/Dropdown";
 import { useUser } from "../context/userContext";
 import { IPipedriveContact } from "../types/pipedrive/pipedriveContact";
 import { IPipedriveCreateDeal } from "../types/pipedrive/pipedriveCreateDeal";
+import { IPipedriveDeal } from "../types/pipedrive/pipedriveDeal";
 import { IPipedriveOrganization } from "../types/pipedrive/pipedriveOrganization";
 import { IPipedrivePipeline } from "../types/pipedrive/pipedrivePipeline";
 import { IPipedriveUser } from "../types/pipedrive/pipedriveUser";
@@ -41,6 +43,7 @@ export const EditDeal = () => {
     setError,
     watch,
     setValue,
+    reset,
   } = useForm<IPipedriveCreateDeal>();
 
   const [orgId, personId, pipelineId, userId] = watch([
@@ -56,10 +59,11 @@ export const EditDeal = () => {
   );
   const [pipelines, setPipelines] = useState<IPipedrivePipeline[]>([]);
   const [users, setUsers] = useState<IPipedriveUser[]>([]);
+  const [deal, setDeal] = useState<IPipedriveDeal | null>(null);
 
   useInitialisedDeskproAppClient(
     async (client) => {
-      if (!deskproUser) return;
+      if (!deskproUser || !dealId) return;
 
       await Promise.all([
         (async () => {
@@ -80,6 +84,15 @@ export const EditDeal = () => {
         (async () => {
           const users = await getAllUsers(client, deskproUser.orgName);
           setUsers(users.data ?? []);
+        })(),
+        (async () => {
+          const deal = await getDealById(
+            client,
+            deskproUser.orgName,
+            Number(dealId)
+          );
+
+          setDeal(deal.data);
         })(),
       ]);
     },
@@ -104,6 +117,19 @@ export const EditDeal = () => {
     [client]
   );
 
+  useEffect(() => {
+    if (!deal) return;
+
+    reset({
+      title: deal.title,
+      value: deal.value.toString(),
+      org_id: deal.org_id.value.toString(),
+      person_id: deal.person_id?.value?.toString(),
+      pipeline_id: deal.pipeline_id.toString(),
+      user_id: deal.user_id?.value?.toString(),
+    });
+  }, [deal, reset]);
+
   const submitEditDeal = async (values: IPipedriveCreateDeal) => {
     if (!client || !deskproUser || !contacts || !dealId) return;
 
@@ -116,7 +142,7 @@ export const EditDeal = () => {
       expected_close_date: values.expected_close_date,
       pipeline_id: pipelineId,
     } as IPipedriveCreateDeal;
-
+    console.log("a");
     const response = await editDeal(
       client,
       deskproUser?.orgName,

@@ -70,7 +70,7 @@ export const Dropdown = <T,>({
             placeholder="Enter value"
             value={
               dataOptions.find(
-                (e: { value: string; key: string }) => e.key === value
+                (e: { value: string; key: string }) => e.key == value
               )?.value ?? ""
             }
           />
