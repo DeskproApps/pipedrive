@@ -92,6 +92,7 @@ export const CreateNote = () => {
           minimal
         >
           <LabelButtonFileInput
+            accept="image/jpeg, image/jpg, image/pjp, image/pjpeg"
             onChange={(e) => submitImage(e as unknown as TargetFile)}
           />
         </LabelButton>
