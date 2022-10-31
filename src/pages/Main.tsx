@@ -108,6 +108,10 @@ export const Main = () => {
 
     client.registerElement("pipedriveHomeButton", {
       type: "home_button",
+      payload: {
+        type: "changePage",
+        page: "/",
+      },
     });
 
     client.registerElement("pipedriveRefreshButton", {
@@ -132,10 +136,6 @@ export const Main = () => {
     {
       async onElementEvent(id) {
         switch (id) {
-          case "pipedriveHomeButton": {
-            navigate("/redirect");
-            break;
-          }
           case "pipedriveEditButton": {
             if (!pipedriveContact) return;
             navigate(`/editcontact/${pipedriveContact.id}`);

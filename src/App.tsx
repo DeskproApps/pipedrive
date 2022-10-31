@@ -16,7 +16,6 @@ import { Contacts } from "./pages/Contact";
 import { Main } from "./pages/Main";
 
 import { DealDetails } from "./pages/DealDetails";
-import { Redirect } from "./pages/Redirect";
 import { CreateDeal } from "./pages/CreateDeal";
 import { CreateActivity } from "./pages/CreateActivity";
 import { CreateNote } from "./pages/CreateNote";
@@ -37,7 +36,6 @@ function App() {
               element={<DealDetails />}
             ></Route>
             <Route path="/contacts" element={<Contacts />}></Route>
-            <Route path="/redirect/" element={<Redirect />}></Route>
             <Route path="/createdeal" element={<CreateDeal />}></Route>
             <Route path="/editdeal/:dealId" element={<EditDeal />}></Route>
             <Route path="/createactivity" element={<CreateActivity />}></Route>

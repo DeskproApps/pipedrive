@@ -59,6 +59,10 @@ export const CreateDeal = () => {
 
     client.registerElement("pipedriveHomeButton", {
       type: "home_button",
+      payload: {
+        type: "changePage",
+        page: "/",
+      },
     });
   });
 
