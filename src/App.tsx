@@ -23,6 +23,7 @@ import { ErrorBoundary } from "react-error-boundary";
 import { ErrorFallback } from "./components/ErrorFallback";
 import { EditDeal } from "./pages/EditDeal";
 import { EditContact } from "./pages/EditContact";
+import { Redirect } from "./pages/Redirect";
 
 function App() {
   return (
@@ -36,6 +37,7 @@ function App() {
               element={<DealDetails />}
             ></Route>
             <Route path="/contacts" element={<Contacts />}></Route>
+            <Route path="/redirect/" element={<Redirect />}></Route>
             <Route path="/createdeal" element={<CreateDeal />}></Route>
             <Route path="/editdeal/:dealId" element={<EditDeal />}></Route>
             <Route path="/createactivity" element={<CreateActivity />}></Route>

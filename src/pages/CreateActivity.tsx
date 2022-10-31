@@ -4,6 +4,7 @@ import {
   Input,
   Stack,
   useDeskproAppClient,
+  useDeskproAppEvents,
   useDeskproAppTheme,
   useInitialisedDeskproAppClient,
 } from "@deskpro/app-sdk";
@@ -44,7 +45,7 @@ export const CreateActivity = () => {
   const { theme } = useDeskproAppTheme();
   const deskproUser = useUser();
   const [activity, contactId, dealId, orgId, userId, duration, time] = watch([
-    "activity_subject",
+    "subject",
     "person_id",
     "deal_id",
     "org_id",
@@ -74,8 +75,8 @@ export const CreateActivity = () => {
 
     const activityObj = {
       ...data,
-      due_time: time,
-      duration: duration,
+      due_time: timeList[Number(time)].value,
+      duration: durations[Number(duration)].value,
       deal_id: dealId,
       person_id: contactId,
       org_id: orgId,
@@ -115,6 +116,20 @@ export const CreateActivity = () => {
       },
     });
   });
+
+  useDeskproAppEvents(
+    {
+      onElementEvent(id) {
+        switch (id) {
+          case "pipedriveHomeButton": {
+            navigate("/redirect");
+            break;
+          }
+        }
+      },
+    },
+    [client]
+  );
 
   useInitialisedDeskproAppClient(async (client) => {
     if (!deskproUser) return;
@@ -181,9 +196,9 @@ export const CreateActivity = () => {
       <Stack vertical gap={5}>
         <Dropdown
           data={activityTypes}
-          onChange={(e) => setValue("activity_subject", e)}
+          onChange={(e) => setValue("subject", e)}
           title="Activity type"
-          error={!!errors?.activity_subject}
+          error={!!errors?.subject}
           value={activity}
           keyName="id"
           valueName="name"
@@ -191,7 +206,7 @@ export const CreateActivity = () => {
         <Stack vertical style={themes.stackStyles}>
           <H1>Activity Subject</H1>
           <Input
-            error={Boolean(errors?.activity_subject)}
+            error={Boolean(errors?.subject)}
             variant="inline"
             placeholder="Enter value"
             type="title"
@@ -199,7 +214,7 @@ export const CreateActivity = () => {
           />
         </Stack>
         <Stack vertical style={themes.stackStyles}>
-          <H1>Date</H1>
+          <H1>Due Date</H1>
           <Input
             style={{
               color: theme.colors.grey80,
@@ -214,7 +229,7 @@ export const CreateActivity = () => {
         <Dropdown<{ key: string; value: string }>
           data={timeList}
           onChange={(e) => setValue("due_time", e)}
-          title="Time"
+          title="Due Time"
           value={time}
           error={!!errors?.due_time}
           keyName="key"
@@ -242,7 +257,7 @@ export const CreateActivity = () => {
           title="Organization"
           data={organizations}
           onChange={(e) => setValue("org_id", e)}
-          value={orgId.toString()}
+          value={orgId}
           error={!!errors?.org_id}
           keyName="id"
           valueName="name"
@@ -260,7 +275,7 @@ export const CreateActivity = () => {
           title="Owner"
           data={users}
           value={userId}
-          onChange={(e) => setValue("user_id", e.toString())}
+          onChange={(e) => setValue("user_id", e)}
           error={!!errors?.user_id}
           keyName="id"
           valueName="name"

@@ -6,6 +6,7 @@ import {
   Input,
   Stack,
   useDeskproAppClient,
+  useDeskproAppEvents,
   useDeskproAppTheme,
   useInitialisedDeskproAppClient,
 } from "@deskpro/app-sdk";
@@ -102,6 +103,20 @@ export const CreateDeal = () => {
       setUsers(users.data ?? []);
     },
     [deskproUser]
+  );
+
+  useDeskproAppEvents(
+    {
+      onElementEvent(id) {
+        switch (id) {
+          case "pipedriveHomeButton": {
+            navigate("/redirect");
+            break;
+          }
+        }
+      },
+    },
+    [client]
   );
 
   const postDeal = async (values: IPipedriveCreateDeal) => {

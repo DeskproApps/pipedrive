@@ -83,7 +83,7 @@ export const ActivitiesMainView = ({
                   justifyContent: "space-between",
                 }}
               >
-                <h1 style={{ fontSize: "12px" }}>{activity.deal_title}</h1>
+                <h1 style={{ fontSize: "12px" }}>{activity.subject}</h1>
                 <LogoAndLinkButton
                   endpoint={`activities/list/user/${contact.owner_id.id}`}
                 />

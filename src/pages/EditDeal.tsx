@@ -5,6 +5,7 @@ import {
   Input,
   Stack,
   useDeskproAppClient,
+  useDeskproAppEvents,
   useDeskproAppTheme,
   useInitialisedDeskproAppClient,
 } from "@deskpro/app-sdk";
@@ -88,6 +89,20 @@ export const EditDeal = () => {
   useInitialisedDeskproAppClient((client) => {
     client.deregisterElement("pipedriveEditButton");
   });
+
+  useDeskproAppEvents(
+    {
+      onElementEvent(id) {
+        switch (id) {
+          case "pipedriveHomeButton": {
+            navigate("/redirect");
+            break;
+          }
+        }
+      },
+    },
+    [client]
+  );
 
   const submitEditDeal = async (values: IPipedriveCreateDeal) => {
     if (!client || !deskproUser || !contacts || !dealId) return;

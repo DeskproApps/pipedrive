@@ -78,7 +78,11 @@ export const CreateNote = () => {
         {image && (
           <AttachmentTag
             download
-            filename={image.name}
+            filename={
+              image.name.length > 27
+                ? `${image.name.substring(0, 25)}...`
+                : image.name
+            }
             fileSize={image.size}
             icon={faFile}
             withClose

@@ -7,9 +7,8 @@ export interface IPipedriveCreateActivity {
   org_id: string;
   note: string;
   location: string;
-  activity_subject: string;
-  public_description: string;
   subject: string;
+  public_description: string;
   type: string;
   user_id: string;
   participants: string[];

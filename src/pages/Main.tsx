@@ -108,10 +108,6 @@ export const Main = () => {
 
     client.registerElement("pipedriveHomeButton", {
       type: "home_button",
-      payload: {
-        type: "changePage",
-        page: "/",
-      },
     });
 
     client.registerElement("pipedriveRefreshButton", {
@@ -134,8 +130,12 @@ export const Main = () => {
 
   useDeskproAppEvents(
     {
-      async onElementEvent(id) {
+      onElementEvent(id) {
         switch (id) {
+          case "pipedriveHomeButton": {
+            navigate("/redirect");
+            break;
+          }
           case "pipedriveEditButton": {
             if (!pipedriveContact) return;
             navigate(`/editcontact/${pipedriveContact.id}`);
@@ -143,16 +143,22 @@ export const Main = () => {
           }
           case "pipedriveMenuButton": {
             if (!client || !deskproUser) return;
-            const id = (
+
+            (async () => {
+              const id = (
+                await client
+                  .getEntityAssociation(
+                    "linkedPipedriveContacts",
+                    deskproUser.id
+                  )
+                  .list()
+              )[0];
+
               await client
                 .getEntityAssociation("linkedPipedriveContacts", deskproUser.id)
-                .list()
-            )[0];
-
-            await client
-              .getEntityAssociation("linkedPipedriveContacts", deskproUser.id)
-              .delete(id);
-            navigate("/contacts");
+                .delete(id);
+              navigate("/contacts");
+            })();
 
             break;
           }
