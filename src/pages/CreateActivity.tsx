@@ -8,7 +8,7 @@ import {
   useDeskproAppTheme,
   useInitialisedDeskproAppClient,
 } from "@deskpro/app-sdk";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 
@@ -29,7 +29,6 @@ import { IPipedriveDeal } from "../types/pipedrive/pipedriveDeal";
 import { IPipedriveOrganization } from "../types/pipedrive/pipedriveOrganization";
 import { IPipedriveUser } from "../types/pipedrive/pipedriveUser";
 import { getHoursEvery30Minutes } from "../utils/utils";
-
 export const CreateActivity = () => {
   const navigate = useNavigate();
   const { client } = useDeskproAppClient();
@@ -44,8 +43,8 @@ export const CreateActivity = () => {
   } = useForm<IPipedriveCreateActivity>();
   const { theme } = useDeskproAppTheme();
   const deskproUser = useUser();
-  const [activity, contactId, dealId, orgId, userId, duration, time] = watch([
-    "subject",
+  const [type, contactId, dealId, orgId, userId, duration, time] = watch([
+    "type",
     "person_id",
     "deal_id",
     "org_id",
@@ -75,13 +74,13 @@ export const CreateActivity = () => {
 
     const activityObj = {
       ...data,
-      due_time: timeList[Number(time)].value,
-      duration: durations[Number(duration)].value,
+      due_time: timeList[Number(time)]?.value,
+      duration: durations[Number(duration)]?.value,
       deal_id: dealId,
       person_id: contactId,
       org_id: orgId,
       user_id: userId,
-      type: activity,
+      type: type,
     } as unknown as IPipedriveCreateActivity;
 
     const response = await createActivity(
@@ -130,6 +129,10 @@ export const CreateActivity = () => {
     },
     [client]
   );
+
+  useEffect(() => {
+    register("user_id", { required: true });
+  }, [register]);
 
   useInitialisedDeskproAppClient(async (client) => {
     if (!deskproUser) return;
@@ -181,8 +184,15 @@ export const CreateActivity = () => {
         value: e,
       }))
     );
+    setValue(
+      "person_id",
+      (
+        await client
+          .getEntityAssociation("linkedPipedriveContacts", deskproUser.id)
+          .list()
+      )[0]
+    );
   });
-
   const themes = {
     stackStyles: {
       marginTop: "5px",
@@ -196,15 +206,21 @@ export const CreateActivity = () => {
       <Stack vertical gap={5}>
         <Dropdown
           data={activityTypes}
-          onChange={(e) => setValue("subject", e)}
+          onChange={(e) => setValue("type", e)}
           title="Activity type"
           error={!!errors?.subject}
-          value={activity}
+          value={type}
           keyName="id"
           valueName="name"
+          required
         ></Dropdown>
         <Stack vertical style={themes.stackStyles}>
-          <H1>Activity Subject</H1>
+          <Stack>
+            <H1>Activity Subject</H1>
+            <Stack style={{ color: "red" }}>
+              <H1>⠀*</H1>
+            </Stack>
+          </Stack>
           <Input
             error={Boolean(errors?.subject)}
             variant="inline"
@@ -214,10 +230,16 @@ export const CreateActivity = () => {
           />
         </Stack>
         <Stack vertical style={themes.stackStyles}>
-          <H1>Due Date</H1>
+          <Stack>
+            <H1>Date</H1>
+            <Stack style={{ color: "red" }}>
+              <H1>⠀*</H1>
+            </Stack>
+          </Stack>
           <Input
             style={{
               color: theme.colors.grey80,
+              margin: 0,
             }}
             error={Boolean(errors?.due_date)}
             variant="inline"
@@ -229,7 +251,7 @@ export const CreateActivity = () => {
         <Dropdown<{ key: string; value: string }>
           data={timeList}
           onChange={(e) => setValue("due_time", e)}
-          title="Due Time"
+          title="Time"
           value={time}
           error={!!errors?.due_time}
           keyName="key"
@@ -279,6 +301,7 @@ export const CreateActivity = () => {
           error={!!errors?.user_id}
           keyName="id"
           valueName="name"
+          required
         />
         <Stack
           vertical
@@ -290,30 +313,30 @@ export const CreateActivity = () => {
         >
           <H1>Note</H1>
           <Input
-            style={errors?.note && { borderColor: "red" }}
+            error={Boolean(errors.note)}
             variant="inline"
             placeholder="Enter value"
             type="title"
-            {...register("note", { required: true })}
+            {...register("note")}
           />
         </Stack>
-        <Stack style={{ justifyContent: "space-between" }}>
-          <Button
-            type="submit"
-            style={{ marginTop: "10px" }}
-            text="Save"
-          ></Button>
-          <Button
-            style={{
-              marginTop: "10px",
-              backgroundColor: "white",
-              color: "#1C3E55",
-              border: "1px solid #D3D6D7",
-            }}
-            text="Cancel"
-            onClick={() => navigate(`/redirect`)}
-          ></Button>
-        </Stack>
+      </Stack>
+      <Stack style={{ justifyContent: "space-between" }}>
+        <Button
+          type="submit"
+          style={{ marginTop: "10px" }}
+          text="Create"
+        ></Button>
+        <Button
+          style={{
+            marginTop: "10px",
+            backgroundColor: "white",
+            color: "#1C3E55",
+            border: "1px solid #D3D6D7",
+          }}
+          text="Cancel"
+          onClick={() => navigate(`/redirect`)}
+        ></Button>
       </Stack>
     </form>
   );

@@ -447,6 +447,13 @@ const getAllPipelines = async (
   return await pipedriveGet(client, orgName, `pipelines?api_token=__api_key__`);
 };
 
+const getAllStages = async (
+  client: IDeskproClient,
+  orgName: string
+): Promise<PipedriveAPIResponse<IPipedriveStage[]>> => {
+  return await pipedriveGet(client, orgName, `stages?api_token=__api_key__`);
+};
+
 const getAllContacts = async (
   client: IDeskproClient,
   orgName: string
@@ -462,6 +469,7 @@ const getAllDeals = async (
 };
 
 export {
+  getAllStages,
   editContact,
   editDeal,
   createNote,

@@ -23,6 +23,7 @@ type Props<T> = {
   error?: boolean;
   keyName: keyof T;
   valueName: keyof T;
+  required?: boolean;
 };
 //change this
 export const Dropdown = <T,>({
@@ -33,6 +34,7 @@ export const Dropdown = <T,>({
   error,
   keyName,
   valueName,
+  required,
 }: Props<T>) => {
   const { theme } = useDeskproAppTheme();
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -50,7 +52,14 @@ export const Dropdown = <T,>({
       vertical
       style={{ marginTop: "5px", color: theme.colors.grey80, width: "100%" }}
     >
-      <H1>{title}</H1>
+      <Stack>
+        <H1>{title}</H1>
+        {required && (
+          <Stack style={{ color: "red" }}>
+            <H1>⠀*</H1>
+          </Stack>
+        )}
+      </Stack>
       <DropdownComponent<Status, HTMLDivElement>
         placement="bottom-start"
         options={dataOptions}

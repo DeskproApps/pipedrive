@@ -62,7 +62,6 @@ export const Main = () => {
       }
 
       setPipedriveContact(contact.data);
-
       return;
     }
 

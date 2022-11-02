@@ -19,6 +19,7 @@ import {
   getAllContacts,
   getAllOrganizations,
   getAllPipelines,
+  getAllStages,
   getAllUsers,
 } from "../api/api";
 import { Dropdown } from "../components/Dropdown";
@@ -28,6 +29,7 @@ import { IPipedriveContact } from "../types/pipedrive/pipedriveContact";
 import { IPipedriveCreateDeal } from "../types/pipedrive/pipedriveCreateDeal";
 import { IPipedriveOrganization } from "../types/pipedrive/pipedriveOrganization";
 import { IPipedrivePipeline } from "../types/pipedrive/pipedrivePipeline";
+import { IPipedriveStage } from "../types/pipedrive/pipedriveStage";
 import { IPipedriveUser } from "../types/pipedrive/pipedriveUser";
 
 export const CreateDeal = () => {
@@ -42,11 +44,12 @@ export const CreateDeal = () => {
     watch,
   } = useForm<IPipedriveCreateDeal>();
 
-  const [orgId, personId, pipelineId, userId] = watch([
+  const [orgId, personId, pipelineId, userId, stageId] = watch([
     "org_id",
     "person_id",
     "pipeline_id",
     "user_id",
+    "stage_id",
   ]);
 
   const navigate = useNavigate();
@@ -73,34 +76,60 @@ export const CreateDeal = () => {
   );
   const [pipelines, setPipelines] = useState<IPipedrivePipeline[]>([]);
   const [users, setUsers] = useState<IPipedriveUser[]>([]);
+  const [stages, setStages] = useState<IPipedriveStage[]>([]);
 
   const deskproUser = useUser();
 
   useEffect(() => {
-    register("org_id", { required: true });
+    register("stage_id", { required: true });
+    register("value", { required: true });
     register("person_id", { required: true });
     register("pipeline_id", { required: true });
-    register("user_id", { required: true });
   }, [register]);
 
   useInitialisedDeskproAppClient(
     async (client) => {
       if (!deskproUser) return;
 
-      const contactsRes = await getAllContacts(client, deskproUser.orgName);
-      setContacts(contactsRes.data ?? []);
+      Promise.all([
+        (async () => {
+          const contactsRes = await getAllContacts(client, deskproUser.orgName);
 
-      const organizationsRes = await getAllOrganizations(
-        client,
-        deskproUser.orgName
+          setContacts(contactsRes.data ?? []);
+        })(),
+        (async () => {
+          const organizationsRes = await getAllOrganizations(
+            client,
+            deskproUser.orgName
+          );
+          setOrganizations(organizationsRes.data ?? []);
+        })(),
+        (async () => {
+          const pipelinesRes = await getAllPipelines(
+            client,
+            deskproUser.orgName
+          );
+          setPipelines(pipelinesRes.data ?? []);
+        })(),
+        (async () => {
+          const users = await getAllUsers(client, deskproUser.orgName);
+
+          setUsers(users.data ?? []);
+        })(),
+        (async () => {
+          const stages = await getAllStages(client, deskproUser.orgName);
+
+          setStages(stages.data ?? []);
+        })(),
+      ]);
+      setValue(
+        "person_id",
+        (
+          await client
+            .getEntityAssociation("linkedPipedriveContacts", deskproUser.id)
+            .list()
+        )[0]
       );
-      setOrganizations(organizationsRes.data ?? []);
-
-      const pipelinesRes = await getAllPipelines(client, deskproUser.orgName);
-      setPipelines(pipelinesRes.data ?? []);
-
-      const users = await getAllUsers(client, deskproUser.orgName);
-      setUsers(users.data ?? []);
     },
     [deskproUser]
   );
@@ -130,6 +159,7 @@ export const CreateDeal = () => {
       user_id: userId,
       expected_close_date: values.expected_close_date,
       pipeline_id: pipelineId,
+      stage_id: stageId,
     } as IPipedriveCreateDeal;
 
     const response = await createDeal(
@@ -159,12 +189,17 @@ export const CreateDeal = () => {
 
   return (
     <form onSubmit={handleSubmit(postDeal)} style={{ width: "100%" }}>
-      <Stack vertical gap={5}>
+      <Stack vertical>
         <H1>Details</H1>
         <Stack vertical style={themes.stackStyles}>
-          <H1>Title</H1>
+          <Stack>
+            <H1>Title</H1>
+            <Stack style={{ color: "red" }}>
+              <H1>⠀*</H1>
+            </Stack>
+          </Stack>
           <Input
-            style={errors?.title && { borderColor: "red" }}
+            error={Boolean(errors.title)}
             variant="inline"
             placeholder="Enter value"
             type="title"
@@ -175,6 +210,7 @@ export const CreateDeal = () => {
           title="Contact Person"
           data={contacts}
           value={personId}
+          required
           onChange={(e) => setValue("person_id", e)}
           error={!!errors?.person_id}
           keyName="id"
@@ -192,7 +228,7 @@ export const CreateDeal = () => {
         <Stack vertical style={themes.stackStyles}>
           <H1>Value</H1>
           <Input
-            style={errors?.value && { borderColor: "red" }}
+            error={Boolean(errors.value)}
             variant="inline"
             placeholder="Enter value"
             type="number"
@@ -200,22 +236,33 @@ export const CreateDeal = () => {
           />
         </Stack>
         <Dropdown
+          title="Stage"
+          data={stages}
+          value={stageId}
+          onChange={(e) => setValue("stage_id", e)}
+          error={!!errors?.stage_id}
+          keyName="id"
+          required
+          valueName="name"
+        />
+        <Dropdown
           title="Pipeline"
           data={pipelines}
           value={pipelineId}
           onChange={(e) => setValue("pipeline_id", e)}
           error={!!errors?.pipeline_id}
           keyName="id"
+          required
           valueName="name"
         />
         <Stack vertical style={themes.stackStyles}>
           <H1>Excepted close date</H1>
           <Input
-            style={errors?.expected_close_date && { borderColor: "red" }}
+            error={Boolean(errors.expected_close_date)}
             variant="inline"
             placeholder="Enter value"
             type="date"
-            {...register("expected_close_date", { required: true })}
+            {...register("expected_close_date")}
           />
         </Stack>
         <Dropdown
@@ -227,27 +274,27 @@ export const CreateDeal = () => {
           keyName="id"
           valueName="name"
         />
-        <Stack style={{ justifyContent: "space-between" }}>
-          <Button
-            type="submit"
-            style={{ marginTop: "10px" }}
-            text="Save"
-          ></Button>
-          <Button
-            style={{
-              marginTop: "10px",
-              backgroundColor: "white",
-              color: "#1C3E55",
-              border: "1px solid #D3D6D7",
-            }}
-            text="Cancel"
-            onClick={() => navigate(`/redirect`)}
-          ></Button>
-        </Stack>
-        {errors?.submit && (
-          <h2 style={{ marginTop: "10px" }}>Error creating contact</h2>
-        )}
       </Stack>
+      <Stack style={{ justifyContent: "space-between" }}>
+        <Button
+          type="submit"
+          style={{ marginTop: "10px" }}
+          text="Create"
+        ></Button>
+        <Button
+          style={{
+            marginTop: "10px",
+            backgroundColor: "white",
+            color: "#1C3E55",
+            border: "1px solid #D3D6D7",
+          }}
+          text="Cancel"
+          onClick={() => navigate(`/redirect`)}
+        ></Button>
+      </Stack>
+      {errors?.submit && (
+        <h2 style={{ marginTop: "10px" }}>Error creating contact</h2>
+      )}
     </form>
   );
 };
