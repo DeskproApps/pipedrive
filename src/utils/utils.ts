@@ -32,8 +32,10 @@ export const getHoursEvery30Minutes = () => {
 
   while (i <= 1440) {
     arr.push(i);
-    i += 30;
+    i += 15;
   }
+
+  arr.pop();
 
   return arr.map((e) => {
     const hour = Math.floor(e / 60).toString();
