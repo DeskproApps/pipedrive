@@ -105,6 +105,8 @@ export const CreateActivity = () => {
 
     client.deregisterElement("pipedriveLink");
 
+    client.deregisterElement("pipedriveEditButton");
+
     client.deregisterElement("pipedriveMenuButton");
 
     client.registerElement("pipedriveHomeButton", {

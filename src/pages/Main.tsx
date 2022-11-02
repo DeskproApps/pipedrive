@@ -50,10 +50,7 @@ export const Main = () => {
 
       if (!contact.success) {
         await client
-          .getEntityAssociation(
-            "linkedPipedriveContacts",
-            deskproUser.ticket.id
-          )
+          .getEntityAssociation("linkedPipedriveContacts", deskproUser.id)
           .delete(id);
 
         navigate("/contacts");

@@ -58,7 +58,9 @@ export const CreateDeal = () => {
     client.setTitle("Create Deal");
 
     client.deregisterElement("pipedriveLink");
+
     client.deregisterElement("pipedriveEditButton");
+
     client.deregisterElement("pipedriveMenuButton");
 
     client.registerElement("pipedriveHomeButton", {
@@ -82,7 +84,6 @@ export const CreateDeal = () => {
 
   useEffect(() => {
     register("stage_id", { required: true });
-    register("value", { required: true });
     register("person_id", { required: true });
     register("pipeline_id", { required: true });
   }, [register]);
@@ -232,7 +233,7 @@ export const CreateDeal = () => {
             variant="inline"
             placeholder="Enter value"
             type="number"
-            {...register("value", { required: true })}
+            {...register("value")}
           />
         </Stack>
         <Dropdown
