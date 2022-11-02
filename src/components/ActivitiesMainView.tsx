@@ -73,7 +73,6 @@ export const ActivitiesMainView = ({
             <Stack
               key={i}
               vertical
-              gap={5}
               style={{ width: "100%", marginTop: "5px" }}
             >
               <Stack

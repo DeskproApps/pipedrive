@@ -102,7 +102,7 @@ export const CreateActivity = () => {
   };
 
   useInitialisedDeskproAppClient((client) => {
-    client.setTitle("Home");
+    client.setTitle("Create Activity");
 
     client.deregisterElement("pipedriveLink");
 
@@ -297,11 +297,23 @@ export const CreateActivity = () => {
             {...register("note", { required: true })}
           />
         </Stack>
-        <Button
-          type="submit"
-          style={{ marginTop: "10px" }}
-          text="Create"
-        ></Button>
+        <Stack style={{ justifyContent: "space-between" }}>
+          <Button
+            type="submit"
+            style={{ marginTop: "10px" }}
+            text="Save"
+          ></Button>
+          <Button
+            style={{
+              marginTop: "10px",
+              backgroundColor: "white",
+              color: "#1C3E55",
+              border: "1px solid #D3D6D7",
+            }}
+            text="Cancel"
+            onClick={() => navigate(`/redirect`)}
+          ></Button>
+        </Stack>
       </Stack>
     </form>
   );

@@ -6,6 +6,7 @@ import {
   AttachmentTag,
   useDeskproAppClient,
   useInitialisedDeskproAppClient,
+  useDeskproAppEvents,
 } from "@deskpro/app-sdk";
 import { useState } from "react";
 
@@ -45,6 +46,24 @@ export const CreateNote = () => {
     [deskproUser]
   );
 
+  useInitialisedDeskproAppClient((client) => {
+    client.setTitle("Create Note");
+
+    client.deregisterElement("pipedriveEditButton");
+    client.deregisterElement("pipedriveMenuButton");
+  });
+
+  useDeskproAppEvents({
+    onElementEvent(id) {
+      switch (id) {
+        case "pipedriveHomeButton": {
+          navigate("/redirect");
+          break;
+        }
+      }
+    },
+  });
+
   const submitImage = (data: TargetFile) => {
     setImage(data.target.files[0] ?? null);
   };
@@ -79,8 +98,8 @@ export const CreateNote = () => {
           <AttachmentTag
             download
             filename={
-              image.name.length > 27
-                ? `${image.name.substring(0, 25)}...`
+              image.name.length > 19
+                ? `${image.name.substring(0, 19)}...`
                 : image.name
             }
             fileSize={image.size}
@@ -101,7 +120,23 @@ export const CreateNote = () => {
           />
         </LabelButton>
       </Stack>
-      <Button text="Add" onClick={() => submitNote()}></Button>
+      <Stack style={{ justifyContent: "space-between" }}>
+        <Button
+          onClick={() => submitNote()}
+          style={{ marginTop: "10px" }}
+          text="Save"
+        ></Button>
+        <Button
+          style={{
+            marginTop: "10px",
+            backgroundColor: "white",
+            color: "#1C3E55",
+            border: "1px solid #D3D6D7",
+          }}
+          text="Cancel"
+          onClick={() => navigate(`/redirect`)}
+        ></Button>
+      </Stack>
     </Stack>
   );
 };

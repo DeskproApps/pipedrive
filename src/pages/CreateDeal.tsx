@@ -52,7 +52,7 @@ export const CreateDeal = () => {
   const navigate = useNavigate();
 
   useInitialisedDeskproAppClient((client) => {
-    client.setTitle("Home");
+    client.setTitle("Create Deal");
 
     client.deregisterElement("pipedriveLink");
     client.deregisterElement("pipedriveEditButton");
@@ -227,11 +227,23 @@ export const CreateDeal = () => {
           keyName="id"
           valueName="name"
         />
-        <Button
-          type="submit"
-          style={{ marginTop: "10px" }}
-          text="Create"
-        ></Button>
+        <Stack style={{ justifyContent: "space-between" }}>
+          <Button
+            type="submit"
+            style={{ marginTop: "10px" }}
+            text="Save"
+          ></Button>
+          <Button
+            style={{
+              marginTop: "10px",
+              backgroundColor: "white",
+              color: "#1C3E55",
+              border: "1px solid #D3D6D7",
+            }}
+            text="Cancel"
+            onClick={() => navigate(`/redirect`)}
+          ></Button>
+        </Stack>
         {errors?.submit && (
           <h2 style={{ marginTop: "10px" }}>Error creating contact</h2>
         )}

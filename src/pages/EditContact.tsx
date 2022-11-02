@@ -95,7 +95,9 @@ export const EditContact = () => {
   }, [contact, reset]);
 
   useInitialisedDeskproAppClient((client) => {
+    client.setTitle("Edit Contact");
     client.deregisterElement("pipedriveEditButton");
+    client.deregisterElement("pipedriveMenuButton");
   });
 
   useDeskproAppEvents(
@@ -219,11 +221,23 @@ export const EditContact = () => {
             valueName="name"
           />
         </Stack>
-        <Button
-          type="submit"
-          style={{ marginTop: "10px" }}
-          text="Save"
-        ></Button>
+        <Stack style={{ justifyContent: "space-between" }}>
+          <Button
+            type="submit"
+            style={{ marginTop: "10px" }}
+            text="Save"
+          ></Button>
+          <Button
+            style={{
+              marginTop: "10px",
+              backgroundColor: "white",
+              color: "#1C3E55",
+              border: "1px solid #D3D6D7",
+            }}
+            text="Cancel"
+            onClick={() => navigate(`/redirect`)}
+          ></Button>
+        </Stack>
         {errors?.submit && (
           <Stack style={{ marginTop: "10px" }}>
             <H2>Error editing contact</H2>

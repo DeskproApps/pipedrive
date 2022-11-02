@@ -76,8 +76,12 @@ export const DealDetails = () => {
   );
 
   useDeskproAppEvents({
-     onElementEvent(id) {
+    onElementEvent(id) {
       switch (id) {
+        case "pipedriveHomeButton": {
+          navigate("/redirect");
+          break;
+        }
         case "pipedriveEditButton": {
           navigate(`/editdeal/${dealId}`);
 
