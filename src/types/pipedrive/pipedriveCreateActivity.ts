@@ -1,4 +1,6 @@
 export interface IPipedriveCreateActivity {
+  start_date: Date;
+  end_date: Date;
   due_date: string;
   due_time: string;
   duration: string;

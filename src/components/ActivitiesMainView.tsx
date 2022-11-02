@@ -69,12 +69,9 @@ export const ActivitiesMainView = ({
       <Stack vertical style={{ width: "100%" }}>
         {activities.map((activity, i) => {
           const date = new Date(activity.due_date);
+
           return (
-            <Stack
-              key={i}
-              vertical
-              style={{ width: "100%", marginTop: "5px" }}
-            >
+            <Stack key={i} vertical style={{ width: "100%", marginTop: "5px" }}>
               <Stack
                 style={{
                   alignItems: "center",
@@ -93,7 +90,7 @@ export const ActivitiesMainView = ({
                   activity.type.charAt(0).toUpperCase() + activity.type.slice(1)
                 }
                 rightLabel="Date"
-                rightText={`${date.getDay()} ${date
+                rightText={`${date.getUTCDate()} ${date
                   .toLocaleString("default", { month: "long" })
                   .slice(0, 3)}, ${date.getFullYear()}`}
               ></TwoColumn>

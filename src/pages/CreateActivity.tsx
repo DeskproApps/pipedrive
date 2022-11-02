@@ -20,6 +20,7 @@ import {
   getAllOrganizations,
   getAllUsers,
 } from "../api/api";
+import { DateField } from "../components/DateField";
 import { Dropdown } from "../components/Dropdown";
 import { useUser } from "../context/userContext";
 import { IPipedriveActivityType } from "../types/pipedrive/pipedriveActivityTypes";
@@ -28,7 +29,7 @@ import { IPipedriveCreateActivity } from "../types/pipedrive/pipedriveCreateActi
 import { IPipedriveDeal } from "../types/pipedrive/pipedriveDeal";
 import { IPipedriveOrganization } from "../types/pipedrive/pipedriveOrganization";
 import { IPipedriveUser } from "../types/pipedrive/pipedriveUser";
-import { getHoursEvery30Minutes } from "../utils/utils";
+import { msToTime } from "../utils/utils";
 export const CreateActivity = () => {
   const navigate = useNavigate();
   const { client } = useDeskproAppClient();
@@ -43,7 +44,7 @@ export const CreateActivity = () => {
   } = useForm<IPipedriveCreateActivity>();
   const { theme } = useDeskproAppTheme();
   const deskproUser = useUser();
-  const [type, contactId, dealId, orgId, userId, duration, time] = watch([
+  const [type, contactId, dealId, orgId, userId] = watch([
     "type",
     "person_id",
     "deal_id",
@@ -62,20 +63,21 @@ export const CreateActivity = () => {
   );
   const [deals, setDeals] = useState<IPipedriveDeal[]>([]);
   const [users, setUsers] = useState<IPipedriveUser[]>([]);
-  const [durations, setDurations] = useState<{ key: string; value: string }[]>(
-    []
-  );
-  const [timeList, setTimeList] = useState<{ key: string; value: string }[]>(
-    []
-  );
 
   const postActivity = async (data: IPipedriveCreateActivity) => {
     if (!deskproUser || !client) return;
 
     const activityObj = {
-      ...data,
-      due_time: timeList[Number(time)]?.value,
-      duration: durations[Number(duration)]?.value,
+      note: data.note,
+      subject: data.subject,
+      due_date: data.end_date.toISOString().split("T")[0],
+      due_time: data.end_date.toLocaleTimeString("en-GB", {
+        hour: "2-digit",
+        minute: "2-digit",
+      }),
+      duration: msToTime(
+        Math.abs(data.end_date.getTime() - data.start_date.getTime())
+      ),
       deal_id: dealId,
       person_id: contactId,
       org_id: orgId,
@@ -171,21 +173,6 @@ export const CreateActivity = () => {
         setUsers(users.data ?? []);
       })(),
     ]);
-    const hoursEvery30Minutes = getHoursEvery30Minutes();
-
-    setTimeList(
-      hoursEvery30Minutes.map((e, i) => ({
-        key: i.toString(),
-        value: e,
-      }))
-    );
-
-    setDurations(
-      hoursEvery30Minutes.map((e, i) => ({
-        key: i.toString(),
-        value: e,
-      }))
-    );
     setValue(
       "person_id",
       (
@@ -231,43 +218,18 @@ export const CreateActivity = () => {
             {...register("subject", { required: true })}
           />
         </Stack>
-        <Stack vertical style={themes.stackStyles}>
-          <Stack>
-            <H1>Date</H1>
-            <Stack style={{ color: "red" }}>
-              <H1>⠀*</H1>
-            </Stack>
-          </Stack>
-          <Input
-            style={{
-              color: theme.colors.grey80,
-              margin: 0,
-            }}
-            error={Boolean(errors?.due_date)}
-            variant="inline"
-            placeholder="Enter value"
-            type="date"
-            {...register("due_date", { required: true })}
-          />
-        </Stack>
-        <Dropdown<{ key: string; value: string }>
-          data={timeList}
-          onChange={(e) => setValue("due_time", e)}
-          title="Time"
-          value={time}
-          error={!!errors?.due_time}
-          keyName="key"
-          valueName="value"
-        ></Dropdown>
-        <Dropdown
-          data={durations}
-          onChange={(e) => setValue("duration", e)}
-          title="Duration"
-          value={duration}
-          error={!!errors?.duration}
-          keyName="key"
-          valueName="value"
-        ></Dropdown>
+        <DateField
+          label="Start Date"
+          error={!!errors.end_date}
+          {...register("start_date", { required: true })}
+          onChange={(date: [Date]) => setValue("start_date", date[0])}
+        />
+        <DateField
+          label="End Date"
+          error={!!errors.end_date}
+          {...register("end_date", { required: true })}
+          onChange={(date: [Date]) => setValue("end_date", date[0])}
+        />
         <Dropdown
           data={contacts}
           onChange={(e) => setValue("person_id", e)}
