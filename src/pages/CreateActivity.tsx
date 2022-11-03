@@ -44,14 +44,13 @@ export const CreateActivity = () => {
   } = useForm<IPipedriveCreateActivity>();
   const { theme } = useDeskproAppTheme();
   const deskproUser = useUser();
+
   const [type, contactId, dealId, orgId, userId] = watch([
     "type",
     "person_id",
     "deal_id",
     "org_id",
     "user_id",
-    "duration",
-    "due_time",
   ]);
 
   const [activityTypes, setActivityTypes] = useState<IPipedriveActivityType[]>(
@@ -70,8 +69,8 @@ export const CreateActivity = () => {
     const activityObj = {
       note: data.note,
       subject: data.subject,
-      due_date: data.end_date.toISOString().split("T")[0],
-      due_time: data.end_date.toLocaleTimeString("en-GB", {
+      due_date: data.start_date.toISOString().split("T")[0],
+      due_time: data.start_date.toLocaleTimeString("en-GB", {
         hour: "2-digit",
         minute: "2-digit",
       }),
@@ -164,7 +163,7 @@ export const CreateActivity = () => {
         const deals = await getAllDeals(client, deskproUser.orgName);
 
         setDeals(
-          deals.data.map((deal) => ({ ...deal, name: deal.title })) ?? []
+          deals?.data?.map((deal) => ({ ...deal, name: deal.title })) ?? []
         );
       })(),
       (async () => {

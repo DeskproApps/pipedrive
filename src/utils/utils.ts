@@ -25,15 +25,11 @@ export const timeSince = (date: Date) => {
   return Math.floor(seconds) + " seconds";
 };
 
-export const msToTime = (s: number) => {
-  const ms = s % 1000;
-  s = (s - ms) / 1000;
-  const secs = s % 60;
-  s = (s - secs) / 60;
-  const mins = s % 60;
-  const hrs = (s - mins) / 60;
+export const msToTime = (ms: number) => {
+  const mins = Math.floor((ms / 1000 / 60) % 60);
+  const hrs = Math.floor(ms / 1000 / 3600);
 
-  return hrs + ":" + mins;
+  return (hrs < 10 ? `0${hrs}` : hrs) + ":" + (mins < 10 ? `0${mins}` : mins);
 };
 
 export const getHoursEvery30Minutes = () => {
