@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { FC } from "react";
 import styled from "styled-components";
 import { faCalendarDays } from "@fortawesome/free-solid-svg-icons";
@@ -8,6 +9,8 @@ import {
   LabelProps,
   Label as UILabel,
   DateTimePicker,
+  Stack,
+  H1
 } from "@deskpro/app-sdk";
 import "./DateField.css";
 
@@ -37,12 +40,19 @@ const DateInput = styled(Input)`
   }
 `;
 
+const CustomH1 = styled.h1`
+  color: #8b9293 !important;
+  font-size: 12px;
+  margin: 0px;
+`;
+
 export const DateField: FC<MappedFieldProps> = ({
   id,
   value,
   label,
   error,
   onChange,
+  required,
   ...props
 }: MappedFieldProps) => {
   const { theme } = useDeskproAppTheme();
@@ -59,13 +69,16 @@ export const DateField: FC<MappedFieldProps> = ({
       value={value}
       onChange={onChange}
       {...props}
-      render={(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        _: any,
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        ref: any
-      ) => (
-        <LabelDate htmlFor={id} label={label}>
+      render={(_: any, ref: any) => (
+        <LabelDate htmlFor={id}>
+          <Stack align="center">
+            <CustomH1>{label}</CustomH1>
+            {required && (
+              <Stack style={{ color: "red" }}>
+                <H1>⠀*</H1>
+              </Stack>
+            )}
+          </Stack>
           <DateInput
             id={id}
             ref={ref}

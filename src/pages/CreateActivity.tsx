@@ -70,13 +70,15 @@ export const CreateActivity = () => {
       note: data.note,
       subject: data.subject,
       due_date: data.start_date.toISOString().split("T")[0],
-      due_time: data.start_date.toLocaleTimeString("en-GB", {
+      due_time: data?.start_date.toLocaleTimeString("en-GB", {
         hour: "2-digit",
         minute: "2-digit",
       }),
-      duration: msToTime(
-        Math.abs(data.end_date.getTime() - data.start_date.getTime())
-      ),
+      duration: data.end_date
+        ? msToTime(
+            Math.abs(data.end_date.getTime() - data.start_date.getTime())
+          )
+        : 0,
       deal_id: dealId,
       person_id: contactId,
       org_id: orgId,
@@ -135,6 +137,7 @@ export const CreateActivity = () => {
 
   useEffect(() => {
     register("user_id", { required: true });
+    register("type", { required: true });
   }, [register]);
 
   useInitialisedDeskproAppClient(async (client) => {
@@ -198,7 +201,7 @@ export const CreateActivity = () => {
           title="Activity type"
           error={!!errors?.subject}
           value={type}
-          keyName="id"
+          keyName="key_string"
           valueName="name"
           required
         ></Dropdown>
@@ -219,14 +222,14 @@ export const CreateActivity = () => {
         </Stack>
         <DateField
           label="Start Date"
-          error={!!errors.end_date}
+          error={Boolean(errors.start_date)}
           {...register("start_date", { required: true })}
           onChange={(date: [Date]) => setValue("start_date", date[0])}
+          required
         />
         <DateField
           label="End Date"
-          error={!!errors.end_date}
-          {...register("end_date", { required: true })}
+          {...register("end_date")}
           onChange={(date: [Date]) => setValue("end_date", date[0])}
         />
         <Dropdown
@@ -234,7 +237,6 @@ export const CreateActivity = () => {
           onChange={(e) => setValue("person_id", e)}
           title="Linked Person"
           value={contactId}
-          error={!!errors?.person_id}
           keyName="id"
           valueName="name"
         ></Dropdown>
@@ -243,7 +245,6 @@ export const CreateActivity = () => {
           data={organizations}
           onChange={(e) => setValue("org_id", e)}
           value={orgId}
-          error={!!errors?.org_id}
           keyName="id"
           valueName="name"
         />
@@ -252,7 +253,6 @@ export const CreateActivity = () => {
           onChange={(e) => setValue("deal_id", e)}
           value={dealId}
           title="Linked Deal"
-          error={!!errors?.deal_id}
           keyName="id"
           valueName="title"
         ></Dropdown>
