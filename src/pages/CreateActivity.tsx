@@ -4,12 +4,14 @@ import {
   Input,
   Stack,
   useDeskproAppClient,
+  useDeskproAppEvents,
+  useDeskproAppTheme,
   useInitialisedDeskproAppClient,
 } from "@deskpro/app-sdk";
-import { useState } from "react";
-
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
+
 import {
   createActivity,
   getActivityTypes,
@@ -18,20 +20,18 @@ import {
   getAllOrganizations,
   getAllUsers,
 } from "../api/api";
+import { DateField } from "../components/DateField";
 import { Dropdown } from "../components/Dropdown";
 import { useUser } from "../context/userContext";
-import { ICurrentAndList } from "../types/currentAndList";
 import { IPipedriveActivityType } from "../types/pipedrive/pipedriveActivityTypes";
 import { IPipedriveContact } from "../types/pipedrive/pipedriveContact";
 import { IPipedriveCreateActivity } from "../types/pipedrive/pipedriveCreateActivity";
 import { IPipedriveDeal } from "../types/pipedrive/pipedriveDeal";
 import { IPipedriveOrganization } from "../types/pipedrive/pipedriveOrganization";
 import { IPipedriveUser } from "../types/pipedrive/pipedriveUser";
-import { getHoursEvery30Minutes } from "../utils/utils";
-
+import { msToTime } from "../utils/utils";
 export const CreateActivity = () => {
   const navigate = useNavigate();
-
   const { client } = useDeskproAppClient();
 
   const {
@@ -39,63 +39,57 @@ export const CreateActivity = () => {
     register,
     formState: { errors },
     setError,
+    watch,
+    setValue,
   } = useForm<IPipedriveCreateActivity>();
-
+  const { theme } = useDeskproAppTheme();
   const deskproUser = useUser();
-  const [activityType, setActivityType] = useState<
-    ICurrentAndList<IPipedriveActivityType>
-  >({
-    current: null,
-    list: [],
-  });
-  const [contact, setContact] = useState<ICurrentAndList<IPipedriveContact>>({
-    current: null,
-    list: [],
-  });
-  const [organization, setOrganization] = useState<
-    ICurrentAndList<IPipedriveOrganization>
-  >({
-    current: null,
-    list: [],
-  });
-  const [deal, setDeal] = useState<ICurrentAndList<IPipedriveDeal>>({
-    current: null,
-    list: [],
-  });
-  const [user, setUser] = useState<ICurrentAndList<IPipedriveUser>>({
-    current: null,
-    list: [],
-  });
-  const [duration, setDuration] = useState<
-    ICurrentAndList<{ key: string; value: string }>
-  >({
-    current: null,
-    list: [],
-  });
-  const [time, setTime] = useState<
-    ICurrentAndList<{ key: string; value: string }>
-  >({
-    current: null,
-    list: [],
-  });
+
+  const [type, contactId, dealId, orgId, userId] = watch([
+    "type",
+    "person_id",
+    "deal_id",
+    "org_id",
+    "user_id",
+  ]);
+
+  const [activityTypes, setActivityTypes] = useState<IPipedriveActivityType[]>(
+    []
+  );
+  const [contacts, setContacts] = useState<IPipedriveContact[]>([]);
+  const [organizations, setOrganization] = useState<IPipedriveOrganization[]>(
+    []
+  );
+  const [deals, setDeals] = useState<IPipedriveDeal[]>([]);
+  const [users, setUsers] = useState<IPipedriveUser[]>([]);
 
   const postActivity = async (data: IPipedriveCreateActivity) => {
     if (!deskproUser || !client) return;
-    const activity = {
-      ...data,
-      due_time: time.current,
-      duration: duration.current,
-      deal_id: deal.current,
-      person_id: contact.current,
-      org_id: organization.current,
-      user_id: user.current,
-      type: activityType.current,
+
+    const activityObj = {
+      note: data.note,
+      subject: data.subject,
+      due_date: data.start_date.toISOString().split("T")[0],
+      due_time: data?.start_date.toLocaleTimeString("en-GB", {
+        hour: "2-digit",
+        minute: "2-digit",
+      }),
+      duration: data.end_date
+        ? msToTime(
+            Math.abs(data.end_date.getTime() - data.start_date.getTime())
+          )
+        : 0,
+      deal_id: dealId,
+      person_id: contactId,
+      org_id: orgId,
+      user_id: userId,
+      type: type,
     } as unknown as IPipedriveCreateActivity;
 
     const response = await createActivity(
       client,
       deskproUser?.orgName,
-      activity
+      activityObj
     );
 
     if (!response.success) {
@@ -110,16 +104,41 @@ export const CreateActivity = () => {
   };
 
   useInitialisedDeskproAppClient((client) => {
-    client.setTitle("Home");
+    client.setTitle("Create Activity");
 
     client.deregisterElement("pipedriveLink");
+
+    client.deregisterElement("pipedriveEditButton");
 
     client.deregisterElement("pipedriveMenuButton");
 
     client.registerElement("pipedriveHomeButton", {
       type: "home_button",
+      payload: {
+        type: "changePage",
+        page: "/",
+      },
     });
   });
+
+  useDeskproAppEvents(
+    {
+      onElementEvent(id) {
+        switch (id) {
+          case "pipedriveHomeButton": {
+            navigate("/redirect");
+            break;
+          }
+        }
+      },
+    },
+    [client]
+  );
+
+  useEffect(() => {
+    register("user_id", { required: true });
+    register("type", { required: true });
+  }, [register]);
 
   useInitialisedDeskproAppClient(async (client) => {
     if (!deskproUser) return;
@@ -131,153 +150,155 @@ export const CreateActivity = () => {
           deskproUser.orgName
         );
 
-        setActivityType({ ...activityType, list: activitiesTypes.data });
+        setActivityTypes(activitiesTypes.data ?? []);
       })(),
       (async () => {
         const contacts = await getAllContacts(client, deskproUser.orgName);
 
-        setContact({ ...contact, list: contacts.data });
+        setContacts(contacts.data ?? []);
       })(),
       (async () => {
         const orgs = await getAllOrganizations(client, deskproUser.orgName);
 
-        setOrganization({ ...organization, list: orgs.data });
+        setOrganization(orgs.data ?? []);
       })(),
       (async () => {
         const deals = await getAllDeals(client, deskproUser.orgName);
 
-        setDeal({
-          ...deal,
-          list: deals.data.map((deal) => ({ ...deal, name: deal.title })),
-        });
+        setDeals(
+          deals?.data?.map((deal) => ({ ...deal, name: deal.title })) ?? []
+        );
       })(),
       (async () => {
         const users = await getAllUsers(client, deskproUser.orgName);
 
-        setUser({ ...user, list: users.data });
+        setUsers(users.data ?? []);
       })(),
     ]);
-    const hoursEvery30Minutes = getHoursEvery30Minutes();
-
-    setTime({
-      ...time,
-      list: hoursEvery30Minutes.map((e, i) => ({
-        key: i.toString(),
-        value: e,
-      })),
-    });
-
-    setDuration({
-      ...duration,
-      list: hoursEvery30Minutes.map((e, i) => ({
-        key: i.toString(),
-        value: e,
-      })),
-    });
+    setValue(
+      "person_id",
+      (
+        await client
+          .getEntityAssociation("linkedPipedriveContacts", deskproUser.id)
+          .list()
+      )[0]
+    );
   });
+  const themes = {
+    stackStyles: {
+      marginTop: "5px",
+      color: theme.colors.grey80,
+      width: "100%",
+    },
+  };
 
   return (
     <form onSubmit={handleSubmit(postActivity)} style={{ width: "100%" }}>
       <Stack vertical gap={5}>
-        <Dropdown<IPipedriveActivityType>
-          data={activityType}
-          setter={setActivityType}
+        <Dropdown
+          data={activityTypes}
+          onChange={(e) => setValue("type", e)}
           title="Activity type"
-          errors={errors}
-          keyName="id"
+          error={!!errors?.subject}
+          value={type}
+          keyName="key_string"
           valueName="name"
+          required
         ></Dropdown>
-        <Stack
-          vertical
-          style={{ marginTop: "5px", color: "#8B9293", width: "100%" }}
-        >
-          <H1>Activity Subject</H1>
+        <Stack vertical style={themes.stackStyles}>
+          <Stack>
+            <H1>Activity Subject</H1>
+            <Stack style={{ color: "red" }}>
+              <H1>⠀*</H1>
+            </Stack>
+          </Stack>
           <Input
-            style={errors?.activity_subject && { borderColor: "red" }}
+            error={Boolean(errors?.subject)}
             variant="inline"
             placeholder="Enter value"
             type="title"
             {...register("subject", { required: true })}
           />
         </Stack>
-        <Stack
-          vertical
-          style={{ marginTop: "5px", color: "#8B9293", width: "100%" }}
-        >
-          <H1>Date</H1>
-          <Input
-            style={errors?.due_date && { borderColor: "red" }}
-            variant="inline"
-            placeholder="Enter value"
-            type="date"
-            {...register("due_date", { required: true })}
-          />
-        </Stack>
-        <Dropdown<{ key: string; value: string }>
-          data={time}
-          setter={setTime}
-          title="Time"
-          errors={errors}
-          keyName="key"
-          valueName="value"
-        ></Dropdown>
-        <Dropdown<{ key: string; value: string }>
-          data={duration}
-          setter={setDuration}
-          title="Duration"
-          errors={errors}
-          keyName="key"
-          valueName="value"
-        ></Dropdown>
-        <Dropdown<IPipedriveContact>
-          data={contact}
-          setter={setContact}
+        <DateField
+          label="Start Date"
+          error={Boolean(errors.start_date)}
+          {...register("start_date", { required: true })}
+          onChange={(date: [Date]) => setValue("start_date", date[0])}
+          required
+        />
+        <DateField
+          label="End Date"
+          {...register("end_date")}
+          onChange={(date: [Date]) => setValue("end_date", date[0])}
+        />
+        <Dropdown
+          data={contacts}
+          onChange={(e) => setValue("person_id", e)}
           title="Linked Person"
-          errors={errors}
+          value={contactId}
           keyName="id"
           valueName="name"
         ></Dropdown>
-        <Dropdown<IPipedriveOrganization>
-          data={organization}
-          setter={setOrganization}
-          title="Linked Organization"
-          errors={errors}
+        <Dropdown
+          title="Organization"
+          data={organizations}
+          onChange={(e) => setValue("org_id", e)}
+          value={orgId}
           keyName="id"
           valueName="name"
-        ></Dropdown>
-        <Dropdown<IPipedriveDeal>
-          data={deal}
-          setter={setDeal}
+        />
+        <Dropdown
+          data={deals}
+          onChange={(e) => setValue("deal_id", e)}
+          value={dealId}
           title="Linked Deal"
-          errors={errors}
           keyName="id"
           valueName="title"
         ></Dropdown>
-        <Dropdown<IPipedriveUser>
-          data={user}
-          setter={setUser}
-          title="Assigned to"
-          errors={errors}
+        <Dropdown
+          title="Owner"
+          data={users}
+          value={userId}
+          onChange={(e) => setValue("user_id", e)}
+          error={!!errors?.user_id}
           keyName="id"
           valueName="name"
-        ></Dropdown>
+          required
+        />
         <Stack
           vertical
-          style={{ marginTop: "5px", color: "#8B9293", width: "100%" }}
+          style={{
+            marginTop: "5px",
+            color: theme.colors.grey80,
+            width: "100%",
+          }}
         >
           <H1>Note</H1>
           <Input
-            style={errors?.note && { borderColor: "red" }}
+            error={Boolean(errors.note)}
             variant="inline"
             placeholder="Enter value"
             type="title"
-            {...register("note", { required: true })}
+            {...register("note")}
           />
         </Stack>
+      </Stack>
+      <Stack style={{ justifyContent: "space-between" }}>
         <Button
           type="submit"
           style={{ marginTop: "10px" }}
           text="Create"
+        ></Button>
+        <Button
+          style={{
+            marginTop: "10px",
+            backgroundColor: "white",
+            color: "#1C3E55",
+            border: "1px solid #D3D6D7",
+          }}
+          text="Cancel"
+          onClick={() => navigate(`/redirect`)}
         ></Button>
       </Stack>
     </form>

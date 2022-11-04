@@ -188,6 +188,34 @@ const createContact = async (
   return response.json();
 };
 
+const editContact = async (
+  client: IDeskproClient,
+  orgName: string,
+  data: IPipedriveCreateContact,
+  contactId: string
+): Promise<PipedriveAPIResponse<IPipedriveContact>> => {
+  const pFetch = await proxyFetch(client);
+
+  Object.keys(data).forEach((key) => {
+    if (!data[key as keyof typeof data]) {
+      delete data[key as keyof typeof data];
+    }
+  });
+
+  const response = await pFetch(
+    `https://${orgName}.pipedrive.com/v1/persons/${contactId}?api_token=__api_key__`,
+    {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    }
+  );
+
+  return response.json();
+};
+
 const getDealById = async (
   client: IDeskproClient,
   orgName: string,
@@ -245,6 +273,34 @@ const createDeal = async (
   return response.json();
 };
 
+const editDeal = async (
+  client: IDeskproClient,
+  orgName: string,
+  data: IPipedriveCreateDeal,
+  dealId: string
+): Promise<PipedriveAPIResponse<IPipedriveDeal>> => {
+  const pFetch = await proxyFetch(client);
+
+  Object.keys(data).forEach((key) => {
+    if (!data[key as keyof typeof data]) {
+      delete data[key as keyof typeof data];
+    }
+  });
+
+  const response = await pFetch(
+    `https://${orgName}.pipedrive.com/v1/deals/${dealId}?api_token=__api_key__`,
+    {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    }
+  );
+
+  return response.json();
+};
+
 const createActivity = async (
   client: IDeskproClient,
   orgName: string,
@@ -269,18 +325,25 @@ const createActivity = async (
 const uploadImage = async (
   client: IDeskproClient,
   orgName: string,
-  image: File
+  image: File,
+  contactId: string
 ) => {
   const pFetch = await proxyFetch(client);
+
+  const formData = new FormData();
+
+  formData.set(
+    "file",
+    new Blob([await image.arrayBuffer()], { type: image.type }),
+    image.name
+  );
+  formData.set("person_id", contactId);
 
   const response = await pFetch(
     `https://${orgName}.pipedrive.com/v1/files?api_token=__api_key__`,
     {
       method: "POST",
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-      body: image,
+      body: formData,
     }
   );
 
@@ -291,14 +354,19 @@ const createNote = async (
   client: IDeskproClient,
   orgName: string,
   image: File | null,
-  note: string
+  note: string,
+  contactId: string
 ): Promise<PipedriveAPIResponse<IPipedriveNote>> => {
   const pFetch = await proxyFetch(client);
 
-  let imageResponse = null;
+  let requestNote = null;
 
   if (image) {
-    imageResponse = await uploadImage(client, orgName, image);
+    const imageResponse = await uploadImage(client, orgName, image, contactId);
+
+    requestNote = `${note}<br><a href="cid:${imageResponse?.data?.id}" target="_blank" data-pipecid="cid:${imageResponse?.data?.id}"><img src="cid:${imageResponse?.data?.id}" data-pipecid="cid:${imageResponse?.data?.id}" style="width: 64px; height: 64px;"></a>`;
+  } else {
+    requestNote = note;
   }
 
   const noteResponse = await pFetch(
@@ -309,8 +377,8 @@ const createNote = async (
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        content: note,
-        file_id: imageResponse.data.id,
+        content: requestNote,
+        person_id: contactId,
       }),
     }
   );
@@ -379,6 +447,13 @@ const getAllPipelines = async (
   return await pipedriveGet(client, orgName, `pipelines?api_token=__api_key__`);
 };
 
+const getAllStages = async (
+  client: IDeskproClient,
+  orgName: string
+): Promise<PipedriveAPIResponse<IPipedriveStage[]>> => {
+  return await pipedriveGet(client, orgName, `stages?api_token=__api_key__`);
+};
+
 const getAllContacts = async (
   client: IDeskproClient,
   orgName: string
@@ -394,6 +469,9 @@ const getAllDeals = async (
 };
 
 export {
+  getAllStages,
+  editContact,
+  editDeal,
   createNote,
   createActivity,
   getAllDeals,

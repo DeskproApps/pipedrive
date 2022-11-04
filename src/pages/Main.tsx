@@ -21,7 +21,7 @@ import { IPipedriveContact } from "../types/pipedrive/pipedriveContact";
 import { IPipedriveOrganization } from "../types/pipedrive/pipedriveOrganization";
 import { DealsMainView } from "../components/DealsMainView";
 import { ActivitiesMainView } from "../components/ActivitiesMainView";
-import { NotesMainView } from "../components/NotesMainView";
+// import { NotesMainView } from "../components/NotesMainView";
 import { LogoAndLinkButton } from "../components/LogoAndLinkButton";
 
 export const Main = () => {
@@ -50,10 +50,7 @@ export const Main = () => {
 
       if (!contact.success) {
         await client
-          .getEntityAssociation(
-            "linkedPipedriveContacts",
-            deskproUser.ticket.id
-          )
+          .getEntityAssociation("linkedPipedriveContacts", deskproUser.id)
           .delete(id);
 
         navigate("/contacts");
@@ -62,7 +59,6 @@ export const Main = () => {
       }
 
       setPipedriveContact(contact.data);
-
       return;
     }
 
@@ -102,6 +98,10 @@ export const Main = () => {
 
     client.deregisterElement("pipedriveLink");
 
+    client.registerElement("pipedriveEditButton", {
+      type: "edit_button",
+    });
+
     client.registerElement("pipedriveHomeButton", {
       type: "home_button",
     });
@@ -126,31 +126,42 @@ export const Main = () => {
 
   useDeskproAppEvents(
     {
-      async onElementEvent(id) {
+      onElementEvent(id) {
         switch (id) {
           case "pipedriveHomeButton": {
             navigate("/redirect");
             break;
           }
+          case "pipedriveEditButton": {
+            if (!pipedriveContact) return;
+            navigate(`/editcontact/${pipedriveContact.id}`);
+            break;
+          }
           case "pipedriveMenuButton": {
             if (!client || !deskproUser) return;
-            const id = (
+
+            (async () => {
+              const id = (
+                await client
+                  .getEntityAssociation(
+                    "linkedPipedriveContacts",
+                    deskproUser.id
+                  )
+                  .list()
+              )[0];
+
               await client
                 .getEntityAssociation("linkedPipedriveContacts", deskproUser.id)
-                .list()
-            )[0];
-
-            await client
-              .getEntityAssociation("linkedPipedriveContacts", deskproUser.id)
-              .delete(id);
-            navigate("/contacts");
+                .delete(id);
+              navigate("/contacts");
+            })();
 
             break;
           }
         }
       },
     },
-    [client, deskproUser]
+    [client, deskproUser, pipedriveContact]
   );
 
   useInitialisedDeskproAppClient(
@@ -218,10 +229,10 @@ export const Main = () => {
             contact={pipedriveContact}
             orgName={deskproUser?.orgName}
           />
-          <NotesMainView
+          {/* <NotesMainView
             contact={pipedriveContact}
             orgName={deskproUser?.orgName}
-          />
+          /> */}
         </div>
       )}
     </Stack>

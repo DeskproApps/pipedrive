@@ -10,14 +10,15 @@ import { Avatar } from "@deskpro/deskpro-ui";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
 import parse from "html-react-parser";
-
 import { LogoAndLinkButton } from "./LogoAndLinkButton";
-import { IPipedriveNote } from "../types/pipedrive/pipedriveNote";
 import { useState } from "react";
+
+import { IPipedriveNote } from "../types/pipedrive/pipedriveNote";
 import { getNotes } from "../api/api";
 import { timeSince } from "../utils/utils";
 import { IPipedriveContact } from "../types/pipedrive/pipedriveContact";
 import { useNavigate } from "react-router-dom";
+import "./image.css";
 
 export const NotesMainView = ({
   contact,
@@ -95,7 +96,9 @@ export const NotesMainView = ({
                   <H2>{timeSince(new Date(note.add_time)).slice(0, 5)}</H2>
                 </Stack>
                 <div style={{ maxWidth: "20ch", marginLeft: "10px" }}>
-                  <H2>{parse(note.content)}</H2>
+                  <H2>
+                    {parse(note.content)}
+                  </H2>
                 </div>
               </Stack>
               <HorizontalDivider

@@ -2,162 +2,170 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import {
   Button,
-  DivAsInput,
-  Dropdown,
-  DropdownTargetProps,
   H1,
   Input,
-  Label,
   Stack,
   useDeskproAppClient,
+  useDeskproAppEvents,
+  useDeskproAppTheme,
   useInitialisedDeskproAppClient,
 } from "@deskpro/app-sdk";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { useMemo, useState } from "react";
-import {
-  faCheck,
-  faExternalLinkAlt,
-  faCaretDown,
-} from "@fortawesome/free-solid-svg-icons";
-
-import "../components/removeScrollInput.css";
-import {
-  getAllOrganizations,
-  getAllContacts,
-  getAllPipelines,
-  getAllUsers,
-  createDeal,
-} from "../api/api";
-import { Status } from "../types/status";
-import { useUser } from "../context/userContext";
 import { useNavigate } from "react-router-dom";
+
+import {
+  createDeal,
+  getAllContacts,
+  getAllOrganizations,
+  getAllPipelines,
+  getAllStages,
+  getAllUsers,
+} from "../api/api";
+import { Dropdown } from "../components/Dropdown";
+import "../components/removeScrollInput.css";
+import { useUser } from "../context/userContext";
 import { IPipedriveContact } from "../types/pipedrive/pipedriveContact";
 import { IPipedriveCreateDeal } from "../types/pipedrive/pipedriveCreateDeal";
-import { IPipedrivePipeline } from "../types/pipedrive/pipedrivePipeline";
-import { ICurrentAndList } from "../types/currentAndList";
 import { IPipedriveOrganization } from "../types/pipedrive/pipedriveOrganization";
+import { IPipedrivePipeline } from "../types/pipedrive/pipedrivePipeline";
+import { IPipedriveStage } from "../types/pipedrive/pipedriveStage";
 import { IPipedriveUser } from "../types/pipedrive/pipedriveUser";
 
 export const CreateDeal = () => {
   const { client } = useDeskproAppClient();
-
+  const { theme } = useDeskproAppTheme();
   const {
     handleSubmit,
     register,
     formState: { errors },
     setError,
+    setValue,
+    watch,
   } = useForm<IPipedriveCreateDeal>();
+
+  const [orgId, personId, pipelineId, userId, stageId] = watch([
+    "org_id",
+    "person_id",
+    "pipeline_id",
+    "user_id",
+    "stage_id",
+  ]);
 
   const navigate = useNavigate();
 
   useInitialisedDeskproAppClient((client) => {
-    client.setTitle("Home");
+    client.setTitle("Create Deal");
 
     client.deregisterElement("pipedriveLink");
+
+    client.deregisterElement("pipedriveEditButton");
 
     client.deregisterElement("pipedriveMenuButton");
 
     client.registerElement("pipedriveHomeButton", {
       type: "home_button",
+      payload: {
+        type: "changePage",
+        page: "/",
+      },
     });
   });
 
-  const [contact, setContact] = useState<ICurrentAndList<IPipedriveContact>>({
-    current: null,
-    list: [],
-  });
-  const [organization, setOrganization] = useState<
-    ICurrentAndList<IPipedriveOrganization>
-  >({
-    current: null,
-    list: [],
-  });
-  const [pipeline, setPipeline] = useState<ICurrentAndList<IPipedrivePipeline>>(
-    {
-      current: null,
-      list: [],
-    }
+  const [contacts, setContacts] = useState<IPipedriveContact[]>([]);
+  const [organizations, setOrganizations] = useState<IPipedriveOrganization[]>(
+    []
   );
-  const [user, setUser] = useState<ICurrentAndList<IPipedriveUser>>({
-    current: null,
-    list: [],
-  });
+  const [pipelines, setPipelines] = useState<IPipedrivePipeline[]>([]);
+  const [users, setUsers] = useState<IPipedriveUser[]>([]);
+  const [stages, setStages] = useState<IPipedriveStage[]>([]);
 
   const deskproUser = useUser();
 
-  const checkErrors = (
-    key:
-      | "title"
-      | "value"
-      | "user_id"
-      | "person_id"
-      | "org_id"
-      | "pipeline_id"
-      | "expected_close_date"
-      | "submit",
-    value: Status | string | null
-  ) => {
-    if (!value) {
-      setError(key, {
-        type: "manual",
-        message: `${key} is required`,
-      });
-      return false;
-    }
-  };
+  useEffect(() => {
+    register("stage_id", { required: true });
+    register("person_id", { required: true });
+    register("pipeline_id", { required: true });
+  }, [register]);
 
   useInitialisedDeskproAppClient(
     async (client) => {
       if (!deskproUser) return;
 
-      const contacts = await getAllContacts(client, deskproUser.orgName);
+      Promise.all([
+        (async () => {
+          const contactsRes = await getAllContacts(client, deskproUser.orgName);
 
-      setContact({ current: null, list: contacts.data ?? [] });
+          setContacts(contactsRes.data ?? []);
+        })(),
+        (async () => {
+          const organizationsRes = await getAllOrganizations(
+            client,
+            deskproUser.orgName
+          );
+          setOrganizations(organizationsRes.data ?? []);
+        })(),
+        (async () => {
+          const pipelinesRes = await getAllPipelines(
+            client,
+            deskproUser.orgName
+          );
+          setPipelines(pipelinesRes.data ?? []);
+        })(),
+        (async () => {
+          const users = await getAllUsers(client, deskproUser.orgName);
 
-      const organizations = await getAllOrganizations(
-        client,
-        deskproUser.orgName
+          setUsers(users.data ?? []);
+        })(),
+        (async () => {
+          const stages = await getAllStages(client, deskproUser.orgName);
+
+          setStages(stages.data ?? []);
+        })(),
+      ]);
+      setValue(
+        "person_id",
+        (
+          await client
+            .getEntityAssociation("linkedPipedriveContacts", deskproUser.id)
+            .list()
+        )[0]
       );
-
-      setOrganization({ current: null, list: organizations.data ?? [] });
-
-      const pipelines = await getAllPipelines(client, deskproUser.orgName);
-
-      setPipeline({ current: null, list: pipelines.data ?? [] });
-
-      const users = await getAllUsers(client, deskproUser.orgName);
-
-      setUser({ current: null, list: users.data ?? [] });
     },
     [deskproUser]
   );
 
+  useDeskproAppEvents(
+    {
+      onElementEvent(id) {
+        switch (id) {
+          case "pipedriveHomeButton": {
+            navigate("/redirect");
+            break;
+          }
+        }
+      },
+    },
+    [client]
+  );
+
   const postDeal = async (values: IPipedriveCreateDeal) => {
-    if (!client || !deskproUser || !contact) return;
-
-    const errors = [
-      checkErrors("person_id", contact.current),
-
-      checkErrors("pipeline_id", pipeline.current),
-
-      checkErrors("user_id", user.current),
-    ];
-
-    if (errors.includes(false)) return;
+    if (!client || !deskproUser) return;
 
     const pipedriveDeal = {
       title: values.title,
       value: values.value,
-      org_id: organization.current,
-      person_id: contact.current,
-      user_id: user.current,
+      org_id: orgId,
+      person_id: personId,
+      user_id: userId,
       expected_close_date: values.expected_close_date,
-      pipeline_id: pipeline.current,
+      pipeline_id: pipelineId,
+      stage_id: stageId,
     } as IPipedriveCreateDeal;
 
     const response = await createDeal(
       client,
-      deskproUser?.orgName,
+      deskproUser.orgName,
       pipedriveDeal
     );
 
@@ -172,222 +180,122 @@ export const CreateDeal = () => {
     navigate("/");
   };
 
-  const pipelineOptions = useMemo(() => {
-    return pipeline.list.map((pipelineOption) => ({
-      key: pipelineOption.name,
-      label: <Label label={pipelineOption.name}></Label>,
-      value: pipelineOption.id,
-      type: "value" as const,
-    }));
-  }, [pipeline]) as any;
-
-  const userOptions = useMemo(() => {
-    return user.list.map((userOption) => ({
-      key: userOption.name,
-      label: <Label label={userOption.name}></Label>,
-      value: userOption.id,
-      type: "value" as const,
-    }));
-  }, [user]) as any;
-
-  const contactOptions = useMemo(() => {
-    return contact.list.map((contactOption) => ({
-      key: contactOption.name,
-      label: <Label label={contactOption.name}></Label>,
-      value: contactOption.id,
-      type: "value" as const,
-    }));
-  }, [contact]) as any;
-
-  const organizationOptions = useMemo(() => {
-    return organization.list.map((organizationOption) => ({
-      key: organizationOption.name,
-      label: <Label label={organizationOption.name}></Label>,
-      value: organizationOption.id,
-      type: "value" as const,
-    }));
-  }, [organization]) as any;
-
   const themes = {
     stackStyles: {
       marginTop: "5px",
-      color: "#8B9293",
+      color: theme.colors.grey80,
       width: "100%",
     },
   };
 
   return (
     <form onSubmit={handleSubmit(postDeal)} style={{ width: "100%" }}>
-      <Stack vertical gap={5}>
+      <Stack vertical>
         <H1>Details</H1>
         <Stack vertical style={themes.stackStyles}>
-          <H1>Title</H1>
+          <Stack>
+            <H1>Title</H1>
+            <Stack style={{ color: "red" }}>
+              <H1>⠀*</H1>
+            </Stack>
+          </Stack>
           <Input
-            style={errors?.title && { borderColor: "red" }}
+            error={Boolean(errors.title)}
             variant="inline"
             placeholder="Enter value"
             type="title"
             {...register("title", { required: true })}
           />
         </Stack>
-        <Stack vertical style={themes.stackStyles}>
-          <H1>Contact Person</H1>
-          <Dropdown<Status, HTMLDivElement>
-            placement="bottom-start"
-            options={contactOptions}
-            fetchMoreText={"Fetch more"}
-            autoscrollText={"Autoscroll"}
-            selectedIcon={faCheck}
-            externalLinkIcon={faExternalLinkAlt}
-            onSelectOption={(option) => {
-              setContact({ ...contact, current: option.value });
-            }}
-          >
-            {({
-              targetProps,
-              targetRef,
-            }: DropdownTargetProps<HTMLDivElement>) => (
-              <DivAsInput
-                style={errors?.person_id && { borderColor: "red" }}
-                ref={targetRef}
-                {...targetProps}
-                variant="inline"
-                rightIcon={faCaretDown}
-                placeholder="Enter value"
-                value={
-                  contactOptions.find((e: any) => e.value === contact.current)
-                    ?.key ?? ""
-                }
-              />
-            )}
-          </Dropdown>
-        </Stack>
-        <Stack vertical style={themes.stackStyles}>
-          <H1>Organization</H1>
-          <Dropdown<Status, HTMLDivElement>
-            placement="bottom-start"
-            options={organizationOptions}
-            fetchMoreText={"Fetch more"}
-            autoscrollText={"Autoscroll"}
-            selectedIcon={faCheck}
-            externalLinkIcon={faExternalLinkAlt}
-            onSelectOption={(option) => {
-              setOrganization({ ...organization, current: option.value });
-            }}
-          >
-            {({
-              targetProps,
-              targetRef,
-            }: DropdownTargetProps<HTMLDivElement>) => (
-              <DivAsInput
-                style={errors?.org_id && { borderColor: "red" }}
-                ref={targetRef}
-                {...targetProps}
-                variant="inline"
-                rightIcon={faCaretDown}
-                placeholder="Enter value"
-                value={
-                  organizationOptions.find(
-                    (e: any) => e.value === organization.current
-                  )?.key ?? ""
-                }
-              />
-            )}
-          </Dropdown>
-        </Stack>
+        <Dropdown
+          title="Contact Person"
+          data={contacts}
+          value={personId}
+          required
+          onChange={(e) => setValue("person_id", e)}
+          error={!!errors?.person_id}
+          keyName="id"
+          valueName="name"
+        />
+        <Dropdown
+          title="Organization"
+          data={organizations}
+          onChange={(e) => setValue("org_id", e)}
+          value={orgId}
+          error={!!errors?.org_id}
+          keyName="id"
+          valueName="name"
+        />
         <Stack vertical style={themes.stackStyles}>
           <H1>Value</H1>
           <Input
-            style={errors?.value && { borderColor: "red" }}
+            error={Boolean(errors.value)}
             variant="inline"
             placeholder="Enter value"
             type="number"
-            {...register("value", { required: true })}
+            {...register("value")}
           />
         </Stack>
-        <Stack vertical style={themes.stackStyles}>
-          <H1>Pipeline</H1>
-          <Dropdown<Status, HTMLDivElement>
-            placement="bottom-start"
-            options={pipelineOptions}
-            fetchMoreText={"Fetch more"}
-            autoscrollText={"Autoscroll"}
-            selectedIcon={faCheck}
-            externalLinkIcon={faExternalLinkAlt}
-            onSelectOption={(option) => {
-              setPipeline({ ...pipeline, current: option.value });
-            }}
-          >
-            {({
-              targetProps,
-              targetRef,
-            }: DropdownTargetProps<HTMLDivElement>) => (
-              <DivAsInput
-                style={errors?.pipeline_id && { borderColor: "red" }}
-                ref={targetRef}
-                {...targetProps}
-                variant="inline"
-                rightIcon={faCaretDown}
-                placeholder="Enter value"
-                value={
-                  pipelineOptions.find((e: any) => e.value === pipeline.current)
-                    ?.key ?? ""
-                }
-              />
-            )}
-          </Dropdown>
-        </Stack>
+        <Dropdown
+          title="Stage"
+          data={stages}
+          value={stageId}
+          onChange={(e) => setValue("stage_id", e)}
+          error={!!errors?.stage_id}
+          keyName="id"
+          required
+          valueName="name"
+        />
+        <Dropdown
+          title="Pipeline"
+          data={pipelines}
+          value={pipelineId}
+          onChange={(e) => setValue("pipeline_id", e)}
+          error={!!errors?.pipeline_id}
+          keyName="id"
+          required
+          valueName="name"
+        />
         <Stack vertical style={themes.stackStyles}>
           <H1>Excepted close date</H1>
           <Input
-            style={errors?.expected_close_date && { borderColor: "red" }}
+            error={Boolean(errors.expected_close_date)}
             variant="inline"
             placeholder="Enter value"
             type="date"
-            {...register("expected_close_date", { required: true })}
+            {...register("expected_close_date")}
           />
         </Stack>
-        <Stack vertical style={themes.stackStyles}>
-          <H1>Owner</H1>
-          <Dropdown<Status, HTMLDivElement>
-            placement="bottom-start"
-            options={userOptions}
-            fetchMoreText={"Fetch more"}
-            autoscrollText={"Autoscroll"}
-            selectedIcon={faCheck}
-            externalLinkIcon={faExternalLinkAlt}
-            onSelectOption={(option) => {
-              setUser({ ...user, current: option.value });
-            }}
-          >
-            {({
-              targetProps,
-              targetRef,
-            }: DropdownTargetProps<HTMLDivElement>) => (
-              <DivAsInput
-                style={errors?.user_id && { borderColor: "red" }}
-                ref={targetRef}
-                {...targetProps}
-                variant="inline"
-                rightIcon={faCaretDown}
-                placeholder="Enter value"
-                value={
-                  userOptions.find((e: any) => e.value === user.current)?.key ??
-                  ""
-                }
-              />
-            )}
-          </Dropdown>
-        </Stack>
+        <Dropdown
+          title="Owner"
+          data={users}
+          value={userId}
+          onChange={(e) => setValue("user_id", e)}
+          error={!!errors?.user_id}
+          keyName="id"
+          valueName="name"
+        />
+      </Stack>
+      <Stack style={{ justifyContent: "space-between" }}>
         <Button
           type="submit"
           style={{ marginTop: "10px" }}
           text="Create"
         ></Button>
-        {errors?.submit && (
-          <h2 style={{ marginTop: "10px" }}>Error creating contact</h2>
-        )}
+        <Button
+          style={{
+            marginTop: "10px",
+            backgroundColor: "white",
+            color: "#1C3E55",
+            border: "1px solid #D3D6D7",
+          }}
+          text="Cancel"
+          onClick={() => navigate(`/redirect`)}
+        ></Button>
       </Stack>
+      {errors?.submit && (
+        <h2 style={{ marginTop: "10px" }}>Error creating contact</h2>
+      )}
     </form>
   );
 };

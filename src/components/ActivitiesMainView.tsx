@@ -9,7 +9,6 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
 import { useNavigate } from "react-router-dom";
 
-import { Property } from "./Property";
 import { LogoAndLinkButton } from "./LogoAndLinkButton";
 import { IPipedriveActivity } from "../types/pipedrive/pipedriveActivity";
 import { useState } from "react";
@@ -50,9 +49,9 @@ export const ActivitiesMainView = ({
   return (
     <Stack vertical style={{ width: "100%" }}>
       <Stack
+        align="center"
         style={{
           width: "100%",
-          alignItems: "center",
           justifyContent: "space-between",
         }}
       >
@@ -70,13 +69,9 @@ export const ActivitiesMainView = ({
       <Stack vertical style={{ width: "100%" }}>
         {activities.map((activity, i) => {
           const date = new Date(activity.due_date);
+
           return (
-            <Stack
-              key={i}
-              vertical
-              gap={5}
-              style={{ width: "100%", marginTop: "5px" }}
-            >
+            <Stack key={i} vertical style={{ width: "100%", marginTop: "5px" }}>
               <Stack
                 style={{
                   alignItems: "center",
@@ -84,7 +79,7 @@ export const ActivitiesMainView = ({
                   justifyContent: "space-between",
                 }}
               >
-                <h1 style={{ fontSize: "12px" }}>{activity.deal_title}</h1>
+                <h1 style={{ fontSize: "12px" }}>{activity.subject}</h1>
                 <LogoAndLinkButton
                   endpoint={`activities/list/user/${contact.owner_id.id}`}
                 />
@@ -95,7 +90,7 @@ export const ActivitiesMainView = ({
                   activity.type.charAt(0).toUpperCase() + activity.type.slice(1)
                 }
                 rightLabel="Date"
-                rightText={`${date.getDay()} ${date
+                rightText={`${date.getUTCDate()} ${date
                   .toLocaleString("default", { month: "long" })
                   .slice(0, 3)}, ${date.getFullYear()}`}
               ></TwoColumn>

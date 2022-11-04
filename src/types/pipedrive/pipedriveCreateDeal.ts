@@ -7,5 +7,6 @@ export interface IPipedriveCreateDeal {
     org_id: string;
     pipeline_id: string;
     expected_close_date: string;
+    stage_id: string;
     submit: string | null;
 }

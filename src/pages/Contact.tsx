@@ -11,6 +11,8 @@ export const Contacts = () => {
   const [currentPage, setcurrentPage] = useState("Find Contact");
 
   useInitialisedDeskproAppClient((client) => {
+    client.deregisterElement("pipedriveEditButton");
+    client.deregisterElement("pipedriveMenuButton");
     client.setTitle(currentPage);
   });
 

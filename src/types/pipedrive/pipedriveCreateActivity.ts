@@ -1,17 +1,18 @@
 export interface IPipedriveCreateActivity {
+  start_date: Date;
+  end_date: Date;
   due_date: string;
   due_time: string;
   duration: string;
-  deal_id: number;
-  person_id: number;
-  org_id: number;
+  deal_id: string;
+  person_id: string;
+  org_id: string;
   note: string;
   location: string;
-  activity_subject: string;
-  public_description: string;
   subject: string;
+  public_description: string;
   type: string;
-  user_id: number;
+  user_id: string;
   participants: string[];
   busy_flag: boolean;
   attendees: string[];

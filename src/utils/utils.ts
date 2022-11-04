@@ -25,6 +25,13 @@ export const timeSince = (date: Date) => {
   return Math.floor(seconds) + " seconds";
 };
 
+export const msToTime = (ms: number) => {
+  const mins = Math.floor((ms / 1000 / 60) % 60);
+  const hrs = Math.floor(ms / 1000 / 3600);
+
+  return (hrs < 10 ? `0${hrs}` : hrs) + ":" + (mins < 10 ? `0${mins}` : mins);
+};
+
 export const getHoursEvery30Minutes = () => {
   let i = 0;
 
@@ -32,8 +39,10 @@ export const getHoursEvery30Minutes = () => {
 
   while (i <= 1440) {
     arr.push(i);
-    i += 30;
+    i += 15;
   }
+
+  arr.pop();
 
   return arr.map((e) => {
     const hour = Math.floor(e / 60).toString();
