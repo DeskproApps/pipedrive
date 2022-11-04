@@ -146,7 +146,7 @@ export const EditDeal = () => {
       expected_close_date: values.expected_close_date,
       pipeline_id: pipelineId,
     } as IPipedriveCreateDeal;
-    console.log("a");
+
     const response = await editDeal(
       client,
       deskproUser?.orgName,

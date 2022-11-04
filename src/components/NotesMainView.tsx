@@ -96,7 +96,6 @@ export const NotesMainView = ({
                   <H2>{timeSince(new Date(note.add_time)).slice(0, 5)}</H2>
                 </Stack>
                 <div style={{ maxWidth: "20ch", marginLeft: "10px" }}>
-                  {console.log(note.content)}
                   <H2>
                     {parse(note.content)}
                   </H2>
