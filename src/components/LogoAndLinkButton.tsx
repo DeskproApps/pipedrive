@@ -23,7 +23,10 @@ export const LogoAndLinkButton = ({ endpoint }: { endpoint: string }) => {
     >
       <PipedriveLogo />
       <FontAwesomeIcon
-        icon={faArrowUpRightFromSquare}
+        icon={faArrowUpRightFromSquare as unknown as {
+          prefix: "fas";
+          iconName: "mailchimp";
+        }}
         style={{
           marginLeft: "10px",
           alignSelf: "center",

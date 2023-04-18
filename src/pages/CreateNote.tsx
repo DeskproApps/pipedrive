@@ -7,6 +7,7 @@ import {
   useDeskproAppClient,
   useInitialisedDeskproAppClient,
   useDeskproAppEvents,
+  AnyIcon,
 } from "@deskpro/app-sdk";
 import { useState } from "react";
 
@@ -103,14 +104,14 @@ export const CreateNote = () => {
                 : image.name
             }
             fileSize={image.size}
-            icon={faFile}
+            icon={faFile as AnyIcon}
             withClose
             onClose={() => setImage(null)}
           ></AttachmentTag>
         )}
         <LabelButton
           style={{ padding: "0px" }}
-          icon={faPlus}
+          icon={faPlus as AnyIcon}
           text="Add"
           minimal
         >
