@@ -1,4 +1,5 @@
 import {
+  AnyIcon,
   Button,
   HorizontalDivider,
   Input,
@@ -90,7 +91,7 @@ export const FindContact = () => {
         value={inputText}
         placeholder="Enter account details"
         type="text"
-        leftIcon={faMagnifyingGlass}
+        leftIcon={faMagnifyingGlass as AnyIcon}
       />
       <Stack vertical style={{ width: "100%" }}>
         <Stack vertical style={{ width: "100%", marginBottom: "5px" }}>

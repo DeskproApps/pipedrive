@@ -6,7 +6,7 @@ import {
   VerticalDivider,
 } from "@deskpro/app-sdk";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPlus } from "@fortawesome/free-solid-svg-icons";
+import { faPlus, IconName } from "@fortawesome/free-solid-svg-icons";
 import { useNavigate } from "react-router-dom";
 
 import { LogoAndLinkButton } from "./LogoAndLinkButton";
@@ -60,7 +60,10 @@ export const ActivitiesMainView = ({
             Activities ({activities.length})
           </h1>
           <FontAwesomeIcon
-            icon={faPlus}
+            icon={faPlus as unknown as {
+              prefix: "fas";
+              iconName: "mailchimp";
+            }}
             style={{ width: "12px", marginLeft: "5px", cursor: "pointer" }}
             onClick={() => navigate("/createactivity")}
           ></FontAwesomeIcon>

@@ -55,7 +55,10 @@ export const NotesMainView = ({
         <Stack gap={"2px"} style={{ alignItems: "center" }}>
           <h1 style={{ fontSize: "12px" }}>Notes ({notes.length})</h1>
           <FontAwesomeIcon
-            icon={faPlus}
+            icon={faPlus as unknown as {
+              prefix: "fas";
+              iconName: "mailchimp";
+            }}
             style={{ width: "12px", marginLeft: "5px", cursor: "pointer" }}
             onClick={() => navigate("/createnote")}
           ></FontAwesomeIcon>
