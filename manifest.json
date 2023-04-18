@@ -1,18 +1,13 @@
 {
   "name": "@deskpro-apps/pipedrive_app",
   "title": "Pipedrive",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Integrate with with Pipedrive and view and update information from your CRM while in Deskpro tickets",
   "appStoreUrl": "https://www.deskpro.com/product-embed/apps/pipedrive",
   "scope": "agent",
   "isSingleInstall": false,
   "hasDevMode": true,
-  "targets": [
-    {
-      "target": "user_sidebar",
-      "entrypoint": "index.html"
-    }
-  ],
+  "targets": [{ "target": "user_sidebar", "entrypoint": "index.html" }],
   "entityAssociations": {
     "linkedPipedriveContacts": {
       "entity": "person",
@@ -40,12 +35,7 @@
     "whitelist": [
       {
         "url": "https://.*.pipedrive.com/v1/.*",
-        "methods": [
-          "GET",
-          "POST",
-          "PUT",
-          "DELETE"
-        ],
+        "methods": ["GET", "POST", "PUT", "DELETE"],
         "timeout": 10
       }
     ]
