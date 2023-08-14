@@ -6,6 +6,7 @@ import {
   H1,
   Stack,
   useDeskproAppTheme,
+  AnyIcon,
 } from "@deskpro/app-sdk";
 import {
   faCheck,
@@ -65,8 +66,8 @@ export const Dropdown = <T,>({
         options={dataOptions}
         fetchMoreText={"Fetch more"}
         autoscrollText={"Autoscroll"}
-        selectedIcon={faCheck}
-        externalLinkIcon={faExternalLinkAlt}
+        selectedIcon={faCheck as AnyIcon}
+        externalLinkIcon={faExternalLinkAlt as AnyIcon}
         onSelectOption={(option) => onChange(option.key)}
       >
         {({ targetProps, targetRef }: DropdownTargetProps<HTMLDivElement>) => (
@@ -75,7 +76,7 @@ export const Dropdown = <T,>({
             ref={targetRef}
             {...targetProps}
             variant="inline"
-            rightIcon={faCaretDown}
+            rightIcon={faCaretDown as AnyIcon}
             placeholder="Enter value"
             value={
               dataOptions.find(
