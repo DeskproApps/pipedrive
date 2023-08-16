@@ -2,13 +2,13 @@
 
 To install the Pipedrive app you must copy your personal API token. Access this in Pipedrive under the personal prefences section of your settings in the top right, and click the API tab on the following page. 
 
-![image](https://user-images.githubusercontent.com/97668246/196987230-d8f69d61-63a2-4f83-ab58-ff32b92e5ff8.png)
-![pipedrive ss](https://user-images.githubusercontent.com/97668246/196987816-cdaa1e7d-bebd-4592-8e03-cb085f397e22.png)
+[![](/docs/assets/setup/setup-pipedrive-001.png)](/docs/assets/setup/setup-pipedrive-001.png)
+[![](/docs/assets/setup/setup-pipedrive-002.png)](/docs/assets/setup/setup-pipedrive-002.png)
 
 
 Copy the token and head back to Deskpro and navigate to the "Settings" tab of the Pipedrive app in admin.
 
-[![](/docs/assets/setup/deskproPipedriveSecretPage.png)](/docs/assets/setup/deskproPipedriveSecretPage.png)
+[![](/docs/assets/setup/setup-pipedrive-003.png)](/docs/assets/setup/setup-pipedrive-003.png)
 
 On this screen, enter the following details:
 
