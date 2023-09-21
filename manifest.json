@@ -22,14 +22,24 @@
       "description": "The API key to use to access Pipedrive",
       "type": "string",
       "isRequired": true,
-      "isBackendOnly": true
+      "isBackendOnly": true,
+      "order": 10
     },
     "instance_domain": {
       "title": "Domain Prefix",
       "description": "The domain of your Pipedrive company",
       "type": "string",
       "isRequired": true,
-      "isBackendOnly": false
+      "isBackendOnly": false,
+      "order": 20
+    },
+    "verify_settings": {
+      "title": "",
+      "type": "app_embedded",
+      "options": { "entrypoint": "#/admin/verify_settings" },
+      "isRequired": false,
+      "isBackendOnly": true,
+      "order": 30
     }
   },
   "proxy": {

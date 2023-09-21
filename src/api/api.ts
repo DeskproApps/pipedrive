@@ -1,4 +1,4 @@
-import { IDeskproClient, proxyFetch } from "@deskpro/app-sdk";
+import { IDeskproClient, proxyFetch, adminGenericProxyFetch } from "@deskpro/app-sdk";
 import { PipedriveAPIResponse } from "../types/pipedrive/pipedrive";
 import { IPipedriveCreateContact } from "../types/pipedrive/pipedriveCreateContact";
 
@@ -13,6 +13,7 @@ import { IPipedriveStage } from "../types/pipedrive/pipedriveStage";
 import { IPipedriveCreateDeal } from "../types/pipedrive/pipedriveCreateDeal";
 import { IPipedriveActivityType } from "../types/pipedrive/pipedriveActivityTypes";
 import { IPipedriveCreateActivity } from "../types/pipedrive/pipedriveCreateActivity";
+import { Settings } from "../types/settings";
 
 const pipedriveGet = async (
   client: IDeskproClient,
@@ -26,6 +27,33 @@ const pipedriveGet = async (
   ).then((res) => res.json());
 
   return response;
+};
+
+const preInstalledRequest = async (
+  client: IDeskproClient,
+  pathQuery: string,
+  settings?: Settings,
+) => {
+  const dpFetch = await adminGenericProxyFetch(client);
+  const { api_key, instance_domain } = settings ?? {};
+
+  if (!api_key || !instance_domain) {
+    throw new Error("Invalid settings");
+  }
+
+  const res = await dpFetch(
+      `https://${instance_domain}.pipedrive.com/v1/${pathQuery}?api_token=${api_key}`
+  );
+
+  if (res.status < 200 || res.status > 399) {
+    throw new Error(await res.text());
+  }
+
+  try {
+    return await res.json();
+  } catch (e) {
+    return {};
+  }
 };
 
 const getUserDataPipedrive = async (
@@ -51,6 +79,16 @@ const getUserListPipedrive = async (
   orgName: string
 ) => {
   return await pipedriveGet(client, orgName, `users?api_token=__api_key__`);
+};
+
+const getCurrentUser = async (
+  client: IDeskproClient,
+  orgName?: string,
+  settings?: Settings,
+): Promise<{ data: IPipedriveUser }> => {
+  return (settings?.api_key && settings?.instance_domain)
+    ? await preInstalledRequest(client, `users/me`, settings)
+    : await pipedriveGet(client, orgName as string, `users/me`);
 };
 
 const getUserById = async (
@@ -498,4 +536,5 @@ export {
   getUserById,
   createUser,
   pipedriveGet,
+  getCurrentUser,
 };
