@@ -103,6 +103,9 @@ devDependencies:
   prettier:
     specifier: ^2.8.7
     version: 2.8.7
+  react-resize-observer:
+    specifier: ^1.1.1
+    version: 1.1.1(react@17.0.2)
   rimraf:
     specifier: ^3.0.2
     version: 3.0.2
@@ -550,7 +553,7 @@ packages:
     dev: false
 
   /@deskpro/deskpro-ui@4.1.0(react-dom@17.0.2)(react@17.0.2)(styled-components@5.3.6):
-    resolution: {integrity: sha512-Ziaw3/AQI/p4VfWUngSU/bYTvf27kUlc7o9B+ULyZGxBqqJl5ZsmElEcdHMWx92aSunlGS72/i7GoMKyMh8y+w==}
+    resolution: {integrity: sha512-Ziaw3/AQI/p4VfWUngSU/bYTvf27kUlc7o9B+ULyZGxBqqJl5ZsmElEcdHMWx92aSunlGS72/i7GoMKyMh8y+w==, tarball: https://registry.npmjs.org/@deskpro/deskpro-ui/-/deskpro-ui-4.1.0.tgz}
     engines: {node: ^16.0.0}
     peerDependencies:
       '@typescript/lib-dom': npm:@types/web
@@ -4265,6 +4268,14 @@ packages:
   /react-refresh@0.13.0:
     resolution: {integrity: sha512-XP8A9BT0CpRBD+NYLLeIhld/RqG9+gktUjW1FkE+Vm7OCinbG1SshcK5tb9ls4kzvjZr9mOQc7HYgBngEyPAXg==}
     engines: {node: '>=0.10.0'}
+    dev: true
+
+  /react-resize-observer@1.1.1(react@17.0.2):
+    resolution: {integrity: sha512-3R+90Hou90Mr3wJYc+unsySC8Pn91V4nmjO32NKvUvjphRUbq9HisyLg7bDyGBE7xlMrrM6Fax7iNQaFdc/FYA==}
+    peerDependencies:
+      react: '>=0.14'
+    dependencies:
+      react: 17.0.2
     dev: true
 
   /react-router-dom@6.4.2(react-dom@17.0.2)(react@17.0.2):

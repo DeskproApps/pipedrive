@@ -48,6 +48,7 @@
     "eslint-plugin-react-hooks": "4.3.0",
     "jest": "^27.4.7",
     "prettier": "^2.8.7",
+    "react-resize-observer": "^1.1.1",
     "rimraf": "^3.0.2",
     "rollup-plugin-copy": "3.4.0",
     "slugify": "^1.6.5",

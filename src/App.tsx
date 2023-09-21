@@ -24,6 +24,7 @@ import { ErrorFallback } from "./components/ErrorFallback";
 import { EditDeal } from "./pages/EditDeal";
 import { EditContact } from "./pages/EditContact";
 import { Redirect } from "./pages/Redirect";
+import { VerifySettings } from "./pages/VerifySettings";
 
 function App() {
   return (
@@ -46,6 +47,7 @@ function App() {
               path="/editcontact/:contactId"
               element={<EditContact />}
             ></Route>
+            <Route path="/admin/verify_settings" element={<VerifySettings/>} />
           </Routes>
         </ErrorBoundary>
       </HashRouter>
