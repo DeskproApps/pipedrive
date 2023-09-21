@@ -126,7 +126,6 @@ export const FindContact = () => {
                     label={contact.primary_email}
                   ></Label>
                 </Stack>
-                {/* <LogoAndLinkButton endpoint={``} /> */}
               </Stack>
               <HorizontalDivider
                 style={{ width: "110%", color: "#EFF0F0", marginLeft: "-10px" }}

@@ -1,12 +1,13 @@
 import {
-  H1,
   HorizontalDivider,
   IDeskproClient,
   Stack,
   useDeskproAppClient,
   useDeskproAppEvents,
   useInitialisedDeskproAppClient,
+  Title,
 } from "@deskpro/app-sdk";
+import { PipedriveLogo } from "../components/PipedriveLogo";
 import { Property } from "../components/Property";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -22,7 +23,6 @@ import { IPipedriveOrganization } from "../types/pipedrive/pipedriveOrganization
 import { DealsMainView } from "../components/DealsMainView";
 import { ActivitiesMainView } from "../components/ActivitiesMainView";
 // import { NotesMainView } from "../components/NotesMainView";
-import { LogoAndLinkButton } from "../components/LogoAndLinkButton";
 
 export const Main = () => {
   const { client } = useDeskproAppClient();
@@ -184,18 +184,13 @@ export const Main = () => {
 
   return (
     <Stack vertical>
-      <Stack vertical style={{ width: "100%" }}>
+      <Stack vertical style={{ width: "100%" }} align="stretch">
         {pipedriveContact?.name && (
-          <Stack
-            style={{
-              width: "100%",
-              alignItems: "center",
-              justifyContent: "space-between",
-            }}
-          >
-            <H1>{pipedriveContact?.name}</H1>
-            <LogoAndLinkButton endpoint={`person/${pipedriveContact?.id}`} />
-          </Stack>
+          <Title
+            title={pipedriveContact.name}
+            link={`https://${deskproUser?.orgName}.pipedrive.com/person/${pipedriveContact?.id}`}
+            icon={<PipedriveLogo />}
+          />
         )}
         <Stack
           style={{ marginTop: "10px", marginBottom: "10px", width: "100%" }}
@@ -217,7 +212,7 @@ export const Main = () => {
         </Stack>
       </Stack>
       <HorizontalDivider
-        style={{ width: "110%", color: "#EFF0F0", marginLeft: "-10px" }}
+        style={{ width: "110%", color: "#EFF0F0", marginLeft: "-10px", marginBottom: 10 }}
       />
       {pipedriveContact && deskproUser && (
         <div style={{ width: "100%" }}>

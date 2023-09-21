@@ -1,20 +1,22 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import {
   H2,
+  P5,
   HorizontalDivider,
   Stack,
   useInitialisedDeskproAppClient,
   VerticalDivider,
+  Title,
+  Property,
 } from "@deskpro/app-sdk";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPlus } from "@fortawesome/free-solid-svg-icons";
 import { useNavigate } from "react-router-dom";
-
-import { LogoAndLinkButton } from "./LogoAndLinkButton";
 import { useState } from "react";
 import { IPipedriveDeal } from "../types/pipedrive/pipedriveDeal";
 import { getDeals } from "../api/api";
 import { IPipedriveContact } from "../types/pipedrive/pipedriveContact";
+import { PipedriveLogo } from "./PipedriveLogo";
+import { RouterLink } from "./Link";
+import { useUser } from "../context/userContext";
 
 export const DealsMainView = ({
   contact,
@@ -24,6 +26,7 @@ export const DealsMainView = ({
   orgName: string;
 }) => {
   const navigate = useNavigate();
+  const deskproUser = useUser();
   const [deals, setDeals] = useState<IPipedriveDeal[]>([]);
 
   useInitialisedDeskproAppClient(
@@ -43,25 +46,10 @@ export const DealsMainView = ({
 
   return (
     <Stack vertical style={{ width: "100%" }}>
-      <Stack
-        style={{
-          width: "100%",
-          alignItems: "center",
-          justifyContent: "space-between",
-        }}
-      >
-        <Stack gap={2} style={{ alignItems: "center" }}>
-          <h1 style={{ fontSize: "12px" }}>Deals ({deals.length})</h1>
-          <FontAwesomeIcon
-            icon={faPlus as unknown as {
-              prefix: "fas";
-              iconName: "mailchimp";
-            }}
-            style={{ width: "12px", marginLeft: "5px", cursor: "pointer" }}
-            onClick={() => navigate("/createdeal")}
-          ></FontAwesomeIcon>
-        </Stack>
-      </Stack>
+      <Title
+        title={`Deals (${deals.length})`}
+        onClick={() => navigate("/createdeal")}
+      />
       <Stack vertical style={{ width: "100%" }}>
         {deals.map((deal, i) => {
           return (
@@ -71,27 +59,17 @@ export const DealsMainView = ({
               gap={5}
               style={{ width: "100%", marginTop: "5px" }}
             >
-              <Stack
-                style={{
-                  alignItems: "center",
-                  width: "100%",
-                  justifyContent: "space-between",
-                }}
-              >
-                <h1
-                  style={{
-                    color: "#3A8DDE",
-                    fontSize: "12px",
-                    cursor: "pointer",
-                  }}
-                  onClick={() => navigate("/dealdetails/" + deal.id)}
-                >
-                  {deal.title}
-                </h1>
-                <LogoAndLinkButton endpoint={`deal/${deal.id}`} />
+              <Stack vertical align="stretch" style={{ width: "100%" }}>
+                <Title
+                  title={(
+                    <RouterLink to={`/dealdetails/${deal.id}`}>{deal.title}</RouterLink>
+                  )}
+                  link={`https://${deskproUser?.orgName}.pipedrive.com/deal/${deal.id}`}
+                  icon={<PipedriveLogo/>}
+                />
               </Stack>
               <Stack>
-                <H2 style={{ color: "blue" }}>{deal.add_time.split(" ")[0]}</H2>
+                <Property>{deal.add_time.split(" ")[0]}</Property>
                 <Stack style={{ marginLeft: "40px" }}>
                   <VerticalDivider
                     style={{
@@ -101,11 +79,9 @@ export const DealsMainView = ({
                       marginLeft: "15px",
                     }}
                   ></VerticalDivider>
-                  <H2>
-                    {Intl.NumberFormat("en-IN").format(deal.value) +
-                      " " +
-                      deal.currency}
-                  </H2>
+                  <Property>
+                    {`${Intl.NumberFormat("en-IN").format(deal.value)} ${deal.currency}`}
+                  </Property>
                 </Stack>
               </Stack>
               <HorizontalDivider
