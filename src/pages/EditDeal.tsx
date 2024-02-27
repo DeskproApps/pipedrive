@@ -19,6 +19,7 @@ import {
   getAllContacts,
   getAllOrganizations,
   getAllPipelines,
+  getAllStages,
   getAllUsers,
   getDealById,
 } from "../api/api";
@@ -30,6 +31,7 @@ import { IPipedriveDeal } from "../types/pipedrive/pipedriveDeal";
 import { IPipedriveOrganization } from "../types/pipedrive/pipedriveOrganization";
 import { IPipedrivePipeline } from "../types/pipedrive/pipedrivePipeline";
 import { IPipedriveUser } from "../types/pipedrive/pipedriveUser";
+import { IPipedriveStage } from "../types/pipedrive/pipedriveStage";
 
 export const EditDeal = () => {
   const { client } = useDeskproAppClient();
@@ -47,19 +49,19 @@ export const EditDeal = () => {
     reset,
   } = useForm<IPipedriveCreateDeal>();
 
-  const [orgId, personId, pipelineId, userId] = watch([
+  const [orgId, personId, pipelineId, userId, stageId] = watch([
     "org_id",
     "person_id",
     "pipeline_id",
     "user_id",
+    "stage_id",
   ]);
 
   const [contacts, setContact] = useState<IPipedriveContact[]>([]);
-  const [organizations, setOrganizations] = useState<IPipedriveOrganization[]>(
-    []
-  );
+  const [organizations, setOrganizations] = useState<IPipedriveOrganization[]>([]);
   const [pipelines, setPipelines] = useState<IPipedrivePipeline[]>([]);
   const [users, setUsers] = useState<IPipedriveUser[]>([]);
+  const [stages, setStages] = useState<IPipedriveStage[]>([]);
   const [deal, setDeal] = useState<IPipedriveDeal | null>(null);
 
   useInitialisedDeskproAppClient(
@@ -95,6 +97,10 @@ export const EditDeal = () => {
 
           setDeal(deal.data);
         })(),
+        (async () => {
+          const stages = await getAllStages(client, deskproUser.orgName);
+          setStages(stages.data ?? []);
+        })(),
       ]);
     },
     [deskproUser]
@@ -127,10 +133,11 @@ export const EditDeal = () => {
     reset({
       title: deal.title,
       value: deal.value.toString(),
-      org_id: deal.org_id.value.toString(),
+      org_id: deal.org_id?.value.toString(),
       person_id: deal.person_id?.value?.toString(),
       pipeline_id: deal.pipeline_id.toString(),
       user_id: deal.user_id?.value?.toString(),
+      stage_id: `${deal.stage_id}`,
     });
   }, [deal, reset]);
 
@@ -145,6 +152,7 @@ export const EditDeal = () => {
       user_id: userId,
       expected_close_date: values.expected_close_date,
       pipeline_id: pipelineId,
+      stage_id: stageId,
     } as IPipedriveCreateDeal;
 
     const response = await editDeal(
@@ -215,6 +223,16 @@ export const EditDeal = () => {
               {...register("value")}
             />
           </Stack>
+          <Dropdown
+              title="Stage"
+              data={stages}
+              value={stageId}
+              onChange={(e) => setValue("stage_id", e)}
+              error={!!errors?.stage_id}
+              keyName="id"
+              required
+              valueName="name"
+          />
           <Dropdown
             title="Pipeline"
             data={pipelines}

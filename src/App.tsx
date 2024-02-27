@@ -4,7 +4,6 @@
 // even though it's completely acceptable.
 import { DeskproAppProvider } from "@deskpro/app-sdk";
 import { Routes, HashRouter, Route } from "react-router-dom";
-
 import "flatpickr/dist/themes/light.css";
 import "tippy.js/dist/tippy.css";
 import "simplebar/dist/simplebar.min.css";
@@ -37,11 +36,11 @@ function App() {
               path="/dealdetails/:dealId"
               element={<DealDetails />}
             ></Route>
-            <Route path="/contacts" element={<Contacts />}></Route>
-            <Route path="/redirect/" element={<Redirect />}></Route>
-            <Route path="/createdeal" element={<CreateDeal />}></Route>
-            <Route path="/editdeal/:dealId" element={<EditDeal />}></Route>
-            <Route path="/createactivity" element={<CreateActivity />}></Route>
+            <Route path="/contacts" element={<Contacts />}/>
+            <Route path="/redirect/" element={<Redirect />}/>
+            <Route path="/createdeal" element={<CreateDeal />}/>
+            <Route path="/editdeal/:dealId" element={<EditDeal />}/>
+            <Route path="/createactivity" element={<CreateActivity />}/>
             {/* <Route path="/createnote" element={<CreateNote />}></Route> */}
             <Route
               path="/editcontact/:contactId"
