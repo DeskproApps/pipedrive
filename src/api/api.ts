@@ -15,6 +15,22 @@ import { IPipedriveActivityType } from "../types/pipedrive/pipedriveActivityType
 import { IPipedriveCreateActivity } from "../types/pipedrive/pipedriveCreateActivity";
 import { Settings } from "../types/settings";
 
+type ErrorData = {
+  success: false;
+  errorCode: number;
+  error: string;
+  error_info: string;
+};
+
+class PipeDriveError extends Error {
+  data: ErrorData;
+
+  constructor(data: ErrorData) {
+    super("PipeDrive Api Error");
+    this.data = data;
+  }
+}
+
 const pipedriveGet = async (
   client: IDeskproClient,
   orgName: string,
@@ -24,9 +40,21 @@ const pipedriveGet = async (
 
   const response = await pFetch(
     `https://${orgName}.pipedrive.com/v1/${pathQuery}`
-  ).then((res) => res.json());
+  );
 
-  return response;
+  let result;
+
+  try {
+    result = await response.json();
+  } catch (e) {
+    result = null;
+  }
+
+  if (!result?.success) {
+    throw new PipeDriveError(result);
+  }
+
+  return result;
 };
 
 const preInstalledRequest = async (
@@ -223,7 +251,19 @@ const createContact = async (
     }
   );
 
-  return response.json();
+  let result;
+
+  try {
+    result = await response.json();
+  } catch (e) {
+    result = null;
+  }
+
+  if (!result?.success) {
+    throw new PipeDriveError(result);
+  }
+
+  return result;
 };
 
 const editContact = async (
@@ -251,7 +291,19 @@ const editContact = async (
     }
   );
 
-  return response.json();
+  let result;
+
+  try {
+    result = await response.json();
+  } catch (e) {
+    result = null;
+  }
+
+  if (!result?.success) {
+    throw new PipeDriveError(result);
+  }
+
+  return result;
 };
 
 const getDealById = async (
@@ -537,4 +589,5 @@ export {
   createUser,
   pipedriveGet,
   getCurrentUser,
+  PipeDriveError,
 };

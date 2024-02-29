@@ -31,21 +31,15 @@ function App() {
       <HashRouter>
         <ErrorBoundary FallbackComponent={ErrorFallback}>
           <Routes>
-            <Route index path="/" element={<Main />}></Route>
-            <Route
-              path="/dealdetails/:dealId"
-              element={<DealDetails />}
-            ></Route>
+            <Route index path="/" element={<Main />}/>
+            <Route path="/dealdetails/:dealId" element={<DealDetails />}/>
             <Route path="/contacts" element={<Contacts />}/>
             <Route path="/redirect/" element={<Redirect />}/>
             <Route path="/createdeal" element={<CreateDeal />}/>
             <Route path="/editdeal/:dealId" element={<EditDeal />}/>
             <Route path="/createactivity" element={<CreateActivity />}/>
             {/* <Route path="/createnote" element={<CreateNote />}></Route> */}
-            <Route
-              path="/editcontact/:contactId"
-              element={<EditContact />}
-            ></Route>
+            <Route path="/editcontact/:contactId" element={<EditContact />}/>
             <Route path="/admin/verify_settings" element={<VerifySettings/>} />
           </Routes>
         </ErrorBoundary>

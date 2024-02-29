@@ -50,6 +50,9 @@ dependencies:
   tippy.js:
     specifier: ^6.3.7
     version: 6.3.7
+  ts-pattern:
+    specifier: ^4.3.0
+    version: 4.3.0
   word-wrap:
     specifier: 1.2.4
     version: 1.2.4
@@ -630,7 +633,7 @@ packages:
       simplebar-react: 2.4.3(react-dom@17.0.2)(react@17.0.2)
       styled-components: 5.3.6(react-dom@17.0.2)(react-is@18.2.0)(react@17.0.2)
       tippy.js: 6.3.7
-      ts-pattern: 4.0.5
+      ts-pattern: 4.3.0
       tslib: 2.4.0
       type-fest: 2.19.0
       use-debounce: 7.0.1(react@17.0.2)
@@ -4800,10 +4803,6 @@ packages:
       typescript: 4.8.4
       yargs-parser: 20.2.9
     dev: true
-
-  /ts-pattern@4.0.5:
-    resolution: {integrity: sha512-Bq44KCEt7JVaNLa148mBCJkcQf4l7jtLEBDuDdeuLynWDA+1a60P4D0rMkqSM9mOKLQbIWUddE9h3XKyKwBeqA==}
-    dev: false
 
   /ts-pattern@4.3.0:
     resolution: {integrity: sha512-pefrkcd4lmIVR0LA49Imjf9DYLK8vtWhqBPA3Ya1ir8xCW0O2yjL9dsCVvI7pCodLC5q7smNpEtDR2yVulQxOg==}

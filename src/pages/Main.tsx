@@ -18,6 +18,7 @@ import {
   getOrganizationsById,
 } from "../api/api";
 import { useUser } from "../context/userContext";
+import { useAsyncError } from "../context/useAsyncError";
 import { IPipedriveContact } from "../types/pipedrive/pipedriveContact";
 import { IPipedriveOrganization } from "../types/pipedrive/pipedriveOrganization";
 import { DealsMainView } from "../components/DealsMainView";
@@ -26,6 +27,7 @@ import { ActivitiesMainView } from "../components/ActivitiesMainView";
 
 export const Main = () => {
   const { client } = useDeskproAppClient();
+  const { asyncErrorHandler } = useAsyncError();
 
   const [pipedriveContact, setPipedriveContact] =
     useState<IPipedriveContact | null>(null);
@@ -46,9 +48,10 @@ export const Main = () => {
     )[0];
 
     if (id) {
-      const contact = await getContactById(client, deskproUser.orgName, id);
+      const contact = await getContactById(client, deskproUser.orgName, id)
+          .catch(asyncErrorHandler);
 
-      if (!contact.success) {
+      if (!contact?.success) {
         await client
           .getEntityAssociation("linkedPipedriveContacts", deskproUser.id)
           .delete(id);
@@ -66,7 +69,7 @@ export const Main = () => {
       client,
       deskproUser.orgName,
       deskproUser.primaryEmail
-    );
+    ).catch(asyncErrorHandler);
 
     if (!contact) {
       navigate("/contacts");
@@ -86,9 +89,9 @@ export const Main = () => {
       client,
       deskproUser.orgName,
       pipedriveContact.org_id.value
-    );
+    ).catch(asyncErrorHandler);
 
-    if (!pipedriveOrganization.success) return;
+    if (!pipedriveOrganization?.success) return;
 
     setOrganization(pipedriveOrganization.data);
   };

@@ -1,7 +1,6 @@
 import {
   Button,
   H1,
-  H2,
   Input,
   Stack,
   useDeskproAppClient,
@@ -21,6 +20,7 @@ import {
 } from "../api/api";
 import { Dropdown } from "../components/Dropdown";
 import { useUser } from "../context/userContext";
+import { ErrorBlock } from "../components/ErrorBlock";
 import { IPipedriveContact } from "../types/pipedrive/pipedriveContact";
 import { IPipedriveCreateContact } from "../types/pipedrive/pipedriveCreateContact";
 import { IPipedriveOrganization } from "../types/pipedrive/pipedriveOrganization";
@@ -36,7 +36,6 @@ export const EditContact = () => {
     handleSubmit,
     register,
     formState: { errors },
-    setError,
     setValue,
     watch,
     reset,
@@ -48,6 +47,7 @@ export const EditContact = () => {
     []
   );
   const [users, setUsers] = useState<IPipedriveUser[]>([]);
+  const [error, setError] = useState<string|null>(null);
 
   useInitialisedDeskproAppClient(
     async (client) => {
@@ -132,22 +132,11 @@ export const EditContact = () => {
       }
     });
 
-    const response = await editContact(
-      client,
-      deskproUser?.orgName,
-      pipedriveContact,
-      contactId
-    );
+    setError(null);
 
-    if (!response.success) {
-      setError("submit", {
-        message: "Error creating contact",
-      });
-
-      return;
-    }
-
-    navigate("/");
+    return editContact(client, deskproUser?.orgName, pipedriveContact, contactId)
+        .then(() => navigate("/"))
+        .catch((err) => setError(err?.data?.error || "Error creating contact"));
   };
 
   const themes = {
@@ -160,6 +149,8 @@ export const EditContact = () => {
 
   return (
     <Stack>
+      {error && <ErrorBlock text={error}/>}
+
       <form
         onSubmit={handleSubmit(submitEditContact)}
         style={{ width: "100%" }}
@@ -238,11 +229,6 @@ export const EditContact = () => {
             onClick={() => navigate(`/redirect`)}
           ></Button>
         </Stack>
-        {errors?.submit && (
-          <Stack style={{ marginTop: "10px" }}>
-            <H2>Error editing contact</H2>
-          </Stack>
-        )}
       </form>
     </Stack>
   );
