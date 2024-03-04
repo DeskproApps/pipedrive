@@ -17,7 +17,7 @@ import { Main } from "./pages/Main";
 import { DealDetails } from "./pages/DealDetails";
 import { CreateDeal } from "./pages/CreateDeal";
 import { CreateActivity } from "./pages/CreateActivity";
-// import { CreateNote } from "./pages/CreateNote";
+import { CreateNote } from "./pages/CreateNote";
 import { ErrorBoundary } from "react-error-boundary";
 import { ErrorFallback } from "./components/ErrorFallback";
 import { EditDeal } from "./pages/EditDeal";
@@ -38,7 +38,7 @@ function App() {
             <Route path="/createdeal" element={<CreateDeal />}/>
             <Route path="/editdeal/:dealId" element={<EditDeal />}/>
             <Route path="/createactivity" element={<CreateActivity />}/>
-            {/* <Route path="/createnote" element={<CreateNote />}></Route> */}
+            <Route path="/createnote" element={<CreateNote />}/>
             <Route path="/editcontact/:contactId" element={<EditContact />}/>
             <Route path="/admin/verify_settings" element={<VerifySettings/>} />
           </Routes>

@@ -1,18 +1,13 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import {
-  H1,
   H2,
   HorizontalDivider,
   Stack,
+  Title,
   useInitialisedDeskproAppClient,
 } from "@deskpro/app-sdk";
 import { Avatar } from "@deskpro/deskpro-ui";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPlus } from "@fortawesome/free-solid-svg-icons";
 import parse from "html-react-parser";
-import { LogoAndLinkButton } from "./LogoAndLinkButton";
 import { useState } from "react";
-
 import { IPipedriveNote } from "../types/pipedrive/pipedriveNote";
 import { getNotes } from "../api/api";
 import { timeSince } from "../utils/utils";
@@ -44,26 +39,12 @@ export const NotesMainView = ({
   );
 
   return (
-    <Stack vertical style={{ width: "100%" }}>
-      <Stack
-        style={{
-          width: "100%",
-          alignItems: "center",
-          justifyContent: "space-between",
-        }}
-      >
-        <Stack gap={"2px"} style={{ alignItems: "center" }}>
-          <h1 style={{ fontSize: "12px" }}>Notes ({notes.length})</h1>
-          <FontAwesomeIcon
-            icon={faPlus as unknown as {
-              prefix: "fas";
-              iconName: "mailchimp";
-            }}
-            style={{ width: "12px", marginLeft: "5px", cursor: "pointer" }}
-            onClick={() => navigate("/createnote")}
-          ></FontAwesomeIcon>
-        </Stack>
-      </Stack>
+    <>
+      <Title
+        title={`Notes (${notes.length})`}
+        onClick={() => navigate("/createnote")}
+        marginBottom={0}
+      />
       <Stack vertical style={{ width: "100%" }}>
         {notes.map((note, i) => {
           return (
@@ -73,16 +54,6 @@ export const NotesMainView = ({
               gap={5}
               style={{ width: "100%", marginTop: "10px" }}
             >
-              <Stack
-                style={{
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  width: "100%",
-                }}
-              >
-                <H1>Note {++i}</H1>
-                <LogoAndLinkButton endpoint={`person/${contact.id}`} />
-              </Stack>
               <Stack style={{ alignItems: "flex-start", marginTop: "10px" }}>
                 <Stack
                   vertical
@@ -95,7 +66,7 @@ export const NotesMainView = ({
                   <Avatar
                     size={22}
                     name={note.user.name.split(" ").slice(0, 2).join(" ")}
-                  ></Avatar>
+                  />
                   <H2>{timeSince(new Date(note.add_time)).slice(0, 5)}</H2>
                 </Stack>
                 <div style={{ maxWidth: "20ch", marginLeft: "10px" }}>
@@ -111,6 +82,6 @@ export const NotesMainView = ({
           );
         })}
       </Stack>
-    </Stack>
+    </>
   );
 };

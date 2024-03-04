@@ -23,7 +23,7 @@ import { IPipedriveContact } from "../types/pipedrive/pipedriveContact";
 import { IPipedriveOrganization } from "../types/pipedrive/pipedriveOrganization";
 import { DealsMainView } from "../components/DealsMainView";
 import { ActivitiesMainView } from "../components/ActivitiesMainView";
-// import { NotesMainView } from "../components/NotesMainView";
+import { NotesMainView } from "../components/NotesMainView";
 
 export const Main = () => {
   const { client } = useDeskproAppClient();
@@ -227,10 +227,10 @@ export const Main = () => {
             contact={pipedriveContact}
             orgName={deskproUser?.orgName}
           />
-          {/* <NotesMainView
+           <NotesMainView
             contact={pipedriveContact}
             orgName={deskproUser?.orgName}
-          /> */}
+          />
         </div>
       )}
     </Stack>
