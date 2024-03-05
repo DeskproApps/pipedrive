@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import {
   Button,
   H1,
@@ -11,7 +9,7 @@ import {
 } from "@deskpro/app-sdk";
 import { useForm } from "react-hook-form";
 import { useState } from "react";
-
+import { ErrorBlock } from "./ErrorBlock";
 import { Dropdown } from "./Dropdown";
 import { createContact, getAllOrganizations, getAllUsers } from "../api/api";
 import { IPipedriveCreateContact } from "../types/pipedrive/pipedriveCreateContact";
@@ -23,28 +21,24 @@ import { useNavigate } from "react-router-dom";
 export const CreateContact = () => {
   const { client } = useDeskproAppClient();
   const { theme } = useDeskproAppTheme();
-
   const {
     handleSubmit,
     register,
     formState: { errors },
-    setError,
     setValue,
     watch,
   } = useForm<IPipedriveCreateContact>();
   const navigate = useNavigate();
-
   const [orgId, ownerId] = watch(["org_id", "owner_id"]);
-
-  const [organizations, setOrganizations] = useState<IPipedriveOrganization[]>(
-    []
-  );
+  const [organizations, setOrganizations] = useState<IPipedriveOrganization[]>([]);
   const [users, setUsers] = useState<IPipedriveUser[]>([]);
+  const [error, setError] = useState<string|null>(null);
   const deskproUser = useUser();
 
   useInitialisedDeskproAppClient(
     async (client) => {
       if (!deskproUser) return;
+
       const orgs = await getAllOrganizations(client, deskproUser?.orgName);
       setOrganizations(orgs.data ?? []);
 
@@ -66,25 +60,15 @@ export const CreateContact = () => {
       org_id: orgId,
     } as IPipedriveCreateContact;
 
-    const response = await createContact(
-      client,
-      deskproUser?.orgName,
-      pipedriveContact
-    );
+    setError(null);
 
-    if (!response.success) {
-      setError("submit", {
-        message: "Error creating contact",
-      });
-
-      return;
-    }
-
-    await client
-      ?.getEntityAssociation("linkedPipedriveContacts", deskproUser.id)
-      .set(response.data.id.toString());
-
-    navigate("/");
+    return createContact(client, deskproUser?.orgName, pipedriveContact)
+        .then((response) => client
+            ?.getEntityAssociation("linkedPipedriveContacts", deskproUser.id)
+            .set(response.data.id.toString())
+        )
+        .then(() => navigate("/"))
+        .catch((err) => setError(err?.data?.error || "Error creating contact"));
   };
 
   const themes = {
@@ -96,7 +80,9 @@ export const CreateContact = () => {
   };
 
   return (
-    <Stack vertical gap={10}>
+    <Stack vertical gap={10} align="stretch">
+      {error && <ErrorBlock text={error}/>}
+
       <form onSubmit={handleSubmit(postContact)} style={{ width: "100%" }}>
         <Stack style={themes.stackStyles} vertical>
           <H1>Name</H1>
@@ -173,9 +159,6 @@ export const CreateContact = () => {
             onClick={() => navigate("/")}
           ></Button>
         </Stack>
-        {errors?.submit && (
-          <h2 style={{ marginTop: "10px" }}>Error creating contact</h2>
-        )}
       </form>
     </Stack>
   );

@@ -4,7 +4,6 @@
 // even though it's completely acceptable.
 import { DeskproAppProvider } from "@deskpro/app-sdk";
 import { Routes, HashRouter, Route } from "react-router-dom";
-
 import "flatpickr/dist/themes/light.css";
 import "tippy.js/dist/tippy.css";
 import "simplebar/dist/simplebar.min.css";
@@ -18,7 +17,7 @@ import { Main } from "./pages/Main";
 import { DealDetails } from "./pages/DealDetails";
 import { CreateDeal } from "./pages/CreateDeal";
 import { CreateActivity } from "./pages/CreateActivity";
-// import { CreateNote } from "./pages/CreateNote";
+import { CreateNote } from "./pages/CreateNote";
 import { ErrorBoundary } from "react-error-boundary";
 import { ErrorFallback } from "./components/ErrorFallback";
 import { EditDeal } from "./pages/EditDeal";
@@ -32,21 +31,15 @@ function App() {
       <HashRouter>
         <ErrorBoundary FallbackComponent={ErrorFallback}>
           <Routes>
-            <Route index path="/" element={<Main />}></Route>
-            <Route
-              path="/dealdetails/:dealId"
-              element={<DealDetails />}
-            ></Route>
-            <Route path="/contacts" element={<Contacts />}></Route>
-            <Route path="/redirect/" element={<Redirect />}></Route>
-            <Route path="/createdeal" element={<CreateDeal />}></Route>
-            <Route path="/editdeal/:dealId" element={<EditDeal />}></Route>
-            <Route path="/createactivity" element={<CreateActivity />}></Route>
-            {/* <Route path="/createnote" element={<CreateNote />}></Route> */}
-            <Route
-              path="/editcontact/:contactId"
-              element={<EditContact />}
-            ></Route>
+            <Route index path="/" element={<Main />}/>
+            <Route path="/dealdetails/:dealId" element={<DealDetails />}/>
+            <Route path="/contacts" element={<Contacts />}/>
+            <Route path="/redirect/" element={<Redirect />}/>
+            <Route path="/createdeal" element={<CreateDeal />}/>
+            <Route path="/editdeal/:dealId" element={<EditDeal />}/>
+            <Route path="/createactivity" element={<CreateActivity />}/>
+            <Route path="/createnote" element={<CreateNote />}/>
+            <Route path="/editcontact/:contactId" element={<EditContact />}/>
             <Route path="/admin/verify_settings" element={<VerifySettings/>} />
           </Routes>
         </ErrorBoundary>

@@ -29,7 +29,8 @@
     "react-router-dom": "^6.4.2",
     "simplebar": "^6.2.5",
     "tippy.js": "^6.3.7",
-    "word-wrap": "1.2.4"
+    "word-wrap": "1.2.4",
+    "ts-pattern": "^4.3.0"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^5.16.1",
