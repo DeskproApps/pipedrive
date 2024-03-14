@@ -1,7 +1,6 @@
+import { Spinner, Stack } from "@deskpro/deskpro-ui";
 import {
   HorizontalDivider,
-  Spinner,
-  Stack,
   useDeskproAppEvents,
   useInitialisedDeskproAppClient,
 } from "@deskpro/app-sdk";

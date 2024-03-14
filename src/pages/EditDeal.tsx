@@ -1,9 +1,5 @@
+import { Button, H1, H2, Input, Stack } from "@deskpro/deskpro-ui";
 import {
-  Button,
-  H1,
-  H2,
-  Input,
-  Stack,
   useDeskproAppClient,
   useDeskproAppEvents,
   useDeskproAppTheme,

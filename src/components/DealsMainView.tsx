@@ -1,9 +1,6 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
+import { Stack } from "@deskpro/deskpro-ui";
 import {
-  H2,
-  P5,
   HorizontalDivider,
-  Stack,
   useInitialisedDeskproAppClient,
   VerticalDivider,
   Title,

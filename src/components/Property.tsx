@@ -1,4 +1,5 @@
-import { H2, useDeskproAppTheme } from "@deskpro/app-sdk";
+import { H2 } from "@deskpro/deskpro-ui";
+import { useDeskproAppTheme } from "@deskpro/app-sdk";
 
 export const Property = ({
   title,

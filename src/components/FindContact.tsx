@@ -1,12 +1,6 @@
+import { AnyIcon, Button, Input, Label, Radio, Spinner, Stack } from "@deskpro/deskpro-ui";
 import {
-  AnyIcon,
-  Button,
   HorizontalDivider,
-  Input,
-  Label,
-  Radio,
-  Spinner,
-  Stack,
   useDeskproAppClient,
   useInitialisedDeskproAppClient,
 } from "@deskpro/app-sdk";

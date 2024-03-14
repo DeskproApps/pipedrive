@@ -1,11 +1,9 @@
+import { H2, Stack, Avatar } from "@deskpro/deskpro-ui";
 import {
-  H2,
-  HorizontalDivider,
-  Stack,
   Title,
+  HorizontalDivider,
   useInitialisedDeskproAppClient,
 } from "@deskpro/app-sdk";
-import { Avatar } from "@deskpro/deskpro-ui";
 import parse from "html-react-parser";
 import { useState } from "react";
 import { IPipedriveNote } from "../types/pipedrive/pipedriveNote";

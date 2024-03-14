@@ -1,7 +1,5 @@
+import { Button, Stack, TextArea } from "@deskpro/deskpro-ui";
 import {
-  Button,
-  Stack,
-  TextArea,
   useDeskproAppClient,
   useInitialisedDeskproAppClient,
   useDeskproAppEvents,

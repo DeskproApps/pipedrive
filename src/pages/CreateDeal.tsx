@@ -1,10 +1,5 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @typescript-eslint/no-unused-vars */
+import { Button, H1, Input, Stack } from "@deskpro/deskpro-ui";
 import {
-  Button,
-  H1,
-  Input,
-  Stack,
   useDeskproAppClient,
   useDeskproAppEvents,
   useDeskproAppTheme,

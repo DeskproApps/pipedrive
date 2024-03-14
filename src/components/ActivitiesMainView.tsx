@@ -1,6 +1,6 @@
+import { Stack } from "@deskpro/deskpro-ui";
 import {
   HorizontalDivider,
-  Stack,
   useInitialisedDeskproAppClient,
   Title,
 } from "@deskpro/app-sdk";

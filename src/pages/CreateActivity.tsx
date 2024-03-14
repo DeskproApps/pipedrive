@@ -1,8 +1,6 @@
+import { Button, H1, Input, Stack } from "@deskpro/deskpro-ui";
 import {
-  Button,
-  H1,
-  Input,
-  Stack,
+  DateInput,
   useDeskproAppClient,
   useDeskproAppEvents,
   useDeskproAppTheme,
@@ -11,7 +9,6 @@ import {
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
-
 import {
   createActivity,
   getActivityTypes,
@@ -20,7 +17,6 @@ import {
   getAllOrganizations,
   getAllUsers,
 } from "../api/api";
-import { DateField } from "../components/DateField";
 import { Dropdown } from "../components/Dropdown";
 import { useUser } from "../context/userContext";
 import { IPipedriveActivityType } from "../types/pipedrive/pipedriveActivityTypes";
@@ -220,14 +216,14 @@ export const CreateActivity = () => {
             {...register("subject", { required: true })}
           />
         </Stack>
-        <DateField
+        <DateInput
           label="Start Date"
           error={Boolean(errors.start_date)}
           {...register("start_date", { required: true })}
           onChange={(date: [Date]) => setValue("start_date", date[0])}
           required
         />
-        <DateField
+        <DateInput
           label="End Date"
           {...register("end_date")}
           onChange={(date: [Date]) => setValue("end_date", date[0])}
