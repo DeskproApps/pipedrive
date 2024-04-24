@@ -21,6 +21,7 @@
     "@heroicons/react": "1.0.6",
     "flatpickr": "^4.6.13",
     "html-react-parser": "^3.0.4",
+    "iframe-resizer": "^4.3.11",
     "polished": "^4.1.1",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
