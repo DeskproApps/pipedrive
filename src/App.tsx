@@ -4,10 +4,10 @@
 // even though it's completely acceptable.
 import { DeskproAppProvider } from "@deskpro/app-sdk";
 import { Routes, HashRouter, Route } from "react-router-dom";
+
 import "flatpickr/dist/themes/light.css";
 import "tippy.js/dist/tippy.css";
 import "simplebar/dist/simplebar.min.css";
-
 import "@deskpro/deskpro-ui/dist/deskpro-ui.css";
 import "@deskpro/deskpro-ui/dist/deskpro-custom-icons.css";
 
