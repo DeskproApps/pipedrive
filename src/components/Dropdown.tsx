@@ -1,17 +1,14 @@
 import {
-  DivAsInput,
-  Dropdown as DropdownComponent,
-  DropdownTargetProps,
   Label,
-  H1,
-  Stack,
   AnyIcon,
+  DivAsInput,
+  DropdownTargetProps,
+  Dropdown as DropdownComponent,
 } from "@deskpro/deskpro-ui";
-import { useDeskproAppTheme } from "@deskpro/app-sdk";
 import {
   faCheck,
-  faExternalLinkAlt,
   faCaretDown,
+  faExternalLinkAlt,
 } from "@fortawesome/free-solid-svg-icons";
 import { useMemo } from "react";
 import { Status } from "../types/status";
@@ -37,40 +34,29 @@ export const Dropdown = <T,>({
   valueName,
   required,
 }: Props<T>) => {
-  const { theme } = useDeskproAppTheme();
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const dataOptions = useMemo<any>(() => {
     return data.map((dataInList) => ({
       key: dataInList[keyName],
-      label: <Label label={dataInList[valueName]}></Label>,
+      label: dataInList[valueName],
       value: dataInList[valueName],
       type: "value" as const,
     }));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data, valueName]);
+
   return (
-    <Stack
-      vertical
-      style={{ marginTop: "5px", color: theme.colors.grey80, width: "100%" }}
+    <DropdownComponent<Status, HTMLDivElement>
+      placement="bottom-start"
+      options={dataOptions}
+      fetchMoreText={"Fetch more"}
+      autoscrollText={"Autoscroll"}
+      selectedIcon={faCheck as AnyIcon}
+      externalLinkIcon={faExternalLinkAlt as AnyIcon}
+      onSelectOption={(option) => onChange(option.key)}
     >
-      <Stack>
-        <H1>{title}</H1>
-        {required && (
-          <Stack style={{ color: "red" }}>
-            <H1>⠀*</H1>
-          </Stack>
-        )}
-      </Stack>
-      <DropdownComponent<Status, HTMLDivElement>
-        placement="bottom-start"
-        options={dataOptions}
-        fetchMoreText={"Fetch more"}
-        autoscrollText={"Autoscroll"}
-        selectedIcon={faCheck as AnyIcon}
-        externalLinkIcon={faExternalLinkAlt as AnyIcon}
-        onSelectOption={(option) => onChange(option.key)}
-      >
-        {({ targetProps, targetRef }: DropdownTargetProps<HTMLDivElement>) => (
+      {({targetProps, targetRef}: DropdownTargetProps<HTMLDivElement>) => (
+        <Label label={title} required={required} style={{ marginBottom: 10 }}>
           <DivAsInput
             error={error}
             ref={targetRef}
@@ -84,8 +70,8 @@ export const Dropdown = <T,>({
               )?.value ?? ""
             }
           />
-        )}
-      </DropdownComponent>
-    </Stack>
+        </Label>
+      )}
+    </DropdownComponent>
   );
 };

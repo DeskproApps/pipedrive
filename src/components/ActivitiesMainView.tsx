@@ -1,8 +1,8 @@
-import { Stack } from "@deskpro/deskpro-ui";
+import { Fragment } from "react";
 import {
+  Title,
   HorizontalDivider,
   useInitialisedDeskproAppClient,
-  Title,
 } from "@deskpro/app-sdk";
 import { useNavigate } from "react-router-dom";
 import { PipedriveLogo } from "./PipedriveLogo";
@@ -12,6 +12,8 @@ import { getActivitiesByUserId } from "../api/api";
 import { IPipedriveContact } from "../types/pipedrive/pipedriveContact";
 import { TwoColumn } from "./TwoColumn";
 import { useUser } from "../context/userContext";
+import { isLast } from "../utils/utils";
+import { format } from "../utils/date/format";
 
 export const ActivitiesMainView = ({
   contact,
@@ -45,41 +47,31 @@ export const ActivitiesMainView = ({
   );
 
   return (
-    <Stack vertical style={{ width: "100%" }}>
+    <>
       <Title
         title={`Activities (${activities.length})`}
         onClick={() => navigate("/createactivity")}
       />
-      <Stack vertical style={{ width: "100%" }}>
-        {activities.map((activity, i) => {
-          const date = new Date(activity.due_date);
-
-          return (
-            <Stack key={i} vertical style={{ width: "100%", marginTop: "5px" }}>
-              <Stack vertical align="stretch" style={{ width: "100%" }}>
-                <Title
-                  title={activity.subject}
-                  link={`https://${deskproUser?.orgName}.pipedrive.com/activities/list/user/${contact.owner_id.id}`}
-                  icon={<PipedriveLogo/>}
-                />
-              </Stack>
-              <TwoColumn
-                leftLabel="Type"
-                leftText={
-                  activity.type.charAt(0).toUpperCase() + activity.type.slice(1)
-                }
-                rightLabel="Date"
-                rightText={`${date.getUTCDate()} ${date
-                  .toLocaleString("default", { month: "long" })
-                  .slice(0, 3)}, ${date.getFullYear()}`}
-              ></TwoColumn>
-              <HorizontalDivider
-                style={{ width: "110%", color: "#EFF0F0", marginLeft: "-10px" }}
-              />
-            </Stack>
-          );
-        })}
-      </Stack>
-    </Stack>
+      {activities.map((activity, idx) => (
+        <Fragment key={activity.id}>
+          <Title
+            title={activity.subject}
+            link={`https://${deskproUser?.orgName}.pipedrive.com/activities/list/user/${contact.owner_id.id}`}
+            icon={<PipedriveLogo/>}
+          />
+          <TwoColumn
+            leftLabel="Type"
+            leftText={activity.type.charAt(0).toUpperCase() + activity.type.slice(1)}
+            rightLabel="Date"
+            rightText={format(activity.due_date) || "-"}
+          />
+          <HorizontalDivider
+            style={{
+              margin: `0 ${isLast(activities, idx) ? "-8px" : "0"} 10px`,
+            }}
+          />
+        </Fragment>
+      ))}
+    </>
   );
 };

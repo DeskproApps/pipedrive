@@ -1,4 +1,3 @@
-import { Stack } from "@deskpro/deskpro-ui";
 import {
   HorizontalDivider,
   IDeskproClient,
@@ -6,9 +5,9 @@ import {
   useDeskproAppEvents,
   useInitialisedDeskproAppClient,
   Title,
+  Property,
 } from "@deskpro/app-sdk";
 import { PipedriveLogo } from "../components/PipedriveLogo";
-import { Property } from "../components/Property";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -186,39 +185,31 @@ export const Main = () => {
   );
 
   return (
-    <Stack vertical>
-      <Stack vertical style={{ width: "100%" }} align="stretch">
-        {pipedriveContact?.name && (
-          <Title
-            title={pipedriveContact.name}
-            link={`https://${deskproUser?.orgName}.pipedrive.com/person/${pipedriveContact?.id}`}
-            icon={<PipedriveLogo />}
-          />
-        )}
-        <Stack
-          style={{ marginTop: "10px", marginBottom: "10px", width: "100%" }}
-          vertical
-          gap={10}
-        >
-          {pipedriveContact?.primary_email && (
-            <Property title="Email">{pipedriveContact.primary_email}</Property>
-          )}
-          {pipedriveContact?.phone[0].value && (
-            <Property title="Phone">{pipedriveContact.phone[0].value}</Property>
-          )}
-          {organization?.owner_name && (
-            <Property title="Owner">{organization.owner_name}</Property>
-          )}
-          {organization?.name && (
-            <Property title="Organization">{organization.name}</Property>
-          )}
-        </Stack>
-      </Stack>
-      <HorizontalDivider
-        style={{ width: "110%", color: "#EFF0F0", marginLeft: "-10px", marginBottom: 10 }}
-      />
+    <>
+      {pipedriveContact?.name && (
+        <Title
+          title={pipedriveContact.name}
+          link={`https://${deskproUser?.orgName}.pipedrive.com/person/${pipedriveContact?.id}`}
+          icon={<PipedriveLogo/>}
+        />
+      )}
+      {pipedriveContact?.primary_email && (
+        <Property label="Email" text={pipedriveContact.primary_email}/>
+      )}
+      {pipedriveContact?.phone[0].value && (
+        <Property label="Phone" text={pipedriveContact.phone[0].value}/>
+      )}
+      {organization?.owner_name && (
+        <Property label="Owner" text={organization.owner_name}/>
+      )}
+      {organization?.name && (
+        <Property label="Organization" text={organization.name}/>
+      )}
+
+      <HorizontalDivider style={{margin: "0 -8px 10px"}}/>
+
       {pipedriveContact && deskproUser && (
-        <div style={{ width: "100%" }}>
+        <>
           <DealsMainView
             contact={pipedriveContact}
             orgName={deskproUser?.orgName}
@@ -227,12 +218,12 @@ export const Main = () => {
             contact={pipedriveContact}
             orgName={deskproUser?.orgName}
           />
-           <NotesMainView
+          <NotesMainView
             contact={pipedriveContact}
             orgName={deskproUser?.orgName}
           />
-        </div>
+        </>
       )}
-    </Stack>
+    </>
   );
 };

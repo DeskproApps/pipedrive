@@ -1,10 +1,9 @@
-import { Stack } from "@deskpro/deskpro-ui";
+import { Fragment } from "react";
 import {
+  Title,
+  TwoProperties,
   HorizontalDivider,
   useInitialisedDeskproAppClient,
-  VerticalDivider,
-  Title,
-  Property,
 } from "@deskpro/app-sdk";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
@@ -14,6 +13,7 @@ import { IPipedriveContact } from "../types/pipedrive/pipedriveContact";
 import { PipedriveLogo } from "./PipedriveLogo";
 import { RouterLink } from "./Link";
 import { useUser } from "../context/userContext";
+import { format } from "../utils/date/format";
 
 export const DealsMainView = ({
   contact,
@@ -42,57 +42,27 @@ export const DealsMainView = ({
   );
 
   return (
-    <Stack vertical style={{ width: "100%" }}>
+    <>
       <Title
         title={`Deals (${deals.length})`}
         onClick={() => navigate("/createdeal")}
       />
-      <Stack vertical style={{ width: "100%" }}>
-        {deals.map((deal, i) => {
-          return (
-            <Stack
-              key={i}
-              vertical
-              gap={5}
-              style={{ width: "100%", marginTop: "5px" }}
-            >
-              <Stack vertical align="stretch" style={{ width: "100%" }}>
-                <Title
-                  title={(
-                    <RouterLink to={`/dealdetails/${deal.id}`}>{deal.title}</RouterLink>
-                  )}
-                  link={`https://${deskproUser?.orgName}.pipedrive.com/deal/${deal.id}`}
-                  icon={<PipedriveLogo/>}
-                />
-              </Stack>
-              <Stack>
-                <Property>{deal.add_time.split(" ")[0]}</Property>
-                <Stack style={{ marginLeft: "40px" }}>
-                  <VerticalDivider
-                    style={{
-                      height: "15px",
-                      width: "1px",
-                      color: "#EFF0F0",
-                      marginLeft: "15px",
-                    }}
-                  ></VerticalDivider>
-                  <Property>
-                    {`${Intl.NumberFormat("en-IN").format(deal.value)} ${deal.currency}`}
-                  </Property>
-                </Stack>
-              </Stack>
-              <HorizontalDivider
-                style={{
-                  width: "110%",
-                  color: "#EFF0F0",
-                  marginLeft: "-10px",
-                  marginBottom: "5px",
-                }}
-              />
-            </Stack>
-          );
-        })}
-      </Stack>
-    </Stack>
+      {deals.map((deal) => (
+        <Fragment key={deal.id}>
+          <Title
+            title={(
+              <RouterLink to={`/dealdetails/${deal.id}`}>{deal.title}</RouterLink>
+            )}
+            link={`https://${deskproUser?.orgName}.pipedrive.com/deal/${deal.id}`}
+            icon={<PipedriveLogo/>}
+          />
+          <TwoProperties
+            leftText={format(deal.add_time.split(" ")[0] || "-")}
+            rightText={`${Intl.NumberFormat("en-IN").format(deal.value)} ${deal.currency}`}
+          />
+          <HorizontalDivider style={{marginBottom: 10}}/>
+        </Fragment>
+      ))}
+    </>
   );
 };

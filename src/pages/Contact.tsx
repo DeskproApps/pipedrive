@@ -26,7 +26,7 @@ export const Contacts = () => {
         twoLabel="Create Contact"
         oneOnClick={() => setcurrentPage("Find Contact")}
         twoOnClick={() => setcurrentPage("Create Contact")}
-      ></TwoButtonGroup>
+      />
 
       {currentPage === "Find Contact" ? <FindContact /> : <CreateContact />}
     </div>

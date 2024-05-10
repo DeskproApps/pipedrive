@@ -1,15 +1,15 @@
-import { Spinner, Stack } from "@deskpro/deskpro-ui";
 import {
+  Property,
+  LoadingSpinner,
   HorizontalDivider,
   useDeskproAppEvents,
   useInitialisedDeskproAppClient,
 } from "@deskpro/app-sdk";
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-
-import { Property } from "../components/Property";
 import { getDealById, getPipelineById, getStageById } from "../api/api";
 import { useUser } from "../context/userContext";
+import { format } from "../utils/date/format";
 import { IPipedriveDeal } from "../types/pipedrive/pipedriveDeal";
 
 export const DealDetails = () => {
@@ -90,47 +90,33 @@ export const DealDetails = () => {
     },
   });
 
-  return isLoading ? (
-    <Stack
-      style={{
-        margin: "auto",
-        width: "100%",
-        alignItems: "center",
-        justifyContent: "center",
-      }}
-    >
-      <Spinner size="extra-large" />
-    </Stack>
-  ) : (
-    <Stack vertical gap={10}>
-      {deal?.title && <Property title="Deal Title">{deal?.title}</Property>}
+  if (isLoading) {
+    return (
+      <LoadingSpinner/>
+    );
+  }
+
+  return (
+    <>
+      {deal?.title && <Property label="Deal Title" text={deal?.title}/>}
       {deal?.person_id.name && (
-        <Property title="Contact person">{deal?.person_id.name}</Property>
+        <Property label="Contact person" text={deal?.person_id.name}/>
       )}
       {deal?.org_id?.name && (
-        <Property title="Organization">{deal?.org_id?.name}</Property>
+        <Property label="Organization" text={deal?.org_id?.name}/>
       )}
-      {pipeline && <Property title="Pipeline">{pipeline}</Property>}
-      {stage && <Property title="Stage">{stage}</Property>}
+      {pipeline && <Property label="Pipeline" text={pipeline}/>}
+      {stage && <Property label="Stage" text={stage}/>}
       {deal?.formatted_weighted_value && (
-        <Property title="Value">{deal?.formatted_weighted_value}</Property>
+        <Property label="Value" text={deal?.formatted_weighted_value}/>
       )}
       {deal?.owner_name && (
-        <Property title="Owner">{deal?.owner_name}</Property>
+        <Property label="Owner" text={deal?.owner_name}/>
       )}
       {deal?.expected_close_date && (
-        <Property title="Expected close date">
-          {deal?.expected_close_date}
-        </Property>
+        <Property label="Expected close date" text={format(deal?.expected_close_date) || "-"}/>
       )}
-      <HorizontalDivider
-        style={{
-          width: "110%",
-          color: "#EFF0F0",
-          marginLeft: "-10px",
-          marginBottom: "5px",
-        }}
-      />
-    </Stack>
+      <HorizontalDivider/>
+    </>
   );
 };

@@ -1,8 +1,8 @@
-import { Button, H1, Input, Stack } from "@deskpro/deskpro-ui";
+import { Button, Input, Stack, Label } from "@deskpro/deskpro-ui";
 import {
+  Title,
   useDeskproAppClient,
   useDeskproAppEvents,
-  useDeskproAppTheme,
   useInitialisedDeskproAppClient,
 } from "@deskpro/app-sdk";
 import { useEffect, useState } from "react";
@@ -25,7 +25,6 @@ import { IPipedriveUser } from "../types/pipedrive/pipedriveUser";
 
 export const EditContact = () => {
   const { client } = useDeskproAppClient();
-  const { theme } = useDeskproAppTheme();
   const navigate = useNavigate();
   const deskproUser = useUser();
   const { contactId } = useParams();
@@ -37,12 +36,9 @@ export const EditContact = () => {
     watch,
     reset,
   } = useForm<IPipedriveCreateContact>();
-
   const [orgId, ownerId] = watch(["org_id", "owner_id"]);
   const [contact, setContact] = useState<IPipedriveContact | null>(null);
-  const [organizations, setOrganizations] = useState<IPipedriveOrganization[]>(
-    []
-  );
+  const [organizations, setOrganizations] = useState<IPipedriveOrganization[]>([]);
   const [users, setUsers] = useState<IPipedriveUser[]>([]);
   const [error, setError] = useState<string|null>(null);
 
@@ -136,97 +132,72 @@ export const EditContact = () => {
         .catch((err) => setError(err?.data?.error || "Error creating contact"));
   };
 
-  const themes = {
-    stackStyles: {
-      marginTop: "5px",
-      color: theme.colors.grey80,
-      width: "100%",
-    },
-  };
-
   return (
-    <Stack>
+    <form onSubmit={handleSubmit(submitEditContact)}>
       {error && <ErrorBlock text={error}/>}
 
-      <form
-        onSubmit={handleSubmit(submitEditContact)}
-        style={{ width: "100%" }}
-      >
-        <Stack vertical gap={5}>
-          <H1>Details</H1>
-          <Stack vertical style={themes.stackStyles}>
-            <H1>Name</H1>
-            <Input
-              variant="inline"
-              placeholder="Enter value"
-              type="title"
-              {...register("name")}
-            />
-          </Stack>
-          <Dropdown
-            title="Organization"
-            data={organizations}
-            onChange={(e) => setValue("org_id", e)}
-            value={orgId}
-            error={!!errors?.org_id}
-            keyName="id"
-            valueName="name"
-          ></Dropdown>
-          <Stack vertical style={themes.stackStyles}>
-            <H1>Label</H1>
-            <Input
-              variant="inline"
-              placeholder="Enter value"
-              type="text"
-              {...register("label")}
-            />
-          </Stack>
-          <Stack vertical style={themes.stackStyles}>
-            <H1>Phone number</H1>
-            <Input
-              variant="inline"
-              placeholder="Enter value"
-              type="tel"
-              {...register("phone")}
-            />
-          </Stack>
-          <Stack vertical style={themes.stackStyles}>
-            <H1>Email</H1>
-            <Input
-              variant="inline"
-              placeholder="Enter value"
-              type="email"
-              {...register("email")}
-            />
-          </Stack>
-          <Dropdown
-            title="Owner"
-            data={users}
-            value={ownerId}
-            onChange={(e) => setValue("owner_id", e)}
-            error={!!errors?.owner_id}
-            keyName="id"
-            valueName="name"
-          />
-        </Stack>
-        <Stack style={{ justifyContent: "space-between" }}>
-          <Button
-            type="submit"
-            style={{ marginTop: "10px" }}
-            text="Save"
-          ></Button>
-          <Button
-            style={{
-              marginTop: "10px",
-              backgroundColor: "white",
-              color: "#1C3E55",
-              border: "1px solid #D3D6D7",
-            }}
-            text="Cancel"
-            onClick={() => navigate(`/redirect`)}
-          ></Button>
-        </Stack>
-      </form>
-    </Stack>
+      <Title title="Details"/>
+
+      <Label label="Name" style={{ marginBottom: 10 }}>
+        <Input
+          variant="inline"
+          placeholder="Enter value"
+          type="title"
+          {...register("name")}
+        />
+      </Label>
+
+      <Dropdown
+        title="Organization"
+        data={organizations}
+        onChange={(e) => setValue("org_id", e)}
+        value={orgId}
+        error={!!errors?.org_id}
+        keyName="id"
+        valueName="name"
+      />
+
+      <Label label="Label">
+        <Input
+          variant="inline"
+          placeholder="Enter value"
+          type="text"
+          {...register("label")}
+        />
+      </Label>
+
+      <Label label="Phone number">
+        <Input
+          variant="inline"
+          placeholder="Enter value"
+          type="tel"
+          {...register("phone")}
+        />
+      </Label>
+
+      <Label label="Email">
+        <Input
+          variant="inline"
+          placeholder="Enter value"
+          type="email"
+          {...register("email")}
+        />
+      </Label>
+
+      <Dropdown
+        title="Owner"
+        data={users}
+        value={ownerId}
+        onChange={(e) => setValue("owner_id", e)}
+        error={!!errors?.owner_id}
+        keyName="id"
+        valueName="name"
+      />
+
+      <Stack justify="space-between">
+        <Button type="submit" text="Save" />
+        <Button type="button" intent="secondary" text="Cancel" onClick={() => navigate(`/redirect`)}/>
+      </Stack>
+    </form>
   );
 };

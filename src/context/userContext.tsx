@@ -1,14 +1,13 @@
 import { createContext, useContext, useState } from "react";
-
 import { useDeskproAppEvents, Context } from "@deskpro/app-sdk";
-
 import IDeskproUser from "../types/deskproUser";
+import type { FC, PropsWithChildren } from "react";
 
 const UserContext = createContext<IDeskproUser | null>(null);
 
 export const useUser = () => useContext(UserContext);
 
-export const UserContextProvider: React.FC = ({ children }) => {
+export const UserContextProvider: FC<PropsWithChildren> = ({ children }) => {
   const [user, setUser] = useState<IDeskproUser | null>(null);
   useDeskproAppEvents({
     onChange: (c: Context) => {
