@@ -16,35 +16,41 @@ import { useNavigate } from "react-router-dom";
 
 export const CreateContact = () => {
   const { client } = useDeskproAppClient();
+  const dpUser = useUser();
+
   const {
     handleSubmit,
     register,
     formState: { errors },
     setValue,
     watch,
-  } = useForm<IPipedriveCreateContact>();
+  } = useForm<IPipedriveCreateContact>({
+    defaultValues: {
+      name: [dpUser?.firstName, dpUser?.lastName].filter(Boolean).join(" ") || "",
+      email: dpUser?.primaryEmail || "",
+    },
+  });
   const navigate = useNavigate();
   const [orgId, ownerId] = watch(["org_id", "owner_id"]);
   const [organizations, setOrganizations] = useState<IPipedriveOrganization[]>([]);
   const [users, setUsers] = useState<IPipedriveUser[]>([]);
   const [error, setError] = useState<string|null>(null);
-  const deskproUser = useUser();
 
   useInitialisedDeskproAppClient(
     async (client) => {
-      if (!deskproUser) return;
+      if (!dpUser) return;
 
-      const orgs = await getAllOrganizations(client, deskproUser?.orgName);
+      const orgs = await getAllOrganizations(client, dpUser?.orgName);
       setOrganizations(orgs.data ?? []);
 
-      const users = await getAllUsers(client, deskproUser.orgName);
+      const users = await getAllUsers(client, dpUser.orgName);
       setUsers(users.data ?? []);
     },
-    [deskproUser]
+    [dpUser]
   );
 
   const postContact = async (values: IPipedriveCreateContact) => {
-    if (!client || !deskproUser) return;
+    if (!client || !dpUser) return;
 
     const pipedriveContact = {
       name: values.name,
@@ -57,9 +63,9 @@ export const CreateContact = () => {
 
     setError(null);
 
-    return createContact(client, deskproUser?.orgName, pipedriveContact)
+    return createContact(client, dpUser?.orgName, pipedriveContact)
         .then((response) => client
-            ?.getEntityAssociation("linkedPipedriveContacts", deskproUser.id)
+            ?.getEntityAssociation("linkedPipedriveContacts", dpUser.id)
             .set(response.data.id.toString())
         )
         .then(() => navigate("/"))
