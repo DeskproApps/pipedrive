@@ -1,4 +1,4 @@
-import { Button, Stack, TextArea } from "@deskpro/deskpro-ui";
+import { Button, Stack, TextArea, Label } from "@deskpro/deskpro-ui";
 import {
   useDeskproAppClient,
   useInitialisedDeskproAppClient,
@@ -60,35 +60,26 @@ export const CreateNote = () => {
 
   return (
     <>
-      <TextArea
-        variant="inline"
-        value={note}
-        onChange={(e) => setNote(e.target.value)}
-        placeholder="Enter text here..."
-        style={{
-          resize: "none",
-          minHeight: "5em",
-          maxHeight: "100%",
-          height: "auto",
-          width: "100%",
-          overflow: "hidden",
-        }}
-      />
-      <Stack style={{ justifyContent: "space-between" }}>
-        <Button
-          onClick={() => submitNote()}
-          style={{ marginTop: "10px" }}
-          text="Save"
-        />
-        <Button
+      <Label label="Note" style={{ marginBottom: 10 }}>
+        <TextArea
+          variant="inline"
+          value={note}
+          onChange={(e) => setNote(e.target.value)}
+          placeholder="Enter text here..."
           style={{
-            marginTop: "10px",
-            backgroundColor: "white",
-            color: "#1C3E55",
-            border: "1px solid #D3D6D7",
+            resize: "none",
+            minHeight: "5em",
+            maxHeight: "100%",
+            height: "auto",
+            width: "100%",
+            overflow: "hidden",
           }}
-          text="Cancel"
-          onClick={() => navigate(`/redirect`)}
+        />
+      </Label>
+
+      <Stack justify="space-between">
+        <Button text="Save" type="button" onClick={submitNote}/>
+        <Button type="button" text="Cancel" intent="secondary" onClick={() => navigate(`/redirect`)}
         />
       </Stack>
     </>

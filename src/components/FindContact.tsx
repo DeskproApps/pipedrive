@@ -1,5 +1,6 @@
-import { AnyIcon, Button, Input, Label, Radio, Spinner, Stack } from "@deskpro/deskpro-ui";
+import { AnyIcon, Button, Input, Label, Radio, Stack } from "@deskpro/deskpro-ui";
 import {
+  LoadingSpinner,
   HorizontalDivider,
   useDeskproAppClient,
   useInitialisedDeskproAppClient,
@@ -93,15 +94,11 @@ export const FindContact = () => {
             style={{ marginTop: "7px", marginBottom: "5px" }}
             text="Link Contact"
             onClick={() => linkContact()}
-          ></Button>
-          <HorizontalDivider
-            style={{ width: "110%", color: "#EFF0F0", marginLeft: "-10px" }}
           />
+          <HorizontalDivider style={{ margin: "0 -8px" }}/>
         </Stack>
         {loading ? (
-          <Stack style={{ margin: "auto" }}>
-            <Spinner size="extra-large" />
-          </Stack>
+          <LoadingSpinner/>
         ) : (
           contacts.map((contact, i) => (
             <div style={{ width: "100%" }} key={i}>
@@ -118,7 +115,7 @@ export const FindContact = () => {
                   <Label
                     style={{ marginLeft: "20px" }}
                     label={contact.primary_email}
-                  ></Label>
+                  />
                 </Stack>
               </Stack>
               <HorizontalDivider

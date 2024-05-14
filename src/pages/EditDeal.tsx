@@ -1,8 +1,8 @@
-import { Button, H1, H2, Input, Stack } from "@deskpro/deskpro-ui";
+import { Button, H2, Input, Stack, Label } from "@deskpro/deskpro-ui";
 import {
+  Title,
   useDeskproAppClient,
   useDeskproAppEvents,
-  useDeskproAppTheme,
   useInitialisedDeskproAppClient,
 } from "@deskpro/app-sdk";
 import { useEffect, useState } from "react";
@@ -31,7 +31,6 @@ import { IPipedriveStage } from "../types/pipedrive/pipedriveStage";
 
 export const EditDeal = () => {
   const { client } = useDeskproAppClient();
-  const { theme } = useDeskproAppTheme();
   const navigate = useNavigate();
   const deskproUser = useUser();
   const { dealId } = useParams();
@@ -44,7 +43,6 @@ export const EditDeal = () => {
     setValue,
     reset,
   } = useForm<IPipedriveCreateDeal>();
-
   const [orgId, personId, pipelineId, userId, stageId] = watch([
     "org_id",
     "person_id",
@@ -52,7 +50,6 @@ export const EditDeal = () => {
     "user_id",
     "stage_id",
   ]);
-
   const [contacts, setContact] = useState<IPipedriveContact[]>([]);
   const [organizations, setOrganizations] = useState<IPipedriveOrganization[]>([]);
   const [pipelines, setPipelines] = useState<IPipedrivePipeline[]>([]);
@@ -169,117 +166,92 @@ export const EditDeal = () => {
     navigate("/");
   };
 
-  const themes = {
-    stackStyles: {
-      marginTop: "5px",
-      color: theme.colors.grey80,
-      width: "100%",
-    },
-  };
-
   return (
-    <Stack>
-      <form onSubmit={handleSubmit(submitEditDeal)} style={{ width: "100%" }}>
-        <Stack vertical gap={5}>
-          <H1>Details</H1>
-          <Stack vertical style={themes.stackStyles}>
-            <H1>Title</H1>
-            <Input
-              variant="inline"
-              placeholder="Enter value"
-              type="title"
-              {...register("title")}
-            />
-          </Stack>
+    <form onSubmit={handleSubmit(submitEditDeal)} style={{width: "100%"}}>
+      <Title title="Details"/>
 
-          <Dropdown
-            title="Contact Person"
-            data={contacts}
-            value={personId}
-            onChange={(e) => setValue("person_id", e)}
-            error={!!errors?.person_id}
-            keyName="id"
-            valueName="name"
-          />
-          <Dropdown
-            title="Organization"
-            data={organizations}
-            onChange={(e) => setValue("org_id", e)}
-            value={orgId}
-            error={!!errors?.org_id}
-            keyName="id"
-            valueName="name"
-          />
-          <Stack vertical style={themes.stackStyles}>
-            <H1>Value</H1>
-            <Input
-              variant="inline"
-              placeholder="Enter value"
-              type="number"
-              {...register("value")}
-            />
-          </Stack>
-          <Dropdown
-              title="Stage"
-              data={stages}
-              value={stageId}
-              onChange={(e) => setValue("stage_id", e)}
-              error={!!errors?.stage_id}
-              keyName="id"
-              required
-              valueName="name"
-          />
-          <Dropdown
-            title="Pipeline"
-            data={pipelines}
-            value={pipelineId}
-            onChange={(e) => setValue("pipeline_id", e)}
-            error={!!errors?.pipeline_id}
-            keyName="id"
-            valueName="name"
-          />
-          <Stack vertical style={themes.stackStyles}>
-            <H1>Excepted close date</H1>
-            <Input
-              variant="inline"
-              placeholder="Enter value"
-              type="date"
-              {...register("expected_close_date")}
-            />
-          </Stack>
-          <Dropdown
-            title="User"
-            data={users}
-            value={userId}
-            onChange={(e) => setValue("user_id", e)}
-            error={!!errors?.user_id}
-            keyName="id"
-            valueName="name"
-          />
+      <Label label="Title" style={{ marginBottom: 10 }}>
+        <Input
+          variant="inline"
+          placeholder="Enter value"
+          type="title"
+          {...register("title")}
+        />
+      </Label>
+
+      <Dropdown
+        title="Contact Person"
+        data={contacts}
+        value={personId}
+        onChange={(e) => setValue("person_id", e)}
+        error={!!errors?.person_id}
+        keyName="id"
+        valueName="name"
+      />
+      <Dropdown
+        title="Organization"
+        data={organizations}
+        onChange={(e) => setValue("org_id", e)}
+        value={orgId}
+        error={!!errors?.org_id}
+        keyName="id"
+        valueName="name"
+      />
+      <Label label="Value">
+        <Input
+          variant="inline"
+          placeholder="Enter value"
+          type="number"
+          {...register("value")}
+        />
+      </Label>
+      <Dropdown
+        title="Stage"
+        data={stages}
+        value={stageId}
+        onChange={(e) => setValue("stage_id", e)}
+        error={!!errors?.stage_id}
+        keyName="id"
+        required
+        valueName="name"
+      />
+      <Dropdown
+        title="Pipeline"
+        data={pipelines}
+        value={pipelineId}
+        onChange={(e) => setValue("pipeline_id", e)}
+        error={!!errors?.pipeline_id}
+        keyName="id"
+        valueName="name"
+      />
+      <Label label="Excepted close date" style={{ marginBottom: 10 }}>
+        <Input
+          variant="inline"
+          placeholder="Enter value"
+          type="date"
+          {...register("expected_close_date")}
+        />
+      </Label>
+      <Dropdown
+        title="User"
+        data={users}
+        value={userId}
+        onChange={(e) => setValue("user_id", e)}
+        error={!!errors?.user_id}
+        keyName="id"
+        valueName="name"
+      />
+
+      <Stack justify="space-between">
+        <Button type="submit" text="Save"/>
+        <Button type="button" intent="secondary" text="Cancel" onClick={() => navigate(`/dealdetails/${dealId}`)}/>
+      </Stack>
+
+      {errors?.submit && (
+        <Stack style={{marginTop: "10px"}}>
+          <H2>Error editing contact</H2>
         </Stack>
-        <Stack style={{ justifyContent: "space-between" }}>
-          <Button
-            type="submit"
-            style={{ marginTop: "10px" }}
-            text="Save"
-          ></Button>
-          <Button
-            style={{
-              marginTop: "10px",
-              backgroundColor: "white",
-              color: "#1C3E55",
-              border: "1px solid #D3D6D7",
-            }}
-            text="Cancel"
-            onClick={() => navigate(`/dealdetails/${dealId}`)}
-          ></Button>
-        </Stack>
-        {errors?.submit && (
-          <Stack style={{ marginTop: "10px" }}>
-            <H2>Error editing contact</H2>
-          </Stack>
-        )}
-      </form>
-    </Stack>
+      )}
+    </form>
   );
 };

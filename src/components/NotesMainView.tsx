@@ -1,16 +1,15 @@
-import { H2, Stack, Avatar } from "@deskpro/deskpro-ui";
+import { Fragment } from "react";
 import {
   Title,
   HorizontalDivider,
   useInitialisedDeskproAppClient,
 } from "@deskpro/app-sdk";
-import parse from "html-react-parser";
 import { useState } from "react";
 import { IPipedriveNote } from "../types/pipedrive/pipedriveNote";
 import { getNotes } from "../api/api";
-import { timeSince } from "../utils/utils";
 import { IPipedriveContact } from "../types/pipedrive/pipedriveContact";
 import { useNavigate } from "react-router-dom";
+import { Comment } from "../components/Comment";
 import "./image.css";
 
 export const NotesMainView = ({
@@ -43,43 +42,17 @@ export const NotesMainView = ({
         onClick={() => navigate("/createnote")}
         marginBottom={0}
       />
-      <Stack vertical style={{ width: "100%" }}>
-        {notes.map((note, i) => {
-          return (
-            <Stack
-              key={i}
-              vertical
-              gap={5}
-              style={{ width: "100%", marginTop: "10px" }}
-            >
-              <Stack style={{ alignItems: "flex-start", marginTop: "10px" }}>
-                <Stack
-                  vertical
-                  gap={3}
-                  style={{
-                    marginLeft: "5px",
-                    alignItems: "center",
-                  }}
-                >
-                  <Avatar
-                    size={22}
-                    name={note.user.name.split(" ").slice(0, 2).join(" ")}
-                  />
-                  <H2>{timeSince(new Date(note.add_time)).slice(0, 5)}</H2>
-                </Stack>
-                <div style={{ maxWidth: "20ch", marginLeft: "10px" }}>
-                  <H2>
-                    {parse(note.content)}
-                  </H2>
-                </div>
-              </Stack>
-              <HorizontalDivider
-                style={{ width: "110%", color: "#EFF0F0", marginLeft: "-10px" }}
-              />
-            </Stack>
-          );
-        })}
-      </Stack>
+      {notes.map((note) => (
+        <Fragment key={note.id}>
+          <Comment
+            key={note.id}
+            name={note.user.name.split(" ").slice(0, 2).join(" ")}
+            date={new Date(note.add_time)}
+            text={note.content}
+          />
+          <HorizontalDivider style={{ marginBottom: 10 }} />
+        </Fragment>
+      ))}
     </>
   );
 };
