@@ -4,9 +4,10 @@ import {
 } from "@deskpro/app-sdk";
 import { useState } from "react";
 import { faMagnifyingGlass, faPlus } from "@fortawesome/free-solid-svg-icons";
-
 import { CreateContact } from "../components/CreateContact";
 import { FindContact } from "../components/FindContact";
+import { Container } from "../components/common";
+
 export const Contacts = () => {
   const [currentPage, setcurrentPage] = useState("Find Contact");
 
@@ -17,7 +18,7 @@ export const Contacts = () => {
   });
 
   return (
-    <div>
+    <Container>
       <TwoButtonGroup
         selected={currentPage === "Find Contact" ? "one" : "two"}
         oneIcon={faMagnifyingGlass}
@@ -29,6 +30,6 @@ export const Contacts = () => {
       />
 
       {currentPage === "Find Contact" ? <FindContact /> : <CreateContact />}
-    </div>
+    </Container>
   );
 };

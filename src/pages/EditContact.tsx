@@ -18,6 +18,7 @@ import {
 import { Dropdown } from "../components/Dropdown";
 import { useUser } from "../context/userContext";
 import { ErrorBlock } from "../components/ErrorBlock";
+import { Container } from "../components/common";
 import { IPipedriveContact } from "../types/pipedrive/pipedriveContact";
 import { IPipedriveCreateContact } from "../types/pipedrive/pipedriveCreateContact";
 import { IPipedriveOrganization } from "../types/pipedrive/pipedriveOrganization";
@@ -133,71 +134,73 @@ export const EditContact = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit(submitEditContact)}>
-      {error && <ErrorBlock text={error}/>}
+    <Container>
+      <form onSubmit={handleSubmit(submitEditContact)}>
+        {error && <ErrorBlock text={error}/>}
 
-      <Title title="Details"/>
+        <Title title="Details"/>
 
-      <Label label="Name" style={{ marginBottom: 10 }}>
-        <Input
-          variant="inline"
-          placeholder="Enter value"
-          type="title"
-          {...register("name")}
+        <Label label="Name" style={{ marginBottom: 10 }}>
+          <Input
+            variant="inline"
+            placeholder="Enter value"
+            type="title"
+            {...register("name")}
+          />
+        </Label>
+
+        <Dropdown
+          title="Organization"
+          data={organizations}
+          onChange={(e) => setValue("org_id", e)}
+          value={orgId}
+          error={!!errors?.org_id}
+          keyName="id"
+          valueName="name"
         />
-      </Label>
 
-      <Dropdown
-        title="Organization"
-        data={organizations}
-        onChange={(e) => setValue("org_id", e)}
-        value={orgId}
-        error={!!errors?.org_id}
-        keyName="id"
-        valueName="name"
-      />
+        <Label label="Label">
+          <Input
+            variant="inline"
+            placeholder="Enter value"
+            type="text"
+            {...register("label")}
+          />
+        </Label>
 
-      <Label label="Label">
-        <Input
-          variant="inline"
-          placeholder="Enter value"
-          type="text"
-          {...register("label")}
+        <Label label="Phone number">
+          <Input
+            variant="inline"
+            placeholder="Enter value"
+            type="tel"
+            {...register("phone")}
+          />
+        </Label>
+
+        <Label label="Email">
+          <Input
+            variant="inline"
+            placeholder="Enter value"
+            type="email"
+            {...register("email")}
+          />
+        </Label>
+
+        <Dropdown
+          title="Owner"
+          data={users}
+          value={ownerId}
+          onChange={(e) => setValue("owner_id", e)}
+          error={!!errors?.owner_id}
+          keyName="id"
+          valueName="name"
         />
-      </Label>
 
-      <Label label="Phone number">
-        <Input
-          variant="inline"
-          placeholder="Enter value"
-          type="tel"
-          {...register("phone")}
-        />
-      </Label>
-
-      <Label label="Email">
-        <Input
-          variant="inline"
-          placeholder="Enter value"
-          type="email"
-          {...register("email")}
-        />
-      </Label>
-
-      <Dropdown
-        title="Owner"
-        data={users}
-        value={ownerId}
-        onChange={(e) => setValue("owner_id", e)}
-        error={!!errors?.owner_id}
-        keyName="id"
-        valueName="name"
-      />
-
-      <Stack justify="space-between">
-        <Button type="submit" text="Save" />
-        <Button type="button" intent="secondary" text="Cancel" onClick={() => navigate(`/redirect`)}/>
-      </Stack>
-    </form>
+        <Stack justify="space-between">
+          <Button type="submit" text="Save" />
+          <Button type="button" intent="secondary" text="Cancel" onClick={() => navigate(`/redirect`)}/>
+        </Stack>
+      </form>
+    </Container>
   );
 };

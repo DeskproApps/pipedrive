@@ -11,6 +11,7 @@ import { getDealById, getPipelineById, getStageById } from "../api/api";
 import { useUser } from "../context/userContext";
 import { format } from "../utils/date/format";
 import { IPipedriveDeal } from "../types/pipedrive/pipedriveDeal";
+import { Container } from "../components/common";
 
 export const DealDetails = () => {
   const { dealId } = useParams();
@@ -97,7 +98,7 @@ export const DealDetails = () => {
   }
 
   return (
-    <>
+    <Container>
       {deal?.title && <Property label="Deal Title" text={deal?.title}/>}
       {deal?.person_id.name && (
         <Property label="Contact person" text={deal?.person_id.name}/>
@@ -117,6 +118,6 @@ export const DealDetails = () => {
         <Property label="Expected close date" text={format(deal?.expected_close_date) || "-"}/>
       )}
       <HorizontalDivider/>
-    </>
+    </Container>
   );
 };

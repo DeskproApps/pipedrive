@@ -10,13 +10,14 @@ import { EditDeal } from "./pages/EditDeal";
 import { EditContact } from "./pages/EditContact";
 import { Redirect } from "./pages/Redirect";
 import { VerifySettings } from "./pages/VerifySettings";
+import { AppContainer } from "./components/common";
 
 const App = () => {
   const { pathname } = useLocation();
   const isAdmin = useMemo(() => pathname.includes("/admin/"), [pathname]);
 
   return (
-    <>
+    <AppContainer isAdmin={isAdmin}>
       <Routes>
         <Route index path="/" element={<Main/>}/>
         <Route path="/dealdetails/:dealId" element={<DealDetails/>}/>
@@ -29,8 +30,7 @@ const App = () => {
         <Route path="/editcontact/:contactId" element={<EditContact/>}/>
         <Route path="/admin/verify_settings" element={<VerifySettings/>}/>
       </Routes>
-      {!isAdmin && (<><br/><br/><br/></>)}
-    </>
+    </AppContainer>
   );
 };
 

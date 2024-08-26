@@ -18,6 +18,7 @@ import {
   getAllUsers,
 } from "../api/api";
 import { Dropdown } from "../components/Dropdown";
+import { Container } from "../components/common";
 import "../components/removeScrollInput.css";
 import { useUser } from "../context/userContext";
 import { IPipedriveContact } from "../types/pipedrive/pipedriveContact";
@@ -172,95 +173,97 @@ export const CreateDeal = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit(postDeal)} style={{ width: "100%" }}>
-      <Title title="Details"/>
+    <Container>
+      <form onSubmit={handleSubmit(postDeal)} style={{ width: "100%" }}>
+        <Title title="Details"/>
 
-      <Label label="Title" required style={{ marginBottom: 10 }}>
-        <Input
-          error={Boolean(errors.title)}
-          variant="inline"
-          placeholder="Enter value"
-          type="title"
-          {...register("title", { required: true })}
+        <Label label="Title" required style={{ marginBottom: 10 }}>
+          <Input
+            error={Boolean(errors.title)}
+            variant="inline"
+            placeholder="Enter value"
+            type="title"
+            {...register("title", { required: true })}
+          />
+        </Label>
+        <Dropdown
+          title="Contact Person"
+          data={contacts}
+          value={personId}
+          required
+          onChange={(e) => setValue("person_id", e)}
+          error={!!errors?.person_id}
+          keyName="id"
+          valueName="name"
         />
-      </Label>
-      <Dropdown
-        title="Contact Person"
-        data={contacts}
-        value={personId}
-        required
-        onChange={(e) => setValue("person_id", e)}
-        error={!!errors?.person_id}
-        keyName="id"
-        valueName="name"
-      />
-      <Dropdown
-        title="Organization"
-        data={organizations}
-        onChange={(e) => setValue("org_id", e)}
-        value={orgId}
-        error={!!errors?.org_id}
-        keyName="id"
-        valueName="name"
-      />
-      <Label label="Value">
-        <Input
-          error={Boolean(errors.value)}
-          variant="inline"
-          placeholder="Enter value"
-          type="number"
-          {...register("value")}
+        <Dropdown
+          title="Organization"
+          data={organizations}
+          onChange={(e) => setValue("org_id", e)}
+          value={orgId}
+          error={!!errors?.org_id}
+          keyName="id"
+          valueName="name"
         />
-      </Label>
-      <Dropdown
-        title="Stage"
-        data={stages}
-        value={stageId}
-        onChange={(e) => setValue("stage_id", e)}
-        error={!!errors?.stage_id}
-        keyName="id"
-        required
-        valueName="name"
-      />
-      <Dropdown
-        title="Pipeline"
-        data={pipelines}
-        value={pipelineId}
-        onChange={(e) => setValue("pipeline_id", e)}
-        error={!!errors?.pipeline_id}
-        keyName="id"
-        required
-        valueName="name"
-      />
-
-      <Label label="Excepted close date" style={{ marginBottom: 10 }}>
-        <Input
-          error={Boolean(errors.expected_close_date)}
-          variant="inline"
-          placeholder="Enter value"
-          type="date"
-          {...register("expected_close_date")}
+        <Label label="Value">
+          <Input
+            error={Boolean(errors.value)}
+            variant="inline"
+            placeholder="Enter value"
+            type="number"
+            {...register("value")}
+          />
+        </Label>
+        <Dropdown
+          title="Stage"
+          data={stages}
+          value={stageId}
+          onChange={(e) => setValue("stage_id", e)}
+          error={!!errors?.stage_id}
+          keyName="id"
+          required
+          valueName="name"
         />
-      </Label>
+        <Dropdown
+          title="Pipeline"
+          data={pipelines}
+          value={pipelineId}
+          onChange={(e) => setValue("pipeline_id", e)}
+          error={!!errors?.pipeline_id}
+          keyName="id"
+          required
+          valueName="name"
+        />
 
-      <Dropdown
-        title="Owner"
-        data={users}
-        value={userId}
-        onChange={(e) => setValue("user_id", e)}
-        error={!!errors?.user_id}
-        keyName="id"
-        valueName="name"
-      />
+        <Label label="Excepted close date" style={{ marginBottom: 10 }}>
+          <Input
+            error={Boolean(errors.expected_close_date)}
+            variant="inline"
+            placeholder="Enter value"
+            type="date"
+            {...register("expected_close_date")}
+          />
+        </Label>
 
-      <Stack style={{ justifyContent: "space-between" }}>
-        <Button type="submit" text="Create"/>
-        <Button text="Cancel" intent="secondary" onClick={() => navigate(`/redirect`)}/>
-      </Stack>
+        <Dropdown
+          title="Owner"
+          data={users}
+          value={userId}
+          onChange={(e) => setValue("user_id", e)}
+          error={!!errors?.user_id}
+          keyName="id"
+          valueName="name"
+        />
 
-      {errors?.submit && (
-        <h2 style={{ marginTop: "10px" }}>Error creating contact</h2>
-      )}
-    </form>
+        <Stack style={{ justifyContent: "space-between" }}>
+          <Button type="submit" text="Create"/>
+          <Button text="Cancel" intent="secondary" onClick={() => navigate(`/redirect`)}/>
+        </Stack>
+
+        {errors?.submit && (
+          <h2 style={{ marginTop: "10px" }}>Error creating contact</h2>
+        )}
+      </form>
+    </Container>
   );
 };
