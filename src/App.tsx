@@ -1,4 +1,3 @@
-import { useMemo } from "react";
 import { Routes, Route, useLocation } from "react-router-dom";
 import { Contacts } from "./pages/Contact";
 import { Main } from "./pages/Main";
@@ -14,7 +13,7 @@ import { AppContainer } from "./components/common";
 
 const App = () => {
   const { pathname } = useLocation();
-  const isAdmin = useMemo(() => pathname.includes("/admin/"), [pathname]);
+  const isAdmin = pathname.includes("/admin/");
 
   return (
     <AppContainer isAdmin={isAdmin}>
