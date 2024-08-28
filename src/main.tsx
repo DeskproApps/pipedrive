@@ -11,23 +11,27 @@ import { App } from "./App";
 
 import "flatpickr/dist/themes/light.css";
 import "tippy.js/dist/tippy.css";
-import "simplebar/dist/simplebar.min.css";
 import "@deskpro/deskpro-ui/dist/deskpro-ui.css";
 import "@deskpro/deskpro-ui/dist/deskpro-custom-icons.css";
+import "./main.css";
+import "simplebar/dist/simplebar.min.css";
+import { Scrollbar } from "@deskpro/deskpro-ui";
 
 TimeAgo.addDefaultLocale(en);
 
 const root = ReactDOM.createRoot(document.getElementById('root') as Element);
 root.render((
     <React.StrictMode>
-        <HashRouter>
-            <DeskproAppProvider>
-                <ErrorBoundary FallbackComponent={ErrorFallback}>
-                    <UserContextProvider>
-                        <App />
-                    </UserContextProvider>
-                </ErrorBoundary>
-            </DeskproAppProvider>
-        </HashRouter>
+        <Scrollbar style={{ height: "100%", width: "100%" }}>
+            <HashRouter>
+                <DeskproAppProvider>
+                    <ErrorBoundary FallbackComponent={ErrorFallback}>
+                        <UserContextProvider>
+                            <App />
+                        </UserContextProvider>
+                    </ErrorBoundary>
+                </DeskproAppProvider>
+            </HashRouter>
+        </Scrollbar>
     </React.StrictMode>
 ));

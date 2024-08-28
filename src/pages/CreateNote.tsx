@@ -8,6 +8,7 @@ import { useState } from "react";
 import { createNote } from "../api/api";
 import { useUser } from "../context/userContext";
 import { useNavigate } from "react-router-dom";
+import { Container } from "../components/common";
 
 export const CreateNote = () => {
   const navigate = useNavigate();
@@ -59,7 +60,7 @@ export const CreateNote = () => {
   };
 
   return (
-    <>
+    <Container>
       <Label label="Note" style={{ marginBottom: 10 }}>
         <TextArea
           variant="inline"
@@ -82,6 +83,6 @@ export const CreateNote = () => {
         <Button type="button" text="Cancel" intent="secondary" onClick={() => navigate(`/redirect`)}
         />
       </Stack>
-    </>
+    </Container>
   );
 };

@@ -20,6 +20,7 @@ import {
   getDealById,
 } from "../api/api";
 import { Dropdown } from "../components/Dropdown";
+import { Container } from "../components/common";
 import { useUser } from "../context/userContext";
 import { IPipedriveContact } from "../types/pipedrive/pipedriveContact";
 import { IPipedriveCreateDeal } from "../types/pipedrive/pipedriveCreateDeal";
@@ -167,91 +168,93 @@ export const EditDeal = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit(submitEditDeal)} style={{width: "100%"}}>
-      <Title title="Details"/>
+    <Container>
+      <form onSubmit={handleSubmit(submitEditDeal)} style={{width: "100%"}}>
+        <Title title="Details"/>
 
-      <Label label="Title" style={{ marginBottom: 10 }}>
-        <Input
-          variant="inline"
-          placeholder="Enter value"
-          type="title"
-          {...register("title")}
+        <Label label="Title" style={{ marginBottom: 10 }}>
+          <Input
+            variant="inline"
+            placeholder="Enter value"
+            type="title"
+            {...register("title")}
+          />
+        </Label>
+
+        <Dropdown
+          title="Contact Person"
+          data={contacts}
+          value={personId}
+          onChange={(e) => setValue("person_id", e)}
+          error={!!errors?.person_id}
+          keyName="id"
+          valueName="name"
         />
-      </Label>
-
-      <Dropdown
-        title="Contact Person"
-        data={contacts}
-        value={personId}
-        onChange={(e) => setValue("person_id", e)}
-        error={!!errors?.person_id}
-        keyName="id"
-        valueName="name"
-      />
-      <Dropdown
-        title="Organization"
-        data={organizations}
-        onChange={(e) => setValue("org_id", e)}
-        value={orgId}
-        error={!!errors?.org_id}
-        keyName="id"
-        valueName="name"
-      />
-      <Label label="Value">
-        <Input
-          variant="inline"
-          placeholder="Enter value"
-          type="number"
-          {...register("value")}
+        <Dropdown
+          title="Organization"
+          data={organizations}
+          onChange={(e) => setValue("org_id", e)}
+          value={orgId}
+          error={!!errors?.org_id}
+          keyName="id"
+          valueName="name"
         />
-      </Label>
-      <Dropdown
-        title="Stage"
-        data={stages}
-        value={stageId}
-        onChange={(e) => setValue("stage_id", e)}
-        error={!!errors?.stage_id}
-        keyName="id"
-        required
-        valueName="name"
-      />
-      <Dropdown
-        title="Pipeline"
-        data={pipelines}
-        value={pipelineId}
-        onChange={(e) => setValue("pipeline_id", e)}
-        error={!!errors?.pipeline_id}
-        keyName="id"
-        valueName="name"
-      />
-      <Label label="Excepted close date" style={{ marginBottom: 10 }}>
-        <Input
-          variant="inline"
-          placeholder="Enter value"
-          type="date"
-          {...register("expected_close_date")}
+        <Label label="Value">
+          <Input
+            variant="inline"
+            placeholder="Enter value"
+            type="number"
+            {...register("value")}
+          />
+        </Label>
+        <Dropdown
+          title="Stage"
+          data={stages}
+          value={stageId}
+          onChange={(e) => setValue("stage_id", e)}
+          error={!!errors?.stage_id}
+          keyName="id"
+          required
+          valueName="name"
         />
-      </Label>
-      <Dropdown
-        title="User"
-        data={users}
-        value={userId}
-        onChange={(e) => setValue("user_id", e)}
-        error={!!errors?.user_id}
-        keyName="id"
-        valueName="name"
-      />
+        <Dropdown
+          title="Pipeline"
+          data={pipelines}
+          value={pipelineId}
+          onChange={(e) => setValue("pipeline_id", e)}
+          error={!!errors?.pipeline_id}
+          keyName="id"
+          valueName="name"
+        />
+        <Label label="Excepted close date" style={{ marginBottom: 10 }}>
+          <Input
+            variant="inline"
+            placeholder="Enter value"
+            type="date"
+            {...register("expected_close_date")}
+          />
+        </Label>
+        <Dropdown
+          title="User"
+          data={users}
+          value={userId}
+          onChange={(e) => setValue("user_id", e)}
+          error={!!errors?.user_id}
+          keyName="id"
+          valueName="name"
+        />
 
-      <Stack justify="space-between">
-        <Button type="submit" text="Save"/>
-        <Button type="button" intent="secondary" text="Cancel" onClick={() => navigate(`/dealdetails/${dealId}`)}/>
-      </Stack>
-
-      {errors?.submit && (
-        <Stack style={{marginTop: "10px"}}>
-          <H2>Error editing contact</H2>
+        <Stack justify="space-between">
+          <Button type="submit" text="Save"/>
+          <Button type="button" intent="secondary" text="Cancel" onClick={() => navigate(`/dealdetails/${dealId}`)}/>
         </Stack>
-      )}
-    </form>
+
+        {errors?.submit && (
+          <Stack style={{marginTop: "10px"}}>
+            <H2>Error editing contact</H2>
+          </Stack>
+        )}
+      </form>
+    </Container>
   );
 };
