@@ -1,14 +1,30 @@
-import { Button, Stack, TextArea, Label } from "@deskpro/deskpro-ui";
+import { useState } from "react";
+import { faPlus, faFile } from "@fortawesome/free-solid-svg-icons";
+import {
+  Label,
+  Stack,
+  Button,
+  AnyIcon,
+  TextArea,
+  LabelButton,
+  AttachmentTag,
+  LabelButtonFileInput,
+} from "@deskpro/deskpro-ui";
 import {
   useDeskproAppClient,
-  useInitialisedDeskproAppClient,
   useDeskproAppEvents,
+  useInitialisedDeskproAppClient,
 } from "@deskpro/app-sdk";
-import { useState } from "react";
 import { createNote } from "../api/api";
 import { useUser } from "../context/userContext";
 import { useNavigate } from "react-router-dom";
 import { Container } from "../components/common";
+
+type TargetFile = {
+  target: {
+    files: File[];
+  };
+};
 
 export const CreateNote = () => {
   const navigate = useNavigate();
@@ -17,6 +33,7 @@ export const CreateNote = () => {
 
   const [note, setNote] = useState<string>("");
   const [contactId, setContactId] = useState<string | null>(null);
+  const [image, setImage] = useState<File | null>(null);
 
   useInitialisedDeskproAppClient(
     async (client) => {
@@ -51,10 +68,14 @@ export const CreateNote = () => {
     },
   });
 
+  const submitImage = (data: TargetFile) => {
+    setImage(data.target.files[0] ?? null);
+  };
+
   const submitNote = async () => {
     if (!client || !deskproUser?.orgName || !contactId || !note) return;
 
-    await createNote(client, deskproUser.orgName, null, note, contactId);
+    await createNote(client, deskproUser.orgName, image, note, contactId);
 
     navigate("/");
   };
@@ -77,6 +98,35 @@ export const CreateNote = () => {
           }}
         />
       </Label>
+
+      <Label label="Attachments">
+        {image && (
+          <AttachmentTag
+            download
+            filename={
+              image.name.length > 19
+                ? `${image.name.substring(0, 19)}...`
+                : image.name
+            }
+            fileSize={image.size}
+            icon={faFile as AnyIcon}
+            withClose
+            onClose={() => setImage(null)}
+          ></AttachmentTag>
+        )}
+      </Label>
+
+      <LabelButton
+          style={{ padding: "0px" }}
+          icon={faPlus as AnyIcon}
+          text="Add"
+          minimal
+        >
+        <LabelButtonFileInput
+          accept="image/jpeg, image/jpg, image/pjp, image/pjpeg"
+          onChange={(e) => submitImage(e as unknown as TargetFile)}
+        />
+      </LabelButton>
 
       <Stack justify="space-between">
         <Button text="Save" type="button" onClick={submitNote}/>

@@ -1,15 +1,10 @@
-import { Fragment } from "react";
-import {
-  Title,
-  HorizontalDivider,
-  useInitialisedDeskproAppClient,
-} from "@deskpro/app-sdk";
-import { useState } from "react";
-import { IPipedriveNote } from "../types/pipedrive/pipedriveNote";
-import { getNotes } from "../api/api";
-import { IPipedriveContact } from "../types/pipedrive/pipedriveContact";
+import { useState, Fragment } from "react";
 import { useNavigate } from "react-router-dom";
+import { Title, HorizontalDivider, useInitialisedDeskproAppClient } from "@deskpro/app-sdk";
+import { getNotes } from "../api/api";
 import { Comment } from "../components/Comment";
+import type { IPipedriveNote } from "../types/pipedrive/pipedriveNote";
+import type { IPipedriveContact } from "../types/pipedrive/pipedriveContact";
 import "./image.css";
 
 export const NotesMainView = ({
@@ -22,18 +17,19 @@ export const NotesMainView = ({
   const navigate = useNavigate();
   const [notes, setNotes] = useState<IPipedriveNote[]>([]);
 
-  useInitialisedDeskproAppClient(
-    async (client) => {
-      if (!contact.owner_id.id || !contact.id) return;
+  useInitialisedDeskproAppClient(async (client) => {
+    if (!contact.owner_id.id || !contact.id) {
+      return;
+    }
 
-      const notesReq = await getNotes(client, orgName, contact.id);
+    const notesReq = await getNotes(client, orgName, contact.id);
 
-      if (!notesReq.success) return;
+    if (!notesReq.success) {
+      return;
+    }
 
-      setNotes(notesReq?.data?.filter((e) => e.person_id === contact.id) ?? []);
-    },
-    [contact]
-  );
+    setNotes(notesReq?.data?.filter((e) => e.person_id === contact.id) ?? []);
+  }, [contact]);
 
   return (
     <>

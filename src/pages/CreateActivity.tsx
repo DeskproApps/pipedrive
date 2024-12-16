@@ -25,7 +25,7 @@ import { IPipedriveCreateActivity } from "../types/pipedrive/pipedriveCreateActi
 import { IPipedriveDeal } from "../types/pipedrive/pipedriveDeal";
 import { IPipedriveOrganization } from "../types/pipedrive/pipedriveOrganization";
 import { IPipedriveUser } from "../types/pipedrive/pipedriveUser";
-import { msToTime } from "../utils/utils";
+import { msToTime } from "../utils/date";
 
 export const CreateActivity = () => {
   const navigate = useNavigate();
