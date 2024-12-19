@@ -1,7 +1,7 @@
 import { css } from "styled-components";
 import { P5 } from "@deskpro/deskpro-ui";
 import styled from "styled-components";
-import { addBlankTargetToLinks } from "../utils/utils";
+import { addBlankTargetToLinks } from "../utils";
 import type { FC } from "react";
 
 type Props = {

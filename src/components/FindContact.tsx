@@ -12,7 +12,7 @@ import { faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
 import { getContactByPrompt } from "../api/api";
 import { useUser } from "../context/userContext";
 import { IPipedriveContact } from "../types/pipedrive/pipedriveContact";
-import useDebounce from "../utils/debounce";
+import { useDebounce } from "../utils";
 import { useNavigate } from "react-router-dom";
 
 export const FindContact = () => {

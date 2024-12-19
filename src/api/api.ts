@@ -1,7 +1,6 @@
 import { IDeskproClient, proxyFetch, adminGenericProxyFetch } from "@deskpro/app-sdk";
 import { PipedriveAPIResponse } from "../types/pipedrive/pipedrive";
 import { IPipedriveCreateContact } from "../types/pipedrive/pipedriveCreateContact";
-
 import { IPipedriveContact } from "../types/pipedrive/pipedriveContact";
 import { IPipedriveOrganization } from "../types/pipedrive/pipedriveOrganization";
 import { IPipedriveDeal } from "../types/pipedrive/pipedriveDeal";
@@ -556,6 +555,12 @@ const getAllDeals = async (
   orgName: string
 ): Promise<PipedriveAPIResponse<IPipedriveDeal[]>> => {
   return await pipedriveGet(client, orgName, `deals?api_token=__api_key__`);
+};
+
+export const getImage = (client: IDeskproClient, orgName: string, imageId: string) => {
+  return proxyFetch(client)
+    .then((fetch) => fetch(`https://${orgName}.pipedrive.com/v1/files/${imageId}/download?api_token=__api_key__`))
+    .then((res) => res.blob());
 };
 
 export {

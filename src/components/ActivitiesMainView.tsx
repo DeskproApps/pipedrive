@@ -12,7 +12,7 @@ import { getActivitiesByUserId } from "../api/api";
 import { IPipedriveContact } from "../types/pipedrive/pipedriveContact";
 import { TwoColumn } from "./TwoColumn";
 import { useUser } from "../context/userContext";
-import { isLast } from "../utils/utils";
+import { isLast } from "../utils";
 import { format } from "../utils/date/format";
 
 export const ActivitiesMainView = ({

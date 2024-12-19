@@ -3,6 +3,7 @@ import styled from "styled-components";
 import ReactTimeAgo from "react-time-ago";
 import { faUser } from "@fortawesome/free-solid-svg-icons";
 import { Avatar, TSpan, P11, Stack } from "@deskpro/deskpro-ui";
+import { useEnhanceHtmlImages } from "../hooks";
 import { DPNormalize } from "./DPNormalize";
 import type { FC } from "react";
 import type { AnyIcon } from "@deskpro/deskpro-ui";
@@ -28,6 +29,8 @@ type Props = {
 };
 
 const Comment: FC<Props> = ({ name, avatarUrl, text, date }) => {
+  const { note } = useEnhanceHtmlImages(text);
+
   return (
     <Stack wrap="nowrap" gap={6} style={{ marginBottom: 10 }}>
       <Author vertical>
@@ -44,7 +47,7 @@ const Comment: FC<Props> = ({ name, avatarUrl, text, date }) => {
         )}
       </Author>
       <Body type="p5">
-        <DPNormalize text={text}/>
+        <DPNormalize text={note}/>
       </Body>
     </Stack>
   );
