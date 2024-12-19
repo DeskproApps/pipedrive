@@ -19,6 +19,7 @@ import { createNote } from "../api/api";
 import { useUser } from "../context/userContext";
 import { useNavigate } from "react-router-dom";
 import { Container } from "../components/common";
+import { MAX_READABILITY_NAME } from "../constants";
 
 type TargetFile = {
   target: {
@@ -104,7 +105,7 @@ export const CreateNote = () => {
           <AttachmentTag
             download
             filename={
-              image.name.length > 19
+              image.name.length > MAX_READABILITY_NAME
                 ? `${image.name.substring(0, 19)}...`
                 : image.name
             }
