@@ -58,7 +58,7 @@ const VerifySettings: FC = () => {
             {nbsp}
             {currentUser
                 ? <P1>Verified as <TSpan type="p1">{`<${currentUser?.email || currentUser?.name}>`}</TSpan></P1>
-                : <Invalid type="p1">{error}</Invalid> || ""
+                : <Invalid type="p1">{error}</Invalid>
             }
         </Stack>
     );
