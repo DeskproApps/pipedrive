@@ -87,7 +87,7 @@ export const CreateNote = () => {
         <TextArea
           variant="inline"
           value={note}
-          onChange={(e) => setNote(e.target.value)}
+          onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setNote(e.target.value)}
           placeholder="Enter text here..."
           style={{
             resize: "none",
@@ -125,7 +125,7 @@ export const CreateNote = () => {
         >
         <LabelButtonFileInput
           accept="image/jpeg, image/jpg, image/pjp, image/pjpeg"
-          onChange={(e) => submitImage(e as unknown as TargetFile)}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => submitImage(e as unknown as TargetFile)}
         />
       </LabelButton>
 

@@ -82,7 +82,7 @@ export const FindContact = () => {
   return (
     <div style={{ width: "100%" }}>
       <Input
-        onChange={(e) => setInputText(e.target.value)}
+        onChange={(e : React.ChangeEvent<HTMLInputElement>) => setInputText(e.target.value)}
         value={inputText}
         placeholder="Enter account details"
         type="text"
