@@ -1,5 +1,6 @@
 import { createSearchParams, useNavigate } from "react-router-dom";
 import { getCurrentUser } from "@/api/api";
+import { OAuth2AccessTokenPath, OAuth2RefreshTokenPath } from "@/constants/deskpro";
 import { OAuth2Result, useDeskproLatestAppContext, useInitialisedDeskproAppClient } from "@deskpro/app-sdk";
 import { Settings, TicketData } from "@/types/settings";
 import { useCallback, useState } from "react";
@@ -77,10 +78,10 @@ export default function useLogin(): UseLogin {
         try {
             const result = await oauth2.poll()
 
-            await client.setUserState("oauth2/access_token", result.data.access_token, { backend: true })
+            await client.setUserState(OAuth2AccessTokenPath, result.data.access_token, { backend: true })
 
             if (result.data.refresh_token) {
-                await client.setUserState("oauth2/refresh_token", result.data.refresh_token, { backend: true })
+                await client.setUserState(OAuth2RefreshTokenPath, result.data.refresh_token, { backend: true })
             }
 
             // Ensure a friendly error message is always sent to the user in case authentication fails

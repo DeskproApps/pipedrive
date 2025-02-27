@@ -1,17 +1,18 @@
 import { IDeskproClient, proxyFetch, adminGenericProxyFetch } from "@deskpro/app-sdk";
-import { PipedriveAPIResponse } from "../types/pipedrive/pipedrive";
-import { IPipedriveCreateContact } from "../types/pipedrive/pipedriveCreateContact";
-import { IPipedriveContact } from "../types/pipedrive/pipedriveContact";
-import { IPipedriveOrganization } from "../types/pipedrive/pipedriveOrganization";
-import { IPipedriveDeal } from "../types/pipedrive/pipedriveDeal";
 import { IPipedriveActivity } from "../types/pipedrive/pipedriveActivity";
+import { IPipedriveActivityType } from "../types/pipedrive/pipedriveActivityTypes";
+import { IPipedriveContact } from "../types/pipedrive/pipedriveContact";
+import { IPipedriveCreateActivity } from "../types/pipedrive/pipedriveCreateActivity";
+import { IPipedriveCreateContact } from "../types/pipedrive/pipedriveCreateContact";
+import { IPipedriveCreateDeal } from "../types/pipedrive/pipedriveCreateDeal";
+import { IPipedriveDeal } from "../types/pipedrive/pipedriveDeal";
 import { IPipedriveNote } from "../types/pipedrive/pipedriveNote";
-import { IPipedriveUser } from "../types/pipedrive/pipedriveUser";
+import { IPipedriveOrganization } from "../types/pipedrive/pipedriveOrganization";
 import { IPipedrivePipeline } from "../types/pipedrive/pipedrivePipeline";
 import { IPipedriveStage } from "../types/pipedrive/pipedriveStage";
-import { IPipedriveCreateDeal } from "../types/pipedrive/pipedriveCreateDeal";
-import { IPipedriveActivityType } from "../types/pipedrive/pipedriveActivityTypes";
-import { IPipedriveCreateActivity } from "../types/pipedrive/pipedriveCreateActivity";
+import { IPipedriveUser } from "../types/pipedrive/pipedriveUser";
+import { OAuth2AccessTokenPath } from "@/constants/deskpro";
+import { PipedriveAPIResponse } from "../types/pipedrive/pipedrive";
 import { Settings } from "../types/settings";
 
 type ErrorData = {
@@ -43,7 +44,7 @@ const pipedriveGet = async (
     `https://${orgName}.pipedrive.com/v1/${pathQuery}`,
     {
       headers: isUsingOAuth2 ? {
-        Authorization: `Bearer [user[oauth2/access_token]]`
+        Authorization: `Bearer [user[${OAuth2AccessTokenPath}]]`
       } : undefined
     }
   );
