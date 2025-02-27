@@ -35,6 +35,7 @@ export const Contacts = () => {
 
   useInitialisedDeskproAppClient((client) => {
     client.setTitle(currentPage);
+    client.deregisterElement("pipedriveEditButton")
   });
 
   return (
