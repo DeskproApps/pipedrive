@@ -36,9 +36,16 @@ const pipedriveGet = async (
   pathQuery: string
 ) => {
   const pFetch = await proxyFetch(client);
+  const isUsingOAuth2 = (await client.getUserState<boolean>("isUsingOAuth"))[0].data
+
 
   const response = await pFetch(
-    `https://${orgName}.pipedrive.com/v1/${pathQuery}`
+    `https://${orgName}.pipedrive.com/v1/${pathQuery}`,
+    {
+      headers: isUsingOAuth2 ? {
+        Authorization: `Bearer [user[oauth2/access_token]]`
+      } : undefined
+    }
   );
 
   let result;
@@ -69,7 +76,7 @@ const preInstalledRequest = async (
   }
 
   const res = await dpFetch(
-      `https://${instance_domain}.pipedrive.com/v1/${pathQuery}?api_token=${api_key}`
+    `https://${instance_domain}.pipedrive.com/v1/${pathQuery}?api_token=${api_key}`
   );
 
   if (res.status < 200 || res.status > 399) {
