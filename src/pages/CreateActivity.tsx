@@ -92,7 +92,7 @@ export const CreateActivity = () => {
       return;
     }
 
-    navigate("/");
+    navigate("/home");
   };
 
   useInitialisedDeskproAppClient((client) => {
@@ -118,7 +118,7 @@ export const CreateActivity = () => {
       onElementEvent(id) {
         switch (id) {
           case "pipedriveHomeButton": {
-            navigate("/redirect");
+            navigate("/home");
             break;
           }
         }

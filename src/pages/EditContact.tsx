@@ -99,7 +99,7 @@ export const EditContact = () => {
       onElementEvent(id) {
         switch (id) {
           case "pipedriveHomeButton": {
-            navigate("/redirect");
+            navigate("/home");
             break;
           }
         }
@@ -129,7 +129,7 @@ export const EditContact = () => {
     setError(null);
 
     return editContact(client, deskproUser?.orgName, pipedriveContact, contactId)
-        .then(() => navigate("/"))
+        .then(() => navigate("/home"))
         .catch((err) => setError(err?.data?.error || "Error creating contact"));
   };
 

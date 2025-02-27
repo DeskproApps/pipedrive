@@ -62,7 +62,7 @@ export const CreateNote = () => {
     onElementEvent(id) {
       switch (id) {
         case "pipedriveHomeButton": {
-          navigate("/redirect");
+          navigate("/home");
           break;
         }
       }
@@ -78,7 +78,7 @@ export const CreateNote = () => {
 
     await createNote(client, deskproUser.orgName, image, note, contactId);
 
-    navigate("/");
+    navigate("/home");
   };
 
   return (

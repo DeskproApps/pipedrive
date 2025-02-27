@@ -132,7 +132,7 @@ export const CreateDeal = () => {
       onElementEvent(id) {
         switch (id) {
           case "pipedriveHomeButton": {
-            navigate("/redirect");
+            navigate("/home");
             break;
           }
         }
@@ -169,7 +169,7 @@ export const CreateDeal = () => {
       return;
     }
 
-    navigate("/");
+    navigate("/home");
   };
 
   return (
