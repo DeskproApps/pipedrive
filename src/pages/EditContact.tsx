@@ -198,7 +198,7 @@ export const EditContact = () => {
 
         <Stack justify="space-between">
           <Button type="submit" text="Save" />
-          <Button type="button" intent="secondary" text="Cancel" onClick={() => navigate(`/redirect`)}/>
+          <Button type="button" intent="secondary" text="Cancel" onClick={() => navigate(`/home`)}/>
         </Stack>
       </form>
     </Container>

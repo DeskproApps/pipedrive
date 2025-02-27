@@ -267,7 +267,7 @@ export const CreateActivity = () => {
 
         <Stack justify="space-between">
           <Button type="submit" text="Create"/>
-          <Button type="button" intent="tertiary" text="Cancel" onClick={() => navigate(`/redirect`)}/>
+          <Button type="button" intent="tertiary" text="Cancel" onClick={() => navigate(`/home`)}/>
         </Stack>
       </form>
     </Container>

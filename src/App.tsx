@@ -8,7 +8,6 @@ import { DealDetails } from "@/pages/DealDetails";
 import { EditContact } from "@/pages/EditContact";
 import { EditDeal } from "@/pages/EditDeal";
 import { Main } from "@/pages/Main";
-import { Redirect } from "@/pages/Redirect";
 import { Routes, Route, useLocation } from "react-router-dom";
 import { VerifySettings } from "@/pages/VerifySettings";
 import LoadingPage from "@/pages/LoadingPage";
@@ -27,7 +26,6 @@ const App = () => {
         <Route path="/home" element={<Main/>}/>
         <Route path="/dealdetails/:dealId" element={<DealDetails/>}/>
         <Route path="/contacts" element={<Contacts/>}/>
-        <Route path="/redirect/" element={<Redirect/>}/>
         <Route path="/createdeal" element={<CreateDeal/>}/>
         <Route path="/editdeal/:dealId" element={<EditDeal/>}/>
         <Route path="/createactivity" element={<CreateActivity/>}/>

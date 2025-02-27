@@ -257,7 +257,7 @@ export const CreateDeal = () => {
 
         <Stack style={{ justifyContent: "space-between" }}>
           <Button type="submit" text="Create"/>
-          <Button text="Cancel" intent="secondary" onClick={() => navigate(`/redirect`)}/>
+          <Button text="Cancel" intent="secondary" onClick={() => navigate(`/home`)}/>
         </Stack>
 
         {errors?.submit && (

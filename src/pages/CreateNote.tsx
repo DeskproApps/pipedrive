@@ -131,7 +131,7 @@ export const CreateNote = () => {
 
       <Stack justify="space-between">
         <Button text="Save" type="button" onClick={submitNote}/>
-        <Button type="button" text="Cancel" intent="secondary" onClick={() => navigate(`/redirect`)}
+        <Button type="button" text="Cancel" intent="secondary" onClick={() => navigate(`/home`)}
         />
       </Stack>
     </Container>
