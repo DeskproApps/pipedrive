@@ -8,7 +8,13 @@
   "isSingleInstall": false,
   "hasDevMode": true,
   "serveUrl": "https://apps-cdn.deskpro-service.com/__name__/__version__",
-  "targets": [{ "target": "user_sidebar", "entrypoint": "index.html" }],
+  "secrets": "9ToG2tPo8Y8J64kyYTziqVAkz9fcPybLBmC/+6s6MeUDzUvN4FtlfQpCJfLHzsRlLXPs83ZULh9BQ6XWffnGqGjO3fgeit2RBPH0v25RVaMabjCDW0CmdCOk3mUPHfwQvCHvGz5JstCXGsDSp3rwbCEWZoF5+Yply659FB5YdvGwc9fwtIabP2tlafzUbx0DSs0Q2NfX6FjstfDP6Q1xHZWUA0iteuLWULxZUOw0yYz0RSQOamGVH6FHvTdS5V54tAOyvn9vjSZD/t3Z9JBM8FlHLrS9cu/ISzn1n/0Azhlt0sIz2cwG/ESEK5a7O1/GsenaH0mNBbg1g3fTIys8+Rqc2KcSiwul6OUpliiyknqtOlyglH6/nlvjbeyO5lhbCvf+WJa0o+QdbUab5Dm7nwRHQN4zZ0q+iE/WBUiQbBiMVArzyrCE60f1O1EiZtwmufXzBTL/S4XBkZKkXjmCY2SsrkzRDYVm9tO5tIGiFxyFy+GDaEioeIddY8QN7yvP/mjXdT7wmPSFUwaRoCcDjZq9tFSG31H+tXiJcvK5PjNZSLNchxRJsm/XkyMZxXdlWJ9gN4KfRg2QJZK3xSBnn0YoEGqLR2nGNQjVw5jZoobepkAEPfRUtx5sUFOHML/71EAl9attE2lyyqHekuXJoGt98M208pVJOL5IvGNdkTQQAnll0oGF0OklOdWObJg16CQuoFp7qis9nJB81s7EXAnfpHwTxDawiioKk11UOklwu2c6Fm+RrH2WzUXtqazP3yQCLF8Z8fAkglS2ttWrRg9UU0QBzLm4mKf1PRb85fCI9a5BIOSl15zmvWzHl1DW10/jVfHX7HJs56VG6W8rora4ycjFKcBARDU8JpMlXIVJzaPl5cqi0Vi41ePsGPbauQzZ+8lLZrIMyOvXpmXoHEHgfIgEfhrxGXysQLF0H/X1ZyVR2e9nT0/WHigG5YC7XlUe9XXVcQpG/b1OO4T+26PMZqkhfqDfMVOASQP6PgRfcBR3gh4gICVgi/LGV055GhwC4jpWOZWzG1j5mp2we13DV9JgDxlVgajFPzj/7wJ4sZSEHh0qHITYBuDoU08D",
+  "targets": [
+    {
+      "target": "user_sidebar",
+      "entrypoint": "index.html"
+    }
+  ],
   "entityAssociations": {
     "linkedPipedriveContacts": {
       "entity": "person",
@@ -17,12 +23,21 @@
     }
   },
   "settings": {
-    "api_key": {
-      "title": "Pipedrive API Key",
-      "description": "The API key to use to access Pipedrive",
-      "type": "string",
-      "isRequired": true,
-      "isBackendOnly": true,
+    "use_deskpro_saas": {
+      "title": "One-Click Installation",
+      "type": "boolean",
+      "default": true,
+      "isRequired": false,
+      "isBackendOnly": false,
+      "order": 5
+    },
+    "use_access_token": {
+      "title": "Use API Key",
+      "type": "boolean",
+      "isRequired": false,
+      "isBackendOnly": false,
+      "default": false,
+      "condition": "settings.use_deskpro_saas != true",
       "order": 10
     },
     "instance_domain": {
@@ -33,20 +48,72 @@
       "isBackendOnly": false,
       "order": 20
     },
+    "api_key": {
+      "title": "API Key",
+      "description": "The API key to use to access Pipedrive",
+      "type": "string",
+      "isRequired": false,
+      "isBackendOnly": true,
+      "condition": "settings.use_deskpro_saas != true && settings.use_access_token == true",
+      "order": 30
+    },
     "verify_settings": {
       "title": "",
       "type": "app_embedded",
-      "options": { "entrypoint": "#/admin/verify_settings", "height": "30px" },
+      "options": {
+        "entrypoint": "#/admin/verify_settings",
+        "height": "30px"
+      },
       "isRequired": false,
       "isBackendOnly": true,
-      "order": 30
+      "condition": "settings.use_deskpro_saas != true && settings.use_access_token == true",
+      "order": 40
+    },
+    "client_id": {
+      "title": "Client ID",
+      "type": "string",
+      "isRequired": false,
+      "isBackendOnly": false,
+      "condition": "settings.use_deskpro_saas != true && settings.use_access_token != true",
+      "order": 50
+    },
+    "client_secret": {
+      "title": "Client Secret",
+      "type": "string",
+      "isRequired": false,
+      "isBackendOnly": true,
+      "condition": "settings.use_deskpro_saas != true && settings.use_access_token != true",
+      "order": 60
+    },
+    "callback_url": {
+      "title": "Callback URL",
+      "type": "app_embedded",
+      "options": {
+        "entrypoint": "#/admin/callback"
+      },
+      "isRequired": false,
+      "isBackendOnly": true,
+      "condition": "settings.use_deskpro_saas != true && settings.use_access_token != true",
+      "order": 70
     }
   },
   "proxy": {
     "whitelist": [
       {
         "url": "https://.*.pipedrive.com/v1/.*",
-        "methods": ["GET", "POST", "PUT", "DELETE"],
+        "methods": [
+          "GET",
+          "POST",
+          "PUT",
+          "DELETE"
+        ],
+        "timeout": 10
+      },
+      {
+        "url": "https://oauth.pipedrive.com/oauth/.*",
+        "methods": [
+          "POST"
+        ],
         "timeout": 10
       }
     ]
