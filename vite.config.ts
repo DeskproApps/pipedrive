@@ -9,9 +9,10 @@ export default defineConfig({
   base: "",
   plugins: [react()],
   server: {
+    port: 3003,
     allowedHosts: true,
   },
-  resolve:{
+  resolve: {
     alias: {
       "@": path.resolve(__dirname, "src"),
     },
