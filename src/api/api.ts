@@ -39,6 +39,10 @@ const pipedriveGet = async (
   const pFetch = await proxyFetch(client);
   const isUsingOAuth2 = (await client.getUserState<boolean>("isUsingOAuth"))[0].data
 
+  // Remove api_token from pathQuery if using OAuth2
+  if (isUsingOAuth2) {
+    pathQuery = pathQuery.replace(/(\?|&)api_token=[^&]+/, '');
+  }
 
   const response = await pFetch(
     `https://${orgName}.pipedrive.com/v1/${pathQuery}`,
