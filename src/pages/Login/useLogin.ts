@@ -1,7 +1,7 @@
 import { createSearchParams, useNavigate } from "react-router-dom";
 import { getCurrentUser } from "@/api/api";
 import { OAuth2AccessTokenPath, OAuth2RefreshTokenPath } from "@/constants/deskpro";
-import { OAuth2Result, useDeskproLatestAppContext, useInitialisedDeskproAppClient } from "@deskpro/app-sdk";
+import { IOAuth2, OAuth2Result, useDeskproLatestAppContext, useInitialisedDeskproAppClient } from "@deskpro/app-sdk";
 import { Settings, TicketData } from "@/types/settings";
 import { useCallback, useState } from "react";
 import { useUser } from "@/context/userContext";
@@ -18,6 +18,8 @@ export default function useLogin(): UseLogin {
     const [authUrl, setAuthUrl] = useState<string | null>(null)
     const [error, setError] = useState<null | string>(null)
     const [isLoading, setIsLoading] = useState(false)
+    const [isPolling, setIsPolling] = useState(false)
+    const [oauth2Context, setOAuth2Context] = useState<IOAuth2 | null>(null)
 
     const navigate = useNavigate()
     const deskproUser = useUser();
@@ -39,12 +41,14 @@ export default function useLogin(): UseLogin {
         const mode = context?.settings.use_deskpro_saas ? 'global' : 'local';
 
         const clientId = context?.settings.client_id;
-        if (mode === 'local' && typeof clientId !== 'string') {
+        if (mode === 'local' && (typeof clientId !== 'string' || clientId.trim() === "")) {
             // Local mode requires a clientId.
             setError("A client ID is required");
             return
         }
-        const oauth2 = mode === "local" ?
+
+        // Start OAuth process depending on the authentication mode
+        const oauth2Response = mode === "local" ?
             await client.startOauth2Local(
                 ({ state, callbackUrl }) => {
                     return `https://oauth.pipedrive.com/oauth/authorize?${createSearchParams([
@@ -57,7 +61,7 @@ export default function useLogin(): UseLogin {
                 /\bcode=(?<code>[^&#]+)/,
                 async (code: string): Promise<OAuth2Result> => {
                     // Extract the callback URL from the authorization URL
-                    const url = new URL(oauth2.authorizationUrl);
+                    const url = new URL(oauth2Response.authorizationUrl);
                     const redirectUri = url.searchParams.get("redirect_uri");
 
                     if (!redirectUri) {
@@ -72,43 +76,59 @@ export default function useLogin(): UseLogin {
             // Global Proxy Service
             : await client.startOauth2Global("04d3430deaf75a01");
 
-        setAuthUrl(oauth2.authorizationUrl)
-        setIsLoading(false)
+        setAuthUrl(oauth2Response.authorizationUrl)
+        setOAuth2Context(oauth2Response)
 
-        try {
-            const result = await oauth2.poll()
-
-            await client.setUserState(OAuth2AccessTokenPath, result.data.access_token, { backend: true })
-
-            if (result.data.refresh_token) {
-                await client.setUserState(OAuth2RefreshTokenPath, result.data.refresh_token, { backend: true })
-            }
-
-            // Ensure a friendly error message is always sent to the user in case authentication fails
-            try {
-                const activeUser = await getCurrentUser(client, deskproUser?.orgName)
-                if (!activeUser) {
-                    throw new Error()
-                }
-            } catch (e) {
-                throw new Error("Error authenticating user")
-            }
-
-            const linkedContactIds = await client.getEntityAssociation("linkedPipedriveContacts", deskproUser.id).list()
-
-            if (linkedContactIds.length < 1) {
-                navigate("/contacts")
-            } else {
-                navigate("/home")
-            }
-        } catch (error) {
-            setError(error instanceof Error ? error.message : 'Unknown error');
-            setIsLoading(false);
-        }
     }, [setAuthUrl, context?.settings.use_deskpro_saas])
+
+    useInitialisedDeskproAppClient((client) => {
+        if (!deskproUser || !oauth2Context) {
+            return
+        }
+
+        const startPolling = async () => {
+            try {
+                const result = await oauth2Context.poll()
+
+                await client.setUserState(OAuth2AccessTokenPath, result.data.access_token, { backend: true })
+
+                if (result.data.refresh_token) {
+                    await client.setUserState(OAuth2RefreshTokenPath, result.data.refresh_token, { backend: true })
+                }
+
+                // Ensure a friendly error message is always sent to the user in case authentication fails
+                try {
+                    const activeUser = await getCurrentUser(client, deskproUser?.orgName)
+                    if (!activeUser) {
+                        throw new Error()
+                    }
+                } catch (e) {
+                    throw new Error("Error authenticating user")
+                }
+
+                const linkedContactIds = await client.getEntityAssociation("linkedPipedriveContacts", deskproUser.id).list()
+
+                if (linkedContactIds.length < 1) {
+                    navigate("/contacts")
+                } else {
+                    navigate("/home")
+                }
+            } catch (error) {
+                setError(error instanceof Error ? error.message : 'Unknown error');
+            } finally {
+                setIsLoading(false)
+                setIsPolling(false)
+            }
+        }
+
+        if (isPolling) {
+            void startPolling()
+        }
+    }, [isPolling, deskproUser, oauth2Context, navigate])
 
     const onSignIn = useCallback(() => {
         setIsLoading(true);
+        setIsPolling(true);
         window.open(authUrl ?? "", '_blank');
     }, [setIsLoading, authUrl]);
 
