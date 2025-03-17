@@ -1,14 +1,17 @@
-import { AppElementPayload, TwoButtonGroup, useDeskproAppEvents, useDeskproElements, useInitialisedDeskproAppClient } from "@deskpro/app-sdk";
+import { AppElementPayload, TwoButtonGroup, useDeskproAppEvents, useDeskproElements, useDeskproLatestAppContext, useInitialisedDeskproAppClient } from "@deskpro/app-sdk";
 import { Container } from "../components/common";
 import { CreateContact } from "../components/CreateContact";
 import { faMagnifyingGlass, faPlus } from "@fortawesome/free-solid-svg-icons";
 import { FindContact } from "../components/FindContact";
+import { Settings } from "@/types/settings";
 import { useLogout } from "@/api/deskpro";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 
 export const Contacts = () => {
   const [currentPage, setcurrentPage] = useState("Find Contact");
+  const { context } = useDeskproLatestAppContext<unknown, Settings>()
+  const isUsingOAuth = context?.settings.use_access_token !== true
 
   const { logoutActiveUser } = useLogout()
   const navigate = useNavigate();
@@ -17,7 +20,10 @@ export const Contacts = () => {
     clearElements();
     registerElement("pipedriveHomeButton", { type: "home_button" })
     registerElement("pipedriveRefreshButton", { type: "refresh_button" })
-    registerElement("pipedriveMenuButton", { type: "menu", items: [{ title: "Logout" }] })
+
+    if (isUsingOAuth) {
+      registerElement("pipedriveMenuButton", { type: "menu", items: [{ title: "Logout" }] })
+    }
   }, [])
 
   useDeskproAppEvents({
@@ -27,7 +33,9 @@ export const Contacts = () => {
           navigate("/home");
           break;
         case "pipedriveMenuButton":
-          logoutActiveUser()
+          if (isUsingOAuth) {
+            logoutActiveUser()
+          }
           break;
       }
     },

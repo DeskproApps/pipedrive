@@ -5,9 +5,10 @@ import { useDeskproElements } from "@deskpro/app-sdk"
 import useLogin from "./useLogin"
 
 const LoginPage: FC = () => {
-    useDeskproElements(({ registerElement, clearElements }) => {
+    useDeskproElements(({ registerElement, clearElements, deRegisterElement }) => {
         clearElements()
-        registerElement("refresh", { type: "refresh_button" })
+        deRegisterElement("pipedriveEditButton")
+        registerElement("pipedriveRefreshButton", { type: "refresh_button" })
     })
 
     const { onSignIn, authUrl, isLoading, error } = useLogin();
