@@ -79,7 +79,7 @@ export const DealDetails = () => {
     onElementEvent(id) {
       switch (id) {
         case "pipedriveHomeButton": {
-          navigate("/redirect");
+          navigate("/home");
           break;
         }
         case "pipedriveEditButton": {
