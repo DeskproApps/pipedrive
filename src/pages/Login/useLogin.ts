@@ -26,6 +26,9 @@ export default function useLogin(): UseLogin {
 
     const { context } = useDeskproLatestAppContext<TicketData, Settings>()
 
+    const isUsingOAuth = context?.settings.use_access_token !== true || context.settings.use_advanced_connect === false
+
+
     useInitialisedDeskproAppClient(async (client) => {
         if (!deskproUser) {
             // Make sure settings have loaded.
@@ -33,7 +36,7 @@ export default function useLogin(): UseLogin {
         }
 
         // Ensure they aren't using access tokens
-        if (context?.settings.use_access_token === true) {
+        if (!isUsingOAuth) {
             setError("Enable OAuth to access this page");
             return
         }

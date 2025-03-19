@@ -17,7 +17,7 @@ const LoadingPage: FC = () => {
   const deskproUser = useUser();
 
   // Determine authentication method from settings
-  const isUsingOAuth = context?.settings.use_access_token !== true
+  const isUsingOAuth = context?.settings.use_access_token !== true || context.settings.use_advanced_connect === false
 
   useDeskproElements(({ registerElement, clearElements }) => {
     clearElements()
