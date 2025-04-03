@@ -232,6 +232,17 @@ const getActivitiesByUserId = async (
   );
 };
 
+const getActivities = async (
+  client: IDeskproClient,
+  orgName: string,
+): Promise<PipedriveAPIResponse<IPipedriveActivity[]>> => {
+  return await pipedriveGet(
+    client,
+    orgName,
+    `activities/collection?api_token=__api_key__`
+  );
+};
+
 const createContact = async (
   client: IDeskproClient,
   orgName: string,
@@ -564,35 +575,36 @@ export const getImage = (client: IDeskproClient, orgName: string, imageId: strin
 };
 
 export {
-  getAllStages,
+  createActivity,
+  createContact,
+  createDeal,
+  createNote,
+  createUser,
   editContact,
   editDeal,
-  createNote,
-  createActivity,
-  getAllDeals,
+  getActivities,
+  getActivitiesByUserId,
   getActivityTypes,
   getAllContacts,
-  getAllPipelines,
-  createDeal,
-  getContactByEmail,
-  getStageById,
-  getPipelineById,
-  getDealById,
-  getAllUsers,
+  getAllDeals,
   getAllOrganizations,
-  getNotes,
-  getActivitiesByUserId,
+  getAllPipelines,
+  getAllStages,
+  getAllUsers,
+  getContactByEmail,
   getContactById,
-  getDeals,
   getContactByPrompt,
+  getCurrentUser,
+  getDealById,
+  getDeals,
+  getNotes,
+  getOrganizationsById,
+  getOrganizationsByUserId,
+  getPipelineById,
+  getStageById,
+  getUserById,
   getUserDataPipedrive,
   getUserListPipedrive,
-  getOrganizationsByUserId,
-  getOrganizationsById,
-  createContact,
-  getUserById,
-  createUser,
-  pipedriveGet,
-  getCurrentUser,
   PipeDriveError,
+  pipedriveGet,
 };
