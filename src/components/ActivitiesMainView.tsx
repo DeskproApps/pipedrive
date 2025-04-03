@@ -8,7 +8,7 @@ import { useNavigate } from "react-router-dom";
 import { PipedriveLogo } from "./PipedriveLogo";
 import { IPipedriveActivity } from "../types/pipedrive/pipedriveActivity";
 import { useState } from "react";
-import { getActivitiesByUserId } from "../api/api";
+import { getActivities } from "../api/api";
 import { IPipedriveContact } from "../types/pipedrive/pipedriveContact";
 import { TwoColumn } from "./TwoColumn";
 import { useUser } from "../context/userContext";
@@ -23,21 +23,25 @@ export const ActivitiesMainView = ({
   orgName: string;
 }) => {
   const navigate = useNavigate();
-    const deskproUser = useUser();
+  const deskproUser = useUser();
 
   const [activities, setActivities] = useState<IPipedriveActivity[]>([]);
 
   useInitialisedDeskproAppClient(
     async (client) => {
-      if (!contact.owner_id.id || !contact.id) return;
+      if (!contact.id) {
+        return
+      };
 
-      const activitiesReq = await getActivitiesByUserId(
+      // Get all activities and filter the ones associated to the linked contact
+      const activitiesReq = await getActivities(
         client,
         orgName,
-        contact.owner_id.id
       );
 
-      if (!activitiesReq.success) return;
+      if (!activitiesReq.success) {
+        return
+      };
 
       setActivities(
         activitiesReq?.data?.filter((e) => e.person_id === contact.id) ?? []
@@ -56,8 +60,9 @@ export const ActivitiesMainView = ({
         <Fragment key={activity.id}>
           <Title
             title={activity.subject}
-            link={`https://${deskproUser?.orgName}.pipedrive.com/activities/list/user/${contact.owner_id.id}`}
-            icon={<PipedriveLogo/>}
+            // Pipedrive doesn't have a direct link you can navigate to so we send the user to the activities list
+            link={`https://${deskproUser?.orgName}.pipedrive.com/activities/list/user/everyone?person_id=${activity.person_id}`}
+            icon={<PipedriveLogo />}
           />
           <TwoColumn
             leftLabel="Type"
