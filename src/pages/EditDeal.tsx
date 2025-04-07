@@ -15,9 +15,9 @@ import {
   getAllContacts,
   getAllOrganizations,
   getAllPipelines,
-  getAllStages,
   getAllUsers,
   getDealById,
+  getPipelineStages,
 } from "../api/api";
 import { Dropdown } from "../components/Dropdown";
 import { Container } from "../components/common";
@@ -90,14 +90,27 @@ export const EditDeal = () => {
           );
 
           setDeal(deal.data);
-        })(),
-        (async () => {
-          const stages = await getAllStages(client, deskproUser.orgName);
-          setStages(stages.data ?? []);
-        })(),
+        })()
       ]);
     },
     [deskproUser]
+  );
+
+  useInitialisedDeskproAppClient(
+    async (client) => {
+      if (!deskproUser) {
+        return
+      }
+
+      if (!pipelineId) {
+        setStages([])
+        return
+      }
+
+      const stages = await getPipelineStages(client, deskproUser.orgName, Number(pipelineId))
+      setStages(stages.data ?? [])
+    },
+    [deskproUser, pipelineId]
   );
 
   useInitialisedDeskproAppClient((client) => {
@@ -106,6 +119,8 @@ export const EditDeal = () => {
     client.deregisterElement("pipedriveEditButton");
     client.deregisterElement("pipedriveMenuButton");
   });
+
+
 
   useDeskproAppEvents(
     {
@@ -169,8 +184,8 @@ export const EditDeal = () => {
 
   return (
     <Container>
-      <form onSubmit={handleSubmit(submitEditDeal)} style={{width: "100%"}}>
-        <Title title="Details"/>
+      <form onSubmit={handleSubmit(submitEditDeal)} style={{ width: "100%" }}>
+        <Title title="Details" />
 
         <Label label="Title" style={{ marginBottom: 10 }}>
           <Input
@@ -207,6 +222,24 @@ export const EditDeal = () => {
             {...register("value")}
           />
         </Label>
+
+        <Dropdown
+          title="Pipeline"
+          data={pipelines}
+          value={pipelineId}
+          onChange={(e) => {
+            // Only reset the stage if the selected pipeline changes
+            // Using != instead of !== because pipelineId is a string and e is a number
+            if (pipelineId != e) {
+              setValue("stage_id", "")
+            }
+            setValue("pipeline_id", e)
+          }}
+          error={!!errors?.pipeline_id}
+          keyName="id"
+          valueName="name"
+        />
+
         <Dropdown
           title="Stage"
           data={stages}
@@ -214,18 +247,11 @@ export const EditDeal = () => {
           onChange={(e) => setValue("stage_id", e)}
           error={!!errors?.stage_id}
           keyName="id"
+          disabled={!pipelineId}
           required
           valueName="name"
         />
-        <Dropdown
-          title="Pipeline"
-          data={pipelines}
-          value={pipelineId}
-          onChange={(e) => setValue("pipeline_id", e)}
-          error={!!errors?.pipeline_id}
-          keyName="id"
-          valueName="name"
-        />
+
         <Label label="Excepted close date" style={{ marginBottom: 10 }}>
           <Input
             variant="inline"
@@ -245,12 +271,12 @@ export const EditDeal = () => {
         />
 
         <Stack justify="space-between">
-          <Button type="submit" text="Save"/>
-          <Button type="button" intent="secondary" text="Cancel" onClick={() => navigate(`/dealdetails/${dealId}`)}/>
+          <Button type="submit" text="Save" />
+          <Button type="button" intent="secondary" text="Cancel" onClick={() => navigate(`/dealdetails/${dealId}`)} />
         </Stack>
 
         {errors?.submit && (
-          <Stack style={{marginTop: "10px"}}>
+          <Stack style={{ marginTop: "10px" }}>
             <H2>Error editing contact</H2>
           </Stack>
         )}
