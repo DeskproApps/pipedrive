@@ -115,7 +115,7 @@ const getCurrentUser = async (
 ): Promise<{ data: IPipedriveUser }> => {
   return (settings?.api_key && settings?.instance_domain)
     ? await preInstalledRequest(client, `users/me`, settings)
-    : await pipedriveGet(client, orgName as string, `users/me`);
+    : await pipedriveGet(client, orgName ?? "", `users/me?api_token=__api_key__`);
 };
 
 const getUserById = async (
