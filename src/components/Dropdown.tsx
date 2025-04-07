@@ -22,6 +22,7 @@ type Props<T> = {
   keyName: keyof T;
   valueName: keyof T;
   required?: boolean;
+  disabled?: boolean
 };
 //change this
 export const Dropdown = <T,>({
@@ -33,6 +34,7 @@ export const Dropdown = <T,>({
   keyName,
   valueName,
   required,
+  disabled
 }: Props<T>) => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const dataOptions = useMemo<any>(() => {
@@ -54,6 +56,7 @@ export const Dropdown = <T,>({
       selectedIcon={faCheck as AnyIcon}
       externalLinkIcon={faExternalLinkAlt as AnyIcon}
       onSelectOption={(option) => onChange(option.key)}
+      disabled={disabled}
     >
       {({targetProps, targetRef}: DropdownTargetProps<HTMLDivElement>) => (
         <Label label={title} required={required} style={{ marginBottom: 10 }}>
