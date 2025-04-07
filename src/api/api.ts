@@ -69,7 +69,7 @@ const preInstalledRequest = async (
   }
 
   const res = await dpFetch(
-      `https://${instance_domain}.pipedrive.com/v1/${pathQuery}?api_token=${api_key}`
+    `https://${instance_domain}.pipedrive.com/v1/${pathQuery}?api_token=${api_key}`
   );
 
   if (res.status < 200 || res.status > 399) {
@@ -554,6 +554,15 @@ const getAllStages = async (
   return await pipedriveGet(client, orgName, `stages?api_token=__api_key__`);
 };
 
+// Source: https://developers.pipedrive.com/docs/api/v1/Stages#getStages
+const getPipelineStages = async (
+  client: IDeskproClient,
+  orgName: string,
+  pipelineId: number
+): Promise<PipedriveAPIResponse<IPipedriveStage[]>> => {
+  return await pipedriveGet(client, orgName, `stages?pipeline_id=${pipelineId}&api_token=__api_key__`);
+};
+
 const getAllContacts = async (
   client: IDeskproClient,
   orgName: string
@@ -601,6 +610,7 @@ export {
   getOrganizationsById,
   getOrganizationsByUserId,
   getPipelineById,
+  getPipelineStages,
   getStageById,
   getUserById,
   getUserDataPipedrive,
