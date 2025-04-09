@@ -5,7 +5,10 @@ Follow these steps to install and configure the Pipedrive app using either an AP
 
 ## Using API Key
 
-To install the Pipedrive app you must copy your personal API token. Access this in Pipedrive under the personal prefences section of your settings in the top right, and click the API tab on the following page. 
+To install the Pipedrive app you must copy your personal API token. Access this in Pipedrive under the personal preferences section of your settings in the top right, and click the API tab on the following page. 
+
+## ⚠️ Important
+For best results, you should use an API token from a Pipedrive account with global (admin-level) privileges. If the token belongs to a regular Pipedrive user, agents in Deskpro will only be able to view contact activities owned by the provided API token holder. Using an admin’s API key ensures agents in Deskpro can view all relevant activities across your Pipedrive account.
 
 [![](/docs/assets/setup/setup-pipedrive-001.png)](/docs/assets/setup/setup-pipedrive-001.png)
 [![](/docs/assets/setup/setup-pipedrive-002.png)](/docs/assets/setup/setup-pipedrive-002.png)

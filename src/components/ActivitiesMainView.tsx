@@ -8,7 +8,7 @@ import { useNavigate } from "react-router-dom";
 import { PipedriveLogo } from "./PipedriveLogo";
 import { IPipedriveActivity } from "../types/pipedrive/pipedriveActivity";
 import { useState } from "react";
-import { getActivities } from "../api/api";
+import { getActivities, getActivitiesByUserId, getCurrentUser } from "../api/api";
 import { IPipedriveContact } from "../types/pipedrive/pipedriveContact";
 import { TwoColumn } from "./TwoColumn";
 import { useUser } from "../context/userContext";
@@ -27,28 +27,31 @@ export const ActivitiesMainView = ({
 
   const [activities, setActivities] = useState<IPipedriveActivity[]>([]);
 
-  useInitialisedDeskproAppClient(
-    async (client) => {
-      if (!contact.id) {
+  useInitialisedDeskproAppClient(async (client) => {
+    if (!contact.id) {
+      return
+    };
+
+    try {
+      // Get the authenticated user and check if they are authorized to view activities
+      // activities assigned to other users. if they aren't, show them activities assigned to them.
+      const user = await getCurrentUser(client, orgName)
+
+      const activitiesReq = user?.data?.is_admin
+        ? getActivities(client, orgName)
+        : getActivitiesByUserId(client, orgName, user.data.id)
+
+      const activities = await activitiesReq
+
+      if (!activities.success) {
         return
       };
 
-      // Get all activities and filter the ones associated to the linked contact
-      const activitiesReq = await getActivities(
-        client,
-        orgName,
-      );
-
-      if (!activitiesReq.success) {
-        return
-      };
-
-      setActivities(
-        activitiesReq?.data?.filter((e) => e.person_id === contact.id) ?? []
-      );
-    },
-    [contact]
-  );
+      setActivities(activities.data?.filter((e) => e.person_id === contact.id) ?? [])
+    } catch (error) {
+      setActivities([]);
+    }
+  }, [contact]);
 
   return (
     <>
