@@ -1,16 +1,16 @@
-import React from "react";
-import styled from "styled-components";
-import ReactTimeAgo from "react-time-ago";
-import { faUser } from "@fortawesome/free-solid-svg-icons";
 import { Avatar, TSpan, P11, Stack } from "@deskpro/deskpro-ui";
-import { useEnhanceHtmlImages } from "../hooks";
 import { DPNormalize } from "./DPNormalize";
+import { faUser } from "@fortawesome/free-solid-svg-icons";
+import { useEnhanceHtmlImages } from "../hooks";
+import React from "react";
+import ReactTimeAgo from "react-time-ago";
+import styled from "styled-components";
+import type { AnyIcon, DeskproTheme } from "@deskpro/deskpro-ui";
 import type { FC } from "react";
-import type { AnyIcon } from "@deskpro/deskpro-ui";
 import type { Maybe } from "../types/common";
 
-const TimeAgo = styled(ReactTimeAgo)`
-  color: ${({theme}) => theme.colors.grey80};
+const TimeAgo = styled(ReactTimeAgo) <{ theme: DeskproTheme }>`
+  color: ${({ theme }) => theme.colors.grey80};
 `;
 
 const Author = styled(Stack)`
@@ -42,12 +42,12 @@ const Comment: FC<Props> = ({ name, avatarUrl, text, date }) => {
         />
         {date && (
           <P11>
-            <TimeAgo date={date} timeStyle="mini"/>
+            <TimeAgo date={date} timeStyle="mini" />
           </P11>
         )}
       </Author>
       <Body type="p5">
-        <DPNormalize text={note}/>
+        <DPNormalize text={note} />
       </Body>
     </Stack>
   );
