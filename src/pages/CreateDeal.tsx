@@ -14,8 +14,8 @@ import {
   getAllContacts,
   getAllOrganizations,
   getAllPipelines,
-  getAllStages,
   getAllUsers,
+  getPipelineStages,
 } from "../api/api";
 import { Dropdown } from "../components/Dropdown";
 import { Container } from "../components/common";
@@ -109,11 +109,6 @@ export const CreateDeal = () => {
 
           setUsers(users.data ?? []);
         })(),
-        (async () => {
-          const stages = await getAllStages(client, deskproUser.orgName);
-
-          setStages(stages.data ?? []);
-        })(),
       ]);
       setValue(
         "person_id",
@@ -125,6 +120,23 @@ export const CreateDeal = () => {
       );
     },
     [deskproUser]
+  );
+
+  useInitialisedDeskproAppClient(
+    async (client) => {
+      if (!deskproUser) {
+        return
+      }
+
+      if (!pipelineId) {
+        setStages([])
+        return
+      }
+
+      const stages = await getPipelineStages(client, deskproUser.orgName, Number(pipelineId))
+      setStages(stages.data ?? [])
+    },
+    [deskproUser, pipelineId]
   );
 
   useDeskproAppEvents(
@@ -175,7 +187,7 @@ export const CreateDeal = () => {
   return (
     <Container>
       <form onSubmit={handleSubmit(postDeal)} style={{ width: "100%" }}>
-        <Title title="Details"/>
+        <Title title="Details" />
 
         <Label label="Title" required style={{ marginBottom: 10 }}>
           <Input
@@ -214,6 +226,24 @@ export const CreateDeal = () => {
             {...register("value")}
           />
         </Label>
+
+        <Dropdown
+          title="Pipeline"
+          data={pipelines}
+          value={pipelineId}
+          onChange={(e) => {
+            // Only reset the stage if the selected pipeline changes
+            if (pipelineId !== e) {
+              setValue("stage_id", "")
+            }
+            setValue("pipeline_id", e)
+          }}
+          error={!!errors?.pipeline_id}
+          keyName="id"
+          required
+          valueName="name"
+        />
+
         <Dropdown
           title="Stage"
           data={stages}
@@ -221,16 +251,7 @@ export const CreateDeal = () => {
           onChange={(e) => setValue("stage_id", e)}
           error={!!errors?.stage_id}
           keyName="id"
-          required
-          valueName="name"
-        />
-        <Dropdown
-          title="Pipeline"
-          data={pipelines}
-          value={pipelineId}
-          onChange={(e) => setValue("pipeline_id", e)}
-          error={!!errors?.pipeline_id}
-          keyName="id"
+          disabled={!pipelineId}
           required
           valueName="name"
         />

@@ -127,7 +127,7 @@ const getCurrentUser = async (
 ): Promise<{ data: IPipedriveUser }> => {
   return (settings?.api_key && settings?.instance_domain)
     ? await preInstalledRequest(client, `users/me`, settings)
-    : await pipedriveGet(client, orgName as string, `users/me?api_token=__api_key__`);
+    : await pipedriveGet(client, orgName ?? "", `users/me?api_token=__api_key__`);
 };
 
 const getUserById = async (
@@ -241,6 +241,17 @@ const getActivitiesByUserId = async (
     client,
     orgName,
     `activities?user_id=${userId}&api_token=__api_key__`
+  );
+};
+
+const getActivities = async (
+  client: IDeskproClient,
+  orgName: string,
+): Promise<PipedriveAPIResponse<IPipedriveActivity[]>> => {
+  return await pipedriveGet(
+    client,
+    orgName,
+    `activities/collection?api_token=__api_key__`
   );
 };
 
@@ -555,6 +566,15 @@ const getAllStages = async (
   return await pipedriveGet(client, orgName, `stages?api_token=__api_key__`);
 };
 
+// Source: https://developers.pipedrive.com/docs/api/v1/Stages#getStages
+const getPipelineStages = async (
+  client: IDeskproClient,
+  orgName: string,
+  pipelineId: number
+): Promise<PipedriveAPIResponse<IPipedriveStage[]>> => {
+  return await pipedriveGet(client, orgName, `stages?pipeline_id=${pipelineId}&api_token=__api_key__`);
+};
+
 const getAllContacts = async (
   client: IDeskproClient,
   orgName: string
@@ -576,35 +596,37 @@ export const getImage = (client: IDeskproClient, orgName: string, imageId: strin
 };
 
 export {
-  getAllStages,
+  createActivity,
+  createContact,
+  createDeal,
+  createNote,
+  createUser,
   editContact,
   editDeal,
-  createNote,
-  createActivity,
-  getAllDeals,
+  getActivities,
+  getActivitiesByUserId,
   getActivityTypes,
   getAllContacts,
-  getAllPipelines,
-  createDeal,
-  getContactByEmail,
-  getStageById,
-  getPipelineById,
-  getDealById,
-  getAllUsers,
+  getAllDeals,
   getAllOrganizations,
-  getNotes,
-  getActivitiesByUserId,
+  getAllPipelines,
+  getAllStages,
+  getAllUsers,
+  getContactByEmail,
   getContactById,
-  getDeals,
   getContactByPrompt,
+  getCurrentUser,
+  getDealById,
+  getDeals,
+  getNotes,
+  getOrganizationsById,
+  getOrganizationsByUserId,
+  getPipelineById,
+  getPipelineStages,
+  getStageById,
+  getUserById,
   getUserDataPipedrive,
   getUserListPipedrive,
-  getOrganizationsByUserId,
-  getOrganizationsById,
-  createContact,
-  getUserById,
-  createUser,
-  pipedriveGet,
-  getCurrentUser,
   PipeDriveError,
+  pipedriveGet,
 };
