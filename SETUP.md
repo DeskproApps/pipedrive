@@ -3,12 +3,20 @@ Pipedrive App Setup Instructions
 
 Follow these steps to install and configure the Pipedrive app using either an API key or OAuth credentials.
 
-## Using API Key
+## ⚠️ Important
+For best results, you should use credentials from a Pipedrive account with global (admin-level) privileges. 
+- **API Key**: If the token belongs to a regular Pipedrive user, agents in Deskpro will only be able to view contact activities owned by the provided API token holder. Using an admin’s API key ensures agents in Deskpro can view all relevant activities across your Pipedrive account. 
+_(Recommended if you want all agents to have the same access level.)_
+
+- **OAuth**: The authenticated agent’s Pipedrive permissions determine what data they can access. If the agent has global privileges in Pipedrive, they’ll be able to view all contact activities. Otherwise, they will only see activities they personally own.  
+  _(Recommended if you want agent access levels to match their individual Pipedrive permissions.)_
+
+
+
+## Using An API Key
 
 To install the Pipedrive app you must copy your personal API token. Access this in Pipedrive under the personal preferences section of your settings in the top right, and click the API tab on the following page. 
 
-## ⚠️ Important
-For best results, you should use an API token from a Pipedrive account with global (admin-level) privileges. If the token belongs to a regular Pipedrive user, agents in Deskpro will only be able to view contact activities owned by the provided API token holder. Using an admin’s API key ensures agents in Deskpro can view all relevant activities across your Pipedrive account.
 
 [![](/docs/assets/setup/setup-pipedrive-001.png)](/docs/assets/setup/setup-pipedrive-001.png)
 [![](/docs/assets/setup/setup-pipedrive-002.png)](/docs/assets/setup/setup-pipedrive-002.png)
@@ -28,7 +36,7 @@ To configure who can see and use the Pipedrive app, head to the "Permissions" ta
 When you're happy, click "Install".
 
 
-## Using OAuth2
+## Using OAuth
 
 Head over to your Pipedrive homepage and click on your profile image in the top right, then select "Developer Hub".
 
