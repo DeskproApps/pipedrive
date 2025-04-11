@@ -14,6 +14,17 @@ import { IPipedriveUser } from "../types/pipedrive/pipedriveUser";
 import { PipedriveAPIResponse, PipedriveV2Response } from "../types/pipedrive/pipedrive";
 import { Settings } from "../types/settings";
 
+/**
+ * Utility to prevent rate limits when making successive requests
+ * 
+ * @param delayPeriod - Number of milliseconds to wait before continuing
+ * @returns A Promise that resolves after the given delay
+ *
+ */
+function pipedriveDelay(delayPeriod: number) {
+  return new Promise(resolve => setTimeout(resolve, delayPeriod));
+}
+
 type ErrorData = {
   success: false;
   errorCode: number;
