@@ -8,7 +8,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { IPipedriveDeal } from "../types/pipedrive/pipedriveDeal";
-import { getDeals } from "../api/api";
+import { getAllContactDeals } from "../api/api";
 import { IPipedriveContact } from "../types/pipedrive/pipedriveContact";
 import { PipedriveLogo } from "./PipedriveLogo";
 import { RouterLink } from "./Link";
@@ -30,12 +30,11 @@ export const DealsMainView = ({
     async (client) => {
       if (!contact.owner_id.id || !contact.id) return;
 
-      const dealsReq = await getDeals(client, orgName, contact.owner_id.id);
-
+      const dealsReq = await getAllContactDeals(client, orgName, contact.id)
       if (!dealsReq.success) return;
 
       setDeals(
-        dealsReq?.data?.filter((e) => e.person_id.value === contact.id) ?? []
+        dealsReq?.data?? []
       );
     },
     [contact]
