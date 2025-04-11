@@ -252,6 +252,54 @@ export async function getDeals(
   );
 };
 
+export async function getAllContactDeals(
+  client: IDeskproClient,
+  orgName: string,
+  contactId: number
+) {
+
+  const deals: IPipedriveDeal[] = []
+  let errorCount = 0
+  let pagesFetched = 0;
+  let hasMorePages = true
+  let nextCursor: string | null = null
+
+  // Continue fetching pages until there's no more data or an error occurs.
+  while (hasMorePages && errorCount === 0) {
+    try {
+      const response = await getDealsByContactId(client, orgName, contactId, { limit: 500, cursor: nextCursor ?? undefined })
+
+      if (!response.success) {
+        errorCount++
+        break
+      }
+
+      pagesFetched++
+      deals.push(...response.data)
+
+      // Update the cursor for the next request. If null, we've reached the end of results.
+      nextCursor = response.additional_data?.next_cursor ?? null
+      hasMorePages = nextCursor !== null
+
+      // Throttle requests to avoid hitting the Pipedrive API's rate limit.
+      if (hasMorePages) {
+        await pipedriveDelay(250)
+      }
+
+    }
+    catch {
+      errorCount++
+      break
+    }
+  }
+
+  return {
+    success: pagesFetched > 0, // true if we got at least one successful page so the user can have something to view.
+    data: deals,
+    hasErrors: errorCount > 0
+  }
+}
+
 interface GetContactDealsOptions {
   limit?: number
   cursor?: string
