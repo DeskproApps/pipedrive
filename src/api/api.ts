@@ -236,7 +236,7 @@ export async function getDeals(
     {
       client,
       orgName,
-      endpoint: `deals?person_id=${personId}&&api_token=__api_key__`
+      endpoint: `deals?person_id=${personId}&api_token=__api_key__`
     }
   );
 };
