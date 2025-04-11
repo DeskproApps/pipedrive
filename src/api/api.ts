@@ -243,6 +243,7 @@ export async function getDeals(
 
 interface GetContactDealsOptions {
   limit?: number
+  cursor?: string
 }
 
 export async function getDealsByContactId(
@@ -252,13 +253,24 @@ export async function getDealsByContactId(
   options?: GetContactDealsOptions
 ): Promise<PipedriveV2Response<IPipedriveDeal[]>> {
 
-  const { limit = 500 } = options ?? {}
+  const { limit = 500, cursor } = options ?? {}
+
+  const queryParams = new URLSearchParams({
+    api_token: '__api_key__',
+    person_id: contactId.toString(),
+    limit: limit.toString(),
+  });
+
+  if (cursor) {
+    queryParams.append('cursor', cursor);
+  }
+
   return await pipedriveGet(
     {
       client,
       orgName,
       apiVersion: 2,
-      endpoint: `deals?api_token=__api_key__&person_id=${contactId}&limit=${limit}`
+      endpoint: `deals?${queryParams.toString()}`
     }
   )
 }
