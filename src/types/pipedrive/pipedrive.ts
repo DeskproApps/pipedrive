@@ -10,3 +10,12 @@ export type PipedriveArray<T> = {
     }
   ];
 };
+
+
+export type PipedriveV2Response<T> = {
+  success: boolean
+  data: T
+  additional_data?: {
+    next_cursor?: null | string
+  }
+};

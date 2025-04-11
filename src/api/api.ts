@@ -1,4 +1,4 @@
-import { adminGenericProxyFetch, IDeskproClient, proxyFetch} from "@deskpro/app-sdk";
+import { adminGenericProxyFetch, IDeskproClient, proxyFetch } from "@deskpro/app-sdk";
 import { IPipedriveActivity } from "../types/pipedrive/pipedriveActivity";
 import { IPipedriveActivityType } from "../types/pipedrive/pipedriveActivityTypes";
 import { IPipedriveContact } from "../types/pipedrive/pipedriveContact";
@@ -11,7 +11,7 @@ import { IPipedriveOrganization } from "../types/pipedrive/pipedriveOrganization
 import { IPipedrivePipeline } from "../types/pipedrive/pipedrivePipeline";
 import { IPipedriveStage } from "../types/pipedrive/pipedriveStage";
 import { IPipedriveUser } from "../types/pipedrive/pipedriveUser";
-import { PipedriveAPIResponse } from "../types/pipedrive/pipedrive";
+import { PipedriveAPIResponse, PipedriveV2Response } from "../types/pipedrive/pipedrive";
 import { Settings } from "../types/settings";
 
 type ErrorData = {
@@ -240,6 +240,28 @@ export async function getDeals(
     }
   );
 };
+
+interface GetContactDealsOptions {
+  limit?: number
+}
+
+export async function getDealsByContactId(
+  client: IDeskproClient,
+  orgName: string,
+  contactId: number,
+  options?: GetContactDealsOptions
+): Promise<PipedriveV2Response<IPipedriveDeal[]>> {
+
+  const { limit = 500 } = options ?? {}
+  return await pipedriveGet(
+    {
+      client,
+      orgName,
+      apiVersion: 2,
+      endpoint: `deals?api_token=__api_key__&person_id=${contactId}&limit=${limit}`
+    }
+  )
+}
 
 export async function getOrganizationsById(
   client: IDeskproClient,
