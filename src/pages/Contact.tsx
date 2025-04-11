@@ -11,7 +11,7 @@ import { useState } from "react";
 export const Contacts = () => {
   const [currentPage, setcurrentPage] = useState("Find Contact");
   const { context } = useDeskproLatestAppContext<unknown, Settings>()
-  const isUsingOAuth = context?.settings.use_access_token !== true || context.settings.use_advanced_connect === false
+  const isUsingOAuth = context?.settings.use_access_token === false || context?.settings.use_advanced_connect === false
 
 
   const { logoutActiveUser } = useLogout()

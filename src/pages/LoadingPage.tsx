@@ -17,7 +17,7 @@ const LoadingPage: FC = () => {
   const deskproUser = useUser();
 
   // Determine authentication method from settings
-  const isUsingOAuth = context?.settings.use_access_token !== true || context.settings.use_advanced_connect === false
+  const isUsingOAuth = context?.settings.use_access_token === false || context?.settings.use_advanced_connect === false
 
   useDeskproElements(({ registerElement, clearElements }) => {
     clearElements()
@@ -35,8 +35,8 @@ const LoadingPage: FC = () => {
     client.setUserState("isUsingOAuth", isUsingOAuth)
 
     // Verify authentication status
-    // If OAuth2 mode and the user is logged in the request would be make with their stored access token
-    // If access token mode the request would be made with the access token provided in the app setup
+    // If OAuth mode and the user is logged in the request would be make with their stored access token
+    // If api key mode the request would be made with the api key provided in the app setup
     getCurrentUser(client, deskproUser.orgName)
       .then((data) => {
         if (data) {
@@ -67,10 +67,10 @@ const LoadingPage: FC = () => {
     if (isUsingOAuth) {
       navigate("/login")
     } else {
-      // Show error for invalid access tokens (expired or not present)
+      // Show error for invalid api keys (expired or not present)
       return (
         <div style={{width: "100%", padding: 12, boxSizing: "border-box"}} >
-          <ErrorBlock text={"Invalid Access Token"} />
+          <ErrorBlock text={"Invalid API Key"} />
         </div>
       )
     }
