@@ -8,12 +8,13 @@ import { useNavigate } from "react-router-dom";
 import { PipedriveLogo } from "./PipedriveLogo";
 import { IPipedriveActivity } from "../types/pipedrive/pipedriveActivity";
 import { useState } from "react";
-import { getActivities, getCurrentUser } from "../api/api";
+import { getAllContactActivities } from "../api/api";
 import { IPipedriveContact } from "../types/pipedrive/pipedriveContact";
 import { TwoColumn } from "./TwoColumn";
 import { useUser } from "../context/userContext";
 import { isLast } from "../utils";
 import { format } from "../utils/date/format";
+import { Spinner, Stack } from "@deskpro/deskpro-ui";
 
 export const ActivitiesMainView = ({
   contact,
@@ -26,32 +27,42 @@ export const ActivitiesMainView = ({
   const deskproUser = useUser();
 
   const [activities, setActivities] = useState<IPipedriveActivity[]>([]);
+  const [isFetchingActivities, setIsFetchingActivities] = useState<boolean>(true);
 
   useInitialisedDeskproAppClient(async (client) => {
     if (!contact.id) {
       return
     };
+    setIsFetchingActivities(true)
 
     try {
-      // Get the authenticated user and check if they are authorized to view activities
-      // activities assigned to other users. if they aren't, show them activities assigned to them.
-      const user = await getCurrentUser(client, orgName)
+      const activitiesReq = await getAllContactActivities(client, orgName, contact.id)
 
-      const activitiesReq = user?.data?.is_admin
-        ? getActivities(client, orgName)
-        : getActivities(client, orgName, { ownerId: user.data.id, limit: 1 })
-
-      const activities = await activitiesReq
-
-      if (!activities.success) {
+      if (!activitiesReq.success) {
         return
       };
 
-      setActivities(activities.data?? [])
+      setActivities(activitiesReq.data ?? [])
     } catch (error) {
       setActivities([]);
+    } finally {
+      setIsFetchingActivities(false)
     }
   }, [contact]);
+
+  if (isFetchingActivities) {
+    return (
+      <>
+        <Title
+          title={`Activities`}
+        />
+
+        <Stack justify="center" align="center" style={{ height: "100px" }}>
+          <Spinner size="large" />
+        </Stack>
+      </>
+    )
+  }
 
   return (
     <>
