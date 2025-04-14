@@ -133,18 +133,18 @@ export async function fetchAllPaginatedData<T>(
   delayBetweenPages?: number
 ): Promise<{ success: boolean, data: T[], hasErrors: boolean }> {
   const items: T[] = []
-  let errorCount = 0
+  let hasErrors = false
   let pagesFetched = 0
   let hasMorePages = true
   let nextCursor: string | null = null
 
   // Continue fetching pages until there's no more data or an error occurs.
-  while (hasMorePages && errorCount === 0) {
+  while (hasMorePages && !hasErrors) {
     try {
       const response = await fetchFunction(nextCursor)
 
       if (!response.success) {
-        errorCount++
+        hasErrors = true
         break
       }
 
@@ -160,7 +160,7 @@ export async function fetchAllPaginatedData<T>(
         await pipedriveDelay(delayBetweenPages ?? 250)
       }
     } catch {
-      errorCount++
+      hasErrors = true
       break
     }
   }
@@ -168,7 +168,7 @@ export async function fetchAllPaginatedData<T>(
   return {
     success: pagesFetched > 0, // true if we got at least one successful page so the user can have something to view.
     data: items,
-    hasErrors: errorCount > 0,
+    hasErrors
   };
 }
 
