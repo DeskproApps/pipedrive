@@ -126,6 +126,52 @@ export async function preInstalledRequest(
   }
 };
 
+export async function fetchAllPaginatedData<T>(
+  fetchFunction: (cursor?: string | null) => Promise<PipedriveAPIResponse<T[]> & {
+    additional_data?: Pick<NonNullable<PipedriveAdditionalData["additional_data"]>, "next_cursor">
+  }>,
+  delayBetweenPages?: number
+): Promise<{ success: boolean, data: T[], hasErrors: boolean }> {
+  const items: T[] = []
+  let errorCount = 0
+  let pagesFetched = 0
+  let hasMorePages = true
+  let nextCursor: string | null = null
+
+  // Continue fetching pages until there's no more data or an error occurs.
+  while (hasMorePages && errorCount === 0) {
+    try {
+      const response = await fetchFunction(nextCursor)
+
+      if (!response.success) {
+        errorCount++
+        break
+      }
+
+      pagesFetched++
+      items.push(...response.data)
+
+      // Update the cursor for the next request. If null, we've reached the end of results.
+      nextCursor = response.additional_data?.next_cursor ?? null
+      hasMorePages = nextCursor !== null
+
+      // Throttle requests to avoid hitting Pipedrive API's rate limit.
+      if (hasMorePages) {
+        await pipedriveDelay(delayBetweenPages ?? 250)
+      }
+    } catch {
+      errorCount++
+      break
+    }
+  }
+
+  return {
+    success: pagesFetched > 0, // true if we got at least one successful page so the user can have something to view.
+    data: items,
+    hasErrors: errorCount > 0,
+  };
+}
+
 export async function getUserDataPipedrive(
   client: IDeskproClient,
   orgName: string
