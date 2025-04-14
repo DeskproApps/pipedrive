@@ -8,7 +8,7 @@ import { useNavigate } from "react-router-dom";
 import { PipedriveLogo } from "./PipedriveLogo";
 import { IPipedriveActivity } from "../types/pipedrive/pipedriveActivity";
 import { useState } from "react";
-import { getActivities, getActivitiesByUserId, getCurrentUser } from "../api/api";
+import { getActivities, getCurrentUser } from "../api/api";
 import { IPipedriveContact } from "../types/pipedrive/pipedriveContact";
 import { TwoColumn } from "./TwoColumn";
 import { useUser } from "../context/userContext";
@@ -39,7 +39,7 @@ export const ActivitiesMainView = ({
 
       const activitiesReq = user?.data?.is_admin
         ? getActivities(client, orgName)
-        : getActivitiesByUserId(client, orgName, user.data.id)
+        : getActivities(client, orgName, { ownerId: user.data.id, limit: 1 })
 
       const activities = await activitiesReq
 
@@ -47,7 +47,7 @@ export const ActivitiesMainView = ({
         return
       };
 
-      setActivities(activities.data?.filter((e) => e.person_id === contact.id) ?? [])
+      setActivities(activities.data?? [])
     } catch (error) {
       setActivities([]);
     }

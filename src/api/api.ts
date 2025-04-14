@@ -379,15 +379,41 @@ export async function getActivitiesByUserId(
 export async function getActivities(
   client: IDeskproClient,
   orgName: string,
-): Promise<PipedriveAPIResponse<IPipedriveActivity[]>> {
+options?: Pick<PipedriveFilterOptions, "limit" | "cursor" | "personId" | "ownerId">
+): Promise<PipedriveAPIResponse<IPipedriveActivity[]> & {
+  additional_data?: Pick<
+    NonNullable<PipedriveAdditionalData['additional_data']>, "next_cursor"
+  >
+}> {
+  const { limit = 500, cursor, personId: contactId, ownerId } = options ?? {}
+
+  const queryParams = new URLSearchParams({
+
+    api_token: '__api_key__',
+    limit: limit.toString(),
+  });
+
+  if (cursor) {
+    queryParams.append('cursor', cursor);
+  }
+
+  if (contactId) {
+    queryParams.append('person_id', contactId.toString());
+  }
+
+  if (ownerId) {
+    queryParams.append('owner_id', ownerId.toString());
+  }
+
   return await pipedriveGet(
     {
       client,
       orgName,
-      endpoint: `activities/collection?api_token=__api_key__`
+apiVersion: 2,
+      endpoint: `activities?${queryParams.toString()}`
     }
   );
-};
+}
 
 export async function createContact(
   client: IDeskproClient,
