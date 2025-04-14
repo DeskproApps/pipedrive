@@ -408,24 +408,18 @@ export async function getNotes(
   );
 };
 
-export async function getActivitiesByUserId(
+export async function getAllContactActivities(
   client: IDeskproClient,
   orgName: string,
-  userId: number
-): Promise<PipedriveAPIResponse<IPipedriveActivity[]>> {
-  return await pipedriveGet(
-    {
-      client,
-      orgName,
-      endpoint: `activities?user_id=${userId}&api_token=__api_key__`
-    }
-  );
-};
+  contactId: number
+) {
+  return await fetchAllPaginatedData((cursor) => getActivities(client, orgName, { personId: contactId, cursor: cursor ?? undefined, limit: 500 }))
+}
 
 export async function getActivities(
   client: IDeskproClient,
   orgName: string,
-options?: Pick<PipedriveFilterOptions, "limit" | "cursor" | "personId" | "ownerId">
+  options?: Pick<PipedriveFilterOptions, "limit" | "cursor" | "personId" | "ownerId">
 ): Promise<PipedriveAPIResponse<IPipedriveActivity[]> & {
   additional_data?: Pick<
     NonNullable<PipedriveAdditionalData['additional_data']>, "next_cursor"
@@ -455,7 +449,7 @@ options?: Pick<PipedriveFilterOptions, "limit" | "cursor" | "personId" | "ownerI
     {
       client,
       orgName,
-apiVersion: 2,
+      apiVersion: 2,
       endpoint: `activities?${queryParams.toString()}`
     }
   );
