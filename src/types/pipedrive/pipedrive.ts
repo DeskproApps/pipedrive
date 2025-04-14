@@ -11,6 +11,14 @@ export type PipedriveArray<T> = {
   ];
 };
 
+export type PipedriveFilterOptions = {
+  userId?: number
+  ownerId?: number
+  personId?: number // Contact ID
+  limit?: number
+  start?: number
+  cursor?: string
+}
 
 export type PipedriveAdditionalData = {
   additional_data?: {

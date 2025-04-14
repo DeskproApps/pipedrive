@@ -11,7 +11,7 @@ import { IPipedriveOrganization } from "../types/pipedrive/pipedriveOrganization
 import { IPipedrivePipeline } from "../types/pipedrive/pipedrivePipeline";
 import { IPipedriveStage } from "../types/pipedrive/pipedriveStage";
 import { IPipedriveUser } from "../types/pipedrive/pipedriveUser";
-import { PipedriveAdditionalData, PipedriveAPIResponse } from "../types/pipedrive/pipedrive";
+import { PipedriveAdditionalData, PipedriveAPIResponse, PipedriveFilterOptions } from "../types/pipedrive/pipedrive";
 import { Settings } from "../types/settings";
 
 /**
@@ -300,16 +300,11 @@ export async function getAllContactDeals(
   }
 }
 
-interface GetContactDealsOptions {
-  limit?: number
-  cursor?: string
-}
-
 export async function getDealsByContactId(
   client: IDeskproClient,
   orgName: string,
   contactId: number,
-  options?: GetContactDealsOptions
+  options?: Pick<PipedriveFilterOptions, "limit" | "cursor">
 ): Promise<PipedriveAPIResponse<IPipedriveDeal[]> & {
   additional_data?: Pick<
     NonNullable<PipedriveAdditionalData['additional_data']>, "next_cursor"
