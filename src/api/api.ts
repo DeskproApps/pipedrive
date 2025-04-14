@@ -11,7 +11,7 @@ import { IPipedriveOrganization } from "../types/pipedrive/pipedriveOrganization
 import { IPipedrivePipeline } from "../types/pipedrive/pipedrivePipeline";
 import { IPipedriveStage } from "../types/pipedrive/pipedriveStage";
 import { IPipedriveUser } from "../types/pipedrive/pipedriveUser";
-import { PipedriveAPIResponse, PipedriveV2Response } from "../types/pipedrive/pipedrive";
+import { PipedriveAdditionalData, PipedriveAPIResponse } from "../types/pipedrive/pipedrive";
 import { Settings } from "../types/settings";
 
 /**
@@ -310,11 +310,16 @@ export async function getDealsByContactId(
   orgName: string,
   contactId: number,
   options?: GetContactDealsOptions
-): Promise<PipedriveV2Response<IPipedriveDeal[]>> {
+): Promise<PipedriveAPIResponse<IPipedriveDeal[]> & {
+  additional_data?: Pick<
+    NonNullable<PipedriveAdditionalData['additional_data']>, "next_cursor"
+  >
+}> {
 
   const { limit = 500, cursor } = options ?? {}
 
   const queryParams = new URLSearchParams({
+
     api_token: '__api_key__',
     person_id: contactId.toString(),
     limit: limit.toString(),
