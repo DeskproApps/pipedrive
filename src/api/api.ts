@@ -11,7 +11,7 @@ import { IPipedriveOrganization } from "../types/pipedrive/pipedriveOrganization
 import { IPipedrivePipeline } from "../types/pipedrive/pipedrivePipeline";
 import { IPipedriveStage } from "../types/pipedrive/pipedriveStage";
 import { IPipedriveUser } from "../types/pipedrive/pipedriveUser";
-import { PipedriveAPIResponse, PipedriveV2Response } from "../types/pipedrive/pipedrive";
+import { PipedriveAdditionalData, PipedriveAPIResponse, PipedriveFilterOptions } from "../types/pipedrive/pipedrive";
 import { Settings } from "../types/settings";
 
 /**
@@ -125,6 +125,52 @@ export async function preInstalledRequest(
     return {};
   }
 };
+
+export async function fetchAllPaginatedData<T>(
+  fetchFunction: (cursor?: string | null) => Promise<PipedriveAPIResponse<T[]> & {
+    additional_data?: Pick<NonNullable<PipedriveAdditionalData["additional_data"]>, "next_cursor">
+  }>,
+  delayBetweenPages?: number
+): Promise<{ success: boolean, data: T[], hasErrors: boolean }> {
+  const items: T[] = []
+  let hasErrors = false
+  let pagesFetched = 0
+  let hasMorePages = true
+  let nextCursor: string | null = null
+
+  // Continue fetching pages until there's no more data or an error occurs.
+  while (hasMorePages && !hasErrors) {
+    try {
+      const response = await fetchFunction(nextCursor)
+
+      if (!response.success) {
+        hasErrors = true
+        break
+      }
+
+      pagesFetched++
+      items.push(...response.data)
+
+      // Update the cursor for the next request. If null, we've reached the end of results.
+      nextCursor = response.additional_data?.next_cursor ?? null
+      hasMorePages = nextCursor !== null
+
+      // Throttle requests to avoid hitting Pipedrive API's rate limit.
+      if (hasMorePages) {
+        await pipedriveDelay(delayBetweenPages ?? 250)
+      }
+    } catch {
+      hasErrors = true
+      break
+    }
+  }
+
+  return {
+    success: pagesFetched > 0, // true if we got at least one successful page so the user can have something to view.
+    data: items,
+    hasErrors
+  };
+}
 
 export async function getUserDataPipedrive(
   client: IDeskproClient,
@@ -257,64 +303,24 @@ export async function getAllContactDeals(
   orgName: string,
   contactId: number
 ) {
-
-  const deals: IPipedriveDeal[] = []
-  let errorCount = 0
-  let pagesFetched = 0;
-  let hasMorePages = true
-  let nextCursor: string | null = null
-
-  // Continue fetching pages until there's no more data or an error occurs.
-  while (hasMorePages && errorCount === 0) {
-    try {
-      const response = await getDealsByContactId(client, orgName, contactId, { limit: 500, cursor: nextCursor ?? undefined })
-
-      if (!response.success) {
-        errorCount++
-        break
-      }
-
-      pagesFetched++
-      deals.push(...response.data)
-
-      // Update the cursor for the next request. If null, we've reached the end of results.
-      nextCursor = response.additional_data?.next_cursor ?? null
-      hasMorePages = nextCursor !== null
-
-      // Throttle requests to avoid hitting the Pipedrive API's rate limit.
-      if (hasMorePages) {
-        await pipedriveDelay(250)
-      }
-
-    }
-    catch {
-      errorCount++
-      break
-    }
-  }
-
-  return {
-    success: pagesFetched > 0, // true if we got at least one successful page so the user can have something to view.
-    data: deals,
-    hasErrors: errorCount > 0
-  }
-}
-
-interface GetContactDealsOptions {
-  limit?: number
-  cursor?: string
+  return await fetchAllPaginatedData((cursor) => getDealsByContactId(client, orgName, contactId, { cursor: cursor ?? undefined, limit: 500 }))
 }
 
 export async function getDealsByContactId(
   client: IDeskproClient,
   orgName: string,
   contactId: number,
-  options?: GetContactDealsOptions
-): Promise<PipedriveV2Response<IPipedriveDeal[]>> {
+  options?: Pick<PipedriveFilterOptions, "limit" | "cursor">
+): Promise<PipedriveAPIResponse<IPipedriveDeal[]> & {
+  additional_data?: Pick<
+    NonNullable<PipedriveAdditionalData['additional_data']>, "next_cursor"
+  >
+}> {
 
   const { limit = 500, cursor } = options ?? {}
 
   const queryParams = new URLSearchParams({
+
     api_token: '__api_key__',
     person_id: contactId.toString(),
     limit: limit.toString(),
@@ -362,32 +368,52 @@ export async function getNotes(
   );
 };
 
-export async function getActivitiesByUserId(
+export async function getAllContactActivities(
   client: IDeskproClient,
   orgName: string,
-  userId: number
-): Promise<PipedriveAPIResponse<IPipedriveActivity[]>> {
-  return await pipedriveGet(
-    {
-      client,
-      orgName,
-      endpoint: `activities?user_id=${userId}&api_token=__api_key__`
-    }
-  );
-};
+  contactId: number
+) {
+  return await fetchAllPaginatedData((cursor) => getActivities(client, orgName, { personId: contactId, cursor: cursor ?? undefined, limit: 500 }))
+}
 
 export async function getActivities(
   client: IDeskproClient,
   orgName: string,
-): Promise<PipedriveAPIResponse<IPipedriveActivity[]>> {
+  options?: Pick<PipedriveFilterOptions, "limit" | "cursor" | "personId" | "ownerId">
+): Promise<PipedriveAPIResponse<IPipedriveActivity[]> & {
+  additional_data?: Pick<
+    NonNullable<PipedriveAdditionalData['additional_data']>, "next_cursor"
+  >
+}> {
+  const { limit = 500, cursor, personId: contactId, ownerId } = options ?? {}
+
+  const queryParams = new URLSearchParams({
+
+    api_token: '__api_key__',
+    limit: limit.toString(),
+  });
+
+  if (cursor) {
+    queryParams.append('cursor', cursor);
+  }
+
+  if (contactId) {
+    queryParams.append('person_id', contactId.toString());
+  }
+
+  if (ownerId) {
+    queryParams.append('owner_id', ownerId.toString());
+  }
+
   return await pipedriveGet(
     {
       client,
       orgName,
-      endpoint: `activities/collection?api_token=__api_key__`
+      apiVersion: 2,
+      endpoint: `activities?${queryParams.toString()}`
     }
   );
-};
+}
 
 export async function createContact(
   client: IDeskproClient,
