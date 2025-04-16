@@ -42,7 +42,10 @@ export const ActivitiesMainView = ({
         return
       };
 
-      setActivities(activitiesReq.data ?? [])
+      // Filter out deleted activities.
+      const activeActivities = activitiesReq.data.filter((activity)=> activity.active_flag === true)
+
+      setActivities(activeActivities)
     } catch (error) {
       setActivities([]);
     } finally {
