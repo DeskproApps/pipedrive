@@ -45,20 +45,25 @@ export const Main = () => {
 
   const deskproUser = useUser();
 
-  const getPipedriveContact = async (client: IDeskproClient) => {
-    if (!deskproUser || !deskproUser.orgName) return;
+  async function getPipedriveContact(client: IDeskproClient) {
+    if (!deskproUser || !deskproUser.orgName) {
+      return
+    };
 
+    // Retrieve the contacts linked to the user.
     const id = (
       await client
         .getEntityAssociation("linkedPipedriveContacts", deskproUser.id)
         .list()
     )[0];
 
+    // If a linked contact was found, fetch & set the data for the contact, navigate to the link page if the fetch fails.
     if (id) {
       const contact = await getContactById(client, deskproUser.orgName, id)
         .catch(asyncErrorHandler);
 
       if (!contact?.success) {
+        // Delete the contact's link.
         await client
           .getEntityAssociation("linkedPipedriveContacts", deskproUser.id)
           .delete(id);
@@ -72,6 +77,9 @@ export const Main = () => {
       return;
     }
 
+
+    // Attempt automatically linking the ticket user by checking if there's a contact with the ticket user's email and linking them.
+    // Navigate to the link page if no contact is found.
     const contact = await getContactByEmail(
       client,
       deskproUser.orgName,
@@ -84,13 +92,21 @@ export const Main = () => {
       return;
     }
 
+    // Link the contact.
+    await client
+      .getEntityAssociation("linkedPipedriveContacts", deskproUser.id)
+      .set(contact.id.toString());
+
+
     setPipedriveContact(contact);
 
     return;
   };
 
-  const getPipedriveOrganization = async (client: IDeskproClient) => {
-    if (!pipedriveContact?.org_id || !deskproUser) return;
+  async function getPipedriveOrganization(client: IDeskproClient) {
+    if (!pipedriveContact?.org_id || !deskproUser) {
+      return
+    };
 
     const pipedriveOrganization = await getOrganizationsById(
       client,
@@ -98,7 +114,9 @@ export const Main = () => {
       pipedriveContact.org_id.value
     ).catch(asyncErrorHandler);
 
-    if (!pipedriveOrganization?.success) return;
+    if (!pipedriveOrganization?.success) {
+      return
+    };
 
     setOrganization(pipedriveOrganization.data);
   };
@@ -149,7 +167,10 @@ export const Main = () => {
             break;
           }
           case "pipedriveEditButton": {
-            if (!pipedriveContact) return;
+            if (!pipedriveContact) {
+              return
+            }
+
             navigate(`/editcontact/${pipedriveContact.id}`);
             break;
           }
@@ -195,7 +216,9 @@ export const Main = () => {
 
   useInitialisedDeskproAppClient(
     async (client) => {
-      if (!deskproUser) return;
+      if (!deskproUser) {
+        return
+      };
 
       await getPipedriveContact(client);
     },
