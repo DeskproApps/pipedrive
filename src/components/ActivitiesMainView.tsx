@@ -42,7 +42,10 @@ export const ActivitiesMainView = ({
         return
       };
 
-      setActivities(activitiesReq.data ?? [])
+      // Filter out deleted activities.
+      const activeActivities = activitiesReq.data.filter((activity)=> activity.is_deleted !== true)
+
+      setActivities(activeActivities)
     } catch (error) {
       setActivities([]);
     } finally {
@@ -74,8 +77,7 @@ export const ActivitiesMainView = ({
         <Fragment key={activity.id}>
           <Title
             title={activity.subject}
-            // Pipedrive doesn't have a direct link you can navigate to so we send the user to the activities list
-            link={`https://${deskproUser?.orgName}.pipedrive.com/activities/list/user/everyone?person_id=${activity.person_id}`}
+            link={`https://${deskproUser?.orgName}.pipedrive.com/activities/list/user/everyone?selected=${activity.id}`}
             icon={<PipedriveLogo />}
           />
           <TwoColumn

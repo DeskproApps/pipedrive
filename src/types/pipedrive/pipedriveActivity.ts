@@ -13,6 +13,7 @@ export interface IPipedriveActivity {
     duration: string;
     busy_flag: null;
     add_time: string;
+    is_deleted: boolean;
     marked_as_done_time: string;
     last_notification_time: null;
     last_notification_user_id: null;
