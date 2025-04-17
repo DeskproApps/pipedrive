@@ -80,15 +80,16 @@ export async function pipedriveGet(props: PipedriveGetProps) {
   const pFetch = await proxyFetch(client);
   const isUsingOAuth2 = (await client.getUserState<boolean>("isUsingOAuth"))[0].data
 
+  let endpointQuery = endpoint
   // Remove api_token from pathQuery if using OAuth2
   if (isUsingOAuth2) {
-    pathQuery = pathQuery.replace(/(\?|&)api_token=[^&]+/, '');
+    endpointQuery = endpoint.replace(/(\?|&)api_token=[^&]+/, '');
   }
 
   const apiVersionRoute = apiVersion === 2 ? "api/v2" : "v1"
 
   const response = await pFetch(
-    `https://${orgName}.pipedrive.com/${apiVersionRoute}/${endpoint}`,
+    `https://${orgName}.pipedrive.com/${apiVersionRoute}/${endpointQuery}`,
     {
       headers: isUsingOAuth2 ? {
         Authorization: `Bearer [user[${OAuth2AccessTokenPath}]]`
