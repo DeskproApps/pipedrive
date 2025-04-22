@@ -1,14 +1,14 @@
-import { css } from "styled-components";
-import { P5 } from "@deskpro/deskpro-ui";
-import styled from "styled-components";
 import { addBlankTargetToLinks } from "../utils";
+import { css } from "styled-components";
+import { DeskproTheme, P5 } from "@deskpro/deskpro-ui";
+import styled from "styled-components";
 import type { FC } from "react";
 
 type Props = {
   text?: string,
 };
 
-const dpNormalize = css`
+const dpNormalize = css<{ theme: DeskproTheme }>`
   p {
     margin-top: 0;
     white-space: pre-wrap;

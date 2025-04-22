@@ -1,7 +1,9 @@
 import path from "path";
 import { defineConfig } from "vite";
-import react from "@vitejs/plugin-react";
 import copy from "rollup-plugin-copy";
+import path from "path";
+import react from "@vitejs/plugin-react";
+
 
 const PORT = process.env.VITE_DEV_SERVER_PORT
   ? parseInt(process.env.VITE_DEV_SERVER_PORT)

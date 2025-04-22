@@ -1,6 +1,7 @@
+import { DeskproTheme } from "@deskpro/deskpro-ui";
 import { FC } from "react";
-import styled from "styled-components";
 import { TextBlockWithLabel } from "./TextBlockWithLabel";
+import styled from "styled-components";
 import type { Props as TextBlockWithLabelProps } from "./TextBlockWithLabel";
 
 export type Props = {
@@ -20,7 +21,7 @@ const Side = styled.div`
   width: calc(49% - 6px);
 `;
 
-const Divider = styled.div`
+const Divider = styled.div<{ theme: DeskproTheme }>`
   display: inline-block;
   width: 1px;
   height: 2em;

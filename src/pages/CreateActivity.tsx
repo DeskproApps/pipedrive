@@ -92,7 +92,7 @@ export const CreateActivity = () => {
       return;
     }
 
-    navigate("/");
+    navigate("/home");
   };
 
   useInitialisedDeskproAppClient((client) => {
@@ -118,7 +118,7 @@ export const CreateActivity = () => {
       onElementEvent(id) {
         switch (id) {
           case "pipedriveHomeButton": {
-            navigate("/redirect");
+            navigate("/home");
             break;
           }
         }
@@ -267,7 +267,7 @@ export const CreateActivity = () => {
 
         <Stack justify="space-between">
           <Button type="submit" text="Create"/>
-          <Button type="button" intent="tertiary" text="Cancel" onClick={() => navigate(`/redirect`)}/>
+          <Button type="button" intent="tertiary" text="Cancel" onClick={() => navigate(`/home`)}/>
         </Stack>
       </form>
     </Container>

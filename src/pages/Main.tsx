@@ -6,6 +6,7 @@ import {
   useInitialisedDeskproAppClient,
   Title,
   Property,
+  useDeskproLatestAppContext,
 } from "@deskpro/app-sdk";
 import { PipedriveLogo } from "../components/PipedriveLogo";
 import { useState } from "react";
@@ -24,6 +25,8 @@ import { DealsMainView } from "../components/DealsMainView";
 import { ActivitiesMainView } from "../components/ActivitiesMainView";
 import { NotesMainView } from "../components/NotesMainView";
 import { Container } from "../components/common";
+import { Settings } from "@/types/settings";
+import { useLogout } from "@/api/deskpro";
 
 export const Main = () => {
   const { client } = useDeskproAppClient();
@@ -34,7 +37,11 @@ export const Main = () => {
   const [organization, setOrganization] =
     useState<IPipedriveOrganization | null>(null);
 
+  const { context } = useDeskproLatestAppContext<unknown, Settings>()
+  const isUsingOAuth = context?.settings.use_access_token === false || context?.settings.use_advanced_connect === false
+
   const navigate = useNavigate();
+  const { logoutActiveUser } = useLogout()
 
   const deskproUser = useUser();
 
@@ -136,21 +143,27 @@ export const Main = () => {
       items: [
         {
           title: "Unlink contact",
-          payload: {
-            type: "changePage",
-            page: "/",
-          },
+          payload: { type: "unlink" },
         },
+
+        ...(isUsingOAuth
+          ? [
+            {
+              title: "Logout",
+              payload: { type: "logout" },
+            },
+          ]
+          : [])
       ],
     });
   });
 
   useDeskproAppEvents(
     {
-      onElementEvent(id) {
+      onElementEvent(id, _type, payload) {
         switch (id) {
           case "pipedriveHomeButton": {
-            navigate("/redirect");
+            navigate("/home");
             break;
           }
           case "pipedriveEditButton": {
@@ -161,28 +174,39 @@ export const Main = () => {
             navigate(`/editcontact/${pipedriveContact.id}`);
             break;
           }
-          case "pipedriveMenuButton": {
-            if (!client || !deskproUser) {
-              return
+        }
+
+
+        if (payload && typeof payload === 'object' && 'type' in payload) {
+
+          switch (payload.type) {
+            case "logout": {
+              if (isUsingOAuth) {
+                logoutActiveUser()
+              }
+              break;
             }
+            case "unlink": {
+              if (!client || !deskproUser) return;
 
-            (async () => {
-              const id = (
+              (async () => {
+                const id = (
+                  await client
+                    .getEntityAssociation(
+                      "linkedPipedriveContacts",
+                      deskproUser.id
+                    )
+                    .list()
+                )[0];
+
                 await client
-                  .getEntityAssociation(
-                    "linkedPipedriveContacts",
-                    deskproUser.id
-                  )
-                  .list()
-              )[0];
+                  .getEntityAssociation("linkedPipedriveContacts", deskproUser.id)
+                  .delete(id);
+                navigate("/contacts");
+              })();
 
-              await client
-                .getEntityAssociation("linkedPipedriveContacts", deskproUser.id)
-                .delete(id);
-              navigate("/contacts");
-            })();
-
-            break;
+              break
+            }
           }
         }
       },

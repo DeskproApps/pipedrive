@@ -68,7 +68,7 @@ export const CreateContact = () => {
             ?.getEntityAssociation("linkedPipedriveContacts", dpUser.id)
             .set(response.data.id.toString())
         )
-        .then(() => navigate("/"))
+        .then(() => navigate("/home"))
         .catch((err) => setError(err?.data?.error || "Error creating contact"));
   };
 
@@ -140,7 +140,7 @@ export const CreateContact = () => {
           type="button"
           text="Cancel"
           intent="secondary"
-          onClick={() => navigate("/")}
+          onClick={() => navigate("/home")}
         />
       </Stack>
     </form>
