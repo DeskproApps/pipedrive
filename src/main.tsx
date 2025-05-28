@@ -1,7 +1,8 @@
+import * as Sentry from '@sentry/react';
+import './instrument';
 import React from "react";
 import ReactDOM from "react-dom/client";
 import { HashRouter } from "react-router-dom";
-import { ErrorBoundary } from "react-error-boundary";
 import TimeAgo from "javascript-time-ago";
 import en from "javascript-time-ago/locale/en.json";
 import { DeskproAppProvider } from "@deskpro/app-sdk";
@@ -19,17 +20,19 @@ import { Scrollbar } from "@deskpro/deskpro-ui";
 
 TimeAgo.addDefaultLocale(en);
 
-const root = ReactDOM.createRoot(document.getElementById('root') as Element);
+const root = ReactDOM.createRoot(document.getElementById('root') as Element, {
+  onRecoverableError: Sentry.reactErrorHandler(),
+});
 root.render((
     <React.StrictMode>
         <Scrollbar style={{ height: "100%", width: "100%" }}>
             <HashRouter>
                 <DeskproAppProvider>
-                    <ErrorBoundary FallbackComponent={ErrorFallback}>
+                    <Sentry.ErrorBoundary FallbackComponent={ErrorFallback}>
                         <UserContextProvider>
                             <App />
                         </UserContextProvider>
-                    </ErrorBoundary>
+                    </Sentry.ErrorBoundary>
                 </DeskproAppProvider>
             </HashRouter>
         </Scrollbar>
