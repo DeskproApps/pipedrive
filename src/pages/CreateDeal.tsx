@@ -144,7 +144,7 @@ export const CreateDeal = () => {
       onElementEvent(id) {
         switch (id) {
           case "pipedriveHomeButton": {
-            navigate("/redirect");
+            navigate("/home");
             break;
           }
         }
@@ -181,7 +181,7 @@ export const CreateDeal = () => {
       return;
     }
 
-    navigate("/");
+    navigate("/home");
   };
 
   return (
@@ -277,8 +277,8 @@ export const CreateDeal = () => {
         />
 
         <Stack style={{ justifyContent: "space-between" }}>
-          <Button type="submit" text="Create" />
-          <Button text="Cancel" intent="secondary" onClick={() => navigate(`/redirect`)} />
+          <Button type="submit" text="Create"/>
+          <Button text="Cancel" intent="secondary" onClick={() => navigate(`/home`)}/>
         </Stack>
 
         {errors?.submit && (

@@ -11,6 +11,7 @@ import { IPipedriveOrganization } from "../types/pipedrive/pipedriveOrganization
 import { IPipedrivePipeline } from "../types/pipedrive/pipedrivePipeline";
 import { IPipedriveStage } from "../types/pipedrive/pipedriveStage";
 import { IPipedriveUser } from "../types/pipedrive/pipedriveUser";
+import { OAuth2AccessTokenPath } from "@/constants/deskpro";
 import { PipedriveAdditionalData, PipedriveAPIResponse, PipedriveFilterOptions } from "../types/pipedrive/pipedrive";
 import { Settings } from "../types/settings";
 
@@ -77,11 +78,23 @@ interface PipedriveGetProps {
 export async function pipedriveGet(props: PipedriveGetProps) {
   const { client, orgName, endpoint, apiVersion } = props
   const pFetch = await proxyFetch(client);
+  const isUsingOAuth2 = (await client.getUserState<boolean>("isUsingOAuth"))[0].data
+
+  let endpointQuery = endpoint
+  // Remove api_token from pathQuery if using OAuth2
+  if (isUsingOAuth2) {
+    endpointQuery = endpoint.replace(/(\?|&)api_token=[^&]+/, '');
+  }
 
   const apiVersionRoute = apiVersion === 2 ? "api/v2" : "v1"
 
   const response = await pFetch(
-    `https://${orgName}.pipedrive.com/${apiVersionRoute}/${endpoint}`
+    `https://${orgName}.pipedrive.com/${apiVersionRoute}/${endpointQuery}`,
+    {
+      headers: isUsingOAuth2 ? {
+        Authorization: `Bearer [user[${OAuth2AccessTokenPath}]]`
+      } : undefined
+    }
   );
 
   let result;

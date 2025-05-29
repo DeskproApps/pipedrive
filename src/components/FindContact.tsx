@@ -76,7 +76,7 @@ export const FindContact = () => {
     await client
       ?.getEntityAssociation("linkedPipedriveContacts", deskproUser.id)
       .set(selectedContact);
-    navigate("/");
+    navigate("/home");
   };
 
   return (
