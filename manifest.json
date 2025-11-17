@@ -45,14 +45,19 @@
   "proxy": {
     "whitelist": [
       {
-        "url": "https://.*.pipedrive.com/v1/.*",
+        "url": "https://__instance_domain__.pipedrive.com/v1/.*",
         "methods": ["GET", "POST", "PUT", "DELETE"],
         "timeout": 10
       },
       {
-        "url": "https://.*.pipedrive.com/api/.*",
+        "url": "https://__instance_domain__.pipedrive.com/api/.*",
         "methods": ["GET", "POST", "PUT", "DELETE"],
-        "timeout": 10
+        "timeout": 10,
+        "settingsInjection": {
+          "api_key": {
+            "querystring": ["api_token"]
+          }
+        }
       }
     ]
   }

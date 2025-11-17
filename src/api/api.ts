@@ -112,7 +112,7 @@ export async function preInstalledRequest(
   }
 
   const res = await dpFetch(
-    `https://${instance_domain}.pipedrive.com/v1/${pathQuery}?api_token=${api_key}`
+    `https://__instance_domain__.pipedrive.com/v1/${pathQuery}?api_token=${api_key}`
   );
 
   if (res.status < 200 || res.status > 399) {
