@@ -86,26 +86,24 @@ export const CreateDeal = () => {
 
       Promise.all([
         (async () => {
-          const contactsRes = await getAllContacts(client, deskproUser.orgName);
+          const contactsRes = await getAllContacts(client);
 
           setContacts(contactsRes.data ?? []);
         })(),
         (async () => {
           const organizationsRes = await getAllOrganizations(
             client,
-            deskproUser.orgName
           );
           setOrganizations(organizationsRes.data ?? []);
         })(),
         (async () => {
           const pipelinesRes = await getAllPipelines(
             client,
-            deskproUser.orgName
           );
           setPipelines(pipelinesRes.data ?? []);
         })(),
         (async () => {
-          const users = await getAllUsers(client, deskproUser.orgName);
+          const users = await getAllUsers(client);
 
           setUsers(users.data ?? []);
         })(),
@@ -133,7 +131,7 @@ export const CreateDeal = () => {
         return
       }
 
-      const stages = await getPipelineStages(client, deskproUser.orgName, Number(pipelineId))
+      const stages = await getPipelineStages(client, Number(pipelineId))
       setStages(stages.data ?? [])
     },
     [deskproUser, pipelineId]
@@ -169,7 +167,6 @@ export const CreateDeal = () => {
 
     const response = await createDeal(
       client,
-      deskproUser.orgName,
       pipedriveDeal
     );
 

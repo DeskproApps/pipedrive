@@ -36,7 +36,7 @@ const VerifySettings: FC = () => {
         setError("");
         setCurrentUser(null);
 
-        return getCurrentUser(client, undefined, settings)
+        return getCurrentUser(client, settings)
             .then((user) => setCurrentUser(user.data))
             .catch(() => setError(errorMessage))
             .finally(() => setIsLoading(false));

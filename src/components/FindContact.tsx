@@ -36,7 +36,6 @@ export const FindContact = () => {
 
         const pipedriveUsers = await getContactByPrompt(
           client,
-          deskproUser?.orgName,
           inputText
         );
 

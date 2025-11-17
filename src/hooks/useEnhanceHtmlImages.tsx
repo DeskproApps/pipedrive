@@ -21,10 +21,10 @@ const useEnhanceHtmlImages = (htmlString: string) => {
     }
 
     // upload iamges
-    enhanceHtmlImages(client, dpUser.orgName, htmlString)
+    enhanceHtmlImages(client, htmlString)
       .then((doc) => setNote(doc.body.innerHTML))
       .catch(() => { /* don’t do anything, placeholder will just be displayed */ });
-  }, [htmlString, dpUser?.orgName]);
+  }, [htmlString]);
 
   return { note };
 };

@@ -80,7 +80,6 @@ export const CreateActivity = () => {
 
     const response = await createActivity(
       client,
-      deskproUser?.orgName,
       activityObj
     );
 
@@ -139,30 +138,29 @@ export const CreateActivity = () => {
       (async () => {
         const activitiesTypes = await getActivityTypes(
           client,
-          deskproUser.orgName
         );
 
         setActivityTypes(activitiesTypes.data ?? []);
       })(),
       (async () => {
-        const contacts = await getAllContacts(client, deskproUser.orgName);
+        const contacts = await getAllContacts(client);
 
         setContacts(contacts.data ?? []);
       })(),
       (async () => {
-        const orgs = await getAllOrganizations(client, deskproUser.orgName);
+        const orgs = await getAllOrganizations(client);
 
         setOrganization(orgs.data ?? []);
       })(),
       (async () => {
-        const deals = await getAllDeals(client, deskproUser.orgName);
+        const deals = await getAllDeals(client);
 
         setDeals(
           deals?.data?.map((deal) => ({ ...deal, name: deal.title })) ?? []
         );
       })(),
       (async () => {
-        const users = await getAllUsers(client, deskproUser.orgName);
+        const users = await getAllUsers(client);
 
         setUsers(users.data ?? []);
       })(),

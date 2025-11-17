@@ -9,10 +9,8 @@ import "./image.css";
 
 export const NotesMainView = ({
   contact,
-  orgName,
 }: {
   contact: IPipedriveContact;
-  orgName: string;
 }) => {
   const navigate = useNavigate();
   const [notes, setNotes] = useState<IPipedriveNote[]>([]);
@@ -22,7 +20,7 @@ export const NotesMainView = ({
       return;
     }
 
-    const notesReq = await getNotes(client, orgName, contact.id);
+    const notesReq = await getNotes(client, contact.id);
 
     if (!notesReq.success) {
       return;

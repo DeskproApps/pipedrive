@@ -43,7 +43,6 @@ export class PipeDriveError extends Error {
 
 interface PipedriveGetProps {
   client: IDeskproClient
-  orgName: string
   endpoint: string
   apiVersion?: 1 | 2
 }
@@ -52,7 +51,6 @@ interface PipedriveGetProps {
  * Fetches data from the Pipedrive API. (Only GET requests)
  *
  * @param {IDeskproClient} client - The Deskpro client.
- * @param {string} orgName - The name of the Pipedrive organisation.
  * @param {string} endpoint - The specific API endpoint to call (e.g. "persons").
  * @param {number} apiVersion - Optional API version (defaults to v1).
  *
@@ -60,7 +58,6 @@ interface PipedriveGetProps {
  * // Get a contact using API v1
  * const response = await pipedriveGet({
  *   client
- *   orgName: "deskpro",
  *   endpoint: "persons/1",
  *   apiVersion: 1
  * });
@@ -69,19 +66,18 @@ interface PipedriveGetProps {
  * // Get all contacts using API v2
  * const response = await pipedriveGet({
  *   client,
- *   orgName: "deskpro",
  *   endpoint: "persons",
  *   apiVersion: 2
  * });
  */
 export async function pipedriveGet(props: PipedriveGetProps) {
-  const { client, orgName, endpoint, apiVersion } = props
+  const { client, endpoint, apiVersion } = props
   const pFetch = await proxyFetch(client);
 
   const apiVersionRoute = apiVersion === 2 ? "api/v2" : "v1"
 
   const response = await pFetch(
-    `https://${orgName}.pipedrive.com/${apiVersionRoute}/${endpoint}`
+    `https://__instance_domain__.pipedrive.com/${apiVersionRoute}/${endpoint}`
   );
 
   let result;
@@ -174,19 +170,16 @@ export async function fetchAllPaginatedData<T>(
 
 export async function getUserDataPipedrive(
   client: IDeskproClient,
-  orgName: string
 ) {
-  return await pipedriveGet({ client, orgName, endpoint: `users/me?api_token=__api_key__` });
+  return await pipedriveGet({ client, endpoint: `users/me?api_token=__api_key__` });
 };
 
 export async function getActivityTypes(
   client: IDeskproClient,
-  orgName: string
 ): Promise<PipedriveAPIResponse<IPipedriveActivityType[]>> {
   return await pipedriveGet(
     {
       client,
-      orgName,
       endpoint: `activityTypes?api_token=__api_key__`
     }
   );
@@ -194,30 +187,26 @@ export async function getActivityTypes(
 
 export async function getUserListPipedrive(
   client: IDeskproClient,
-  orgName: string
 ) {
-  return await pipedriveGet({ client, orgName, endpoint: `users?api_token=__api_key__` });
+  return await pipedriveGet({ client, endpoint: `users?api_token=__api_key__` });
 };
 
 export async function getCurrentUser(
   client: IDeskproClient,
-  orgName?: string,
   settings?: Settings,
 ): Promise<{ data: IPipedriveUser }> {
   return (settings?.api_key && settings?.instance_domain)
     ? await preInstalledRequest(client, `users/me`, settings)
-    : await pipedriveGet({ client, orgName: orgName ?? "", endpoint: `users/me?api_token=__api_key__` });
+    : await pipedriveGet({ client, endpoint: `users/me?api_token=__api_key__` });
 };
 
 export async function getUserById(
   client: IDeskproClient,
-  orgName: string,
   id: string
 ) {
   return await pipedriveGet(
     {
       client,
-      orgName,
       endpoint: `users/${id}?api_token=__api_key__`
     }
   );
@@ -225,12 +214,10 @@ export async function getUserById(
 
 export async function getContactByPrompt(
   client: IDeskproClient,
-  orgName: string,
   prompt: string
 ) {
   return await pipedriveGet({
     client,
-    orgName,
     endpoint: `persons/search?term=${prompt}&api_token=__api_key__`
   }
   );
@@ -238,19 +225,16 @@ export async function getContactByPrompt(
 
 export async function getAllUsers(
   client: IDeskproClient,
-  orgName: string
 ): Promise<PipedriveAPIResponse<IPipedriveUser[]>> {
-  return await pipedriveGet({ client, orgName, endpoint: `users?api_token=__api_key__` });
+  return await pipedriveGet({ client, endpoint: `users?api_token=__api_key__` });
 };
 
 export async function getAllOrganizations(
   client: IDeskproClient,
-  orgName: string
 ): Promise<PipedriveAPIResponse<IPipedriveOrganization[]>> {
   return await pipedriveGet(
     {
       client,
-      orgName,
       endpoint: `organizations?api_token=__api_key__`
     }
   );
@@ -258,13 +242,11 @@ export async function getAllOrganizations(
 
 export async function getContactById(
   client: IDeskproClient,
-  orgName: string,
   id: string
 ): Promise<PipedriveAPIResponse<IPipedriveContact>> {
   return await pipedriveGet(
     {
       client,
-      orgName,
       endpoint: `persons/${id}?api_token=__api_key__`
     }
   );
@@ -272,13 +254,11 @@ export async function getContactById(
 
 export async function getOrganizationsByUserId(
   client: IDeskproClient,
-  orgName: string,
   userId: number
 ) {
   return await pipedriveGet(
     {
       client,
-      orgName,
       endpoint: `organizations?user_id=${userId}&api_token=__api_key__`
     }
   );
@@ -286,13 +266,11 @@ export async function getOrganizationsByUserId(
 
 export async function getDeals(
   client: IDeskproClient,
-  orgName: string,
   personId: number
 ): Promise<PipedriveAPIResponse<IPipedriveDeal[]>> {
   return await pipedriveGet(
     {
       client,
-      orgName,
       endpoint: `deals?person_id=${personId}&api_token=__api_key__`
     }
   );
@@ -300,15 +278,13 @@ export async function getDeals(
 
 export async function getAllContactDeals(
   client: IDeskproClient,
-  orgName: string,
   contactId: number
 ) {
-  return await fetchAllPaginatedData((cursor) => getDealsByContactId(client, orgName, contactId, { cursor: cursor ?? undefined, limit: 500 }))
+  return await fetchAllPaginatedData((cursor) => getDealsByContactId(client, contactId, { cursor: cursor ?? undefined, limit: 500 }))
 }
 
 export async function getDealsByContactId(
   client: IDeskproClient,
-  orgName: string,
   contactId: number,
   options?: Pick<PipedriveFilterOptions, "limit" | "cursor">
 ): Promise<PipedriveAPIResponse<IPipedriveDeal[]> & {
@@ -333,7 +309,6 @@ export async function getDealsByContactId(
   return await pipedriveGet(
     {
       client,
-      orgName,
       apiVersion: 2,
       endpoint: `deals?${queryParams.toString()}`
     }
@@ -342,13 +317,11 @@ export async function getDealsByContactId(
 
 export async function getOrganizationsById(
   client: IDeskproClient,
-  orgName: string,
   orgId: number
 ): Promise<PipedriveAPIResponse<IPipedriveOrganization>> {
   return await pipedriveGet(
     {
       client,
-      orgName,
       endpoint: `organizations/${orgId}?api_token=__api_key__`
     }
   );
@@ -356,13 +329,11 @@ export async function getOrganizationsById(
 
 export async function getNotes(
   client: IDeskproClient,
-  orgName: string,
   personId: number
 ): Promise<PipedriveAPIResponse<IPipedriveNote[]>> {
   return await pipedriveGet(
     {
       client,
-      orgName,
       endpoint: `notes?person_id=${personId}&api_token=__api_key__`
     }
   );
@@ -370,15 +341,13 @@ export async function getNotes(
 
 export async function getAllContactActivities(
   client: IDeskproClient,
-  orgName: string,
   contactId: number
 ) {
-  return await fetchAllPaginatedData((cursor) => getActivities(client, orgName, { personId: contactId, cursor: cursor ?? undefined, limit: 500 }))
+  return await fetchAllPaginatedData((cursor) => getActivities(client, { personId: contactId, cursor: cursor ?? undefined, limit: 500 }))
 }
 
 export async function getActivities(
   client: IDeskproClient,
-  orgName: string,
   options?: Pick<PipedriveFilterOptions, "limit" | "cursor" | "personId" | "ownerId">
 ): Promise<PipedriveAPIResponse<IPipedriveActivity[]> & {
   additional_data?: Pick<
@@ -408,7 +377,6 @@ export async function getActivities(
   return await pipedriveGet(
     {
       client,
-      orgName,
       apiVersion: 2,
       endpoint: `activities?${queryParams.toString()}`
     }
@@ -417,13 +385,12 @@ export async function getActivities(
 
 export async function createContact(
   client: IDeskproClient,
-  orgName: string,
   data: IPipedriveCreateContact
 ): Promise<PipedriveAPIResponse<IPipedriveContact>> {
   const pFetch = await proxyFetch(client);
 
   const response = await pFetch(
-    `https://${orgName}.pipedrive.com/v1/persons?api_token=__api_key__`,
+    `https://__instance_domain__.pipedrive.com/v1/persons?api_token=__api_key__`,
     {
       method: "POST",
       headers: {
@@ -450,7 +417,6 @@ export async function createContact(
 
 export async function editContact(
   client: IDeskproClient,
-  orgName: string,
   data: IPipedriveCreateContact,
   contactId: string
 ): Promise<PipedriveAPIResponse<IPipedriveContact>> {
@@ -463,7 +429,7 @@ export async function editContact(
   });
 
   const response = await pFetch(
-    `https://${orgName}.pipedrive.com/v1/persons/${contactId}?api_token=__api_key__`,
+    `https://__instance_domain__.pipedrive.com/v1/persons/${contactId}?api_token=__api_key__`,
     {
       method: "PUT",
       headers: {
@@ -490,13 +456,11 @@ export async function editContact(
 
 export async function getDealById(
   client: IDeskproClient,
-  orgName: string,
   dealId: number
 ): Promise<PipedriveAPIResponse<IPipedriveDeal>> {
   return await pipedriveGet(
     {
       client,
-      orgName,
       endpoint: `deals/${dealId}?api_token=__api_key__`
     }
   );
@@ -504,13 +468,11 @@ export async function getDealById(
 
 export async function getPipelineById(
   client: IDeskproClient,
-  orgName: string,
   pipelineId: number
 ): Promise<PipedriveAPIResponse<IPipedrivePipeline>> {
   return await pipedriveGet(
     {
       client,
-      orgName,
       endpoint: `pipelines/${pipelineId}?api_token=__api_key__`
     }
   );
@@ -518,13 +480,11 @@ export async function getPipelineById(
 
 export async function getStageById(
   client: IDeskproClient,
-  orgName: string,
   stageId: number
 ): Promise<PipedriveAPIResponse<IPipedriveStage>> {
   return await pipedriveGet(
     {
       client,
-      orgName,
       endpoint: `stages/${stageId}?api_token=__api_key__`
     }
   );
@@ -532,13 +492,12 @@ export async function getStageById(
 
 export async function createDeal(
   client: IDeskproClient,
-  orgName: string,
   data: IPipedriveCreateDeal
 ): Promise<PipedriveAPIResponse<IPipedriveDeal>> {
   const pFetch = await proxyFetch(client);
 
   const response = await pFetch(
-    `https://${orgName}.pipedrive.com/v1/deals?api_token=__api_key__`,
+    `https://__instance_domain__.pipedrive.com/v1/deals?api_token=__api_key__`,
     {
       method: "POST",
       headers: {
@@ -553,7 +512,6 @@ export async function createDeal(
 
 export async function editDeal(
   client: IDeskproClient,
-  orgName: string,
   data: IPipedriveCreateDeal,
   dealId: string
 ): Promise<PipedriveAPIResponse<IPipedriveDeal>> {
@@ -566,7 +524,7 @@ export async function editDeal(
   });
 
   const response = await pFetch(
-    `https://${orgName}.pipedrive.com/v1/deals/${dealId}?api_token=__api_key__`,
+    `https://__instance_domain__.pipedrive.com/v1/deals/${dealId}?api_token=__api_key__`,
     {
       method: "PUT",
       headers: {
@@ -581,13 +539,12 @@ export async function editDeal(
 
 export async function createActivity(
   client: IDeskproClient,
-  orgName: string,
   data: IPipedriveCreateActivity
 ): Promise<PipedriveAPIResponse<IPipedriveActivity>> {
   const pFetch = await proxyFetch(client);
 
   const response = await pFetch(
-    `https://${orgName}.pipedrive.com/v1/activities?api_token=__api_key__`,
+    `https://__instance_domain__.pipedrive.com/v1/activities?api_token=__api_key__`,
     {
       method: "POST",
       headers: {
@@ -602,7 +559,6 @@ export async function createActivity(
 
 export async function uploadImage(
   client: IDeskproClient,
-  orgName: string,
   image: File,
   contactId: string
 ) {
@@ -618,7 +574,7 @@ export async function uploadImage(
   formData.set("person_id", contactId);
 
   const response = await pFetch(
-    `https://${orgName}.pipedrive.com/v1/files?api_token=__api_key__`,
+    `https://__instance_domain__.pipedrive.com/v1/files?api_token=__api_key__`,
     {
       method: "POST",
       body: formData,
@@ -630,7 +586,6 @@ export async function uploadImage(
 
 export async function createNote(
   client: IDeskproClient,
-  orgName: string,
   image: File | null,
   note: string,
   contactId: string
@@ -640,7 +595,7 @@ export async function createNote(
   let requestNote = null;
 
   if (image) {
-    const imageResponse = await uploadImage(client, orgName, image, contactId);
+    const imageResponse = await uploadImage(client, image, contactId);
 
     requestNote = `${note}<br><a href="cid:${imageResponse?.data?.id}" target="_blank" data-pipecid="cid:${imageResponse?.data?.id}"><img src="cid:${imageResponse?.data?.id}" data-pipecid="cid:${imageResponse?.data?.id}" style="width: 64px; height: 64px;"></a>`;
   } else {
@@ -648,7 +603,7 @@ export async function createNote(
   }
 
   const noteResponse = await pFetch(
-    `https://${orgName}.pipedrive.com/v1/notes?api_token=__api_key__`,
+    `https://__instance_domain__.pipedrive.com/v1/notes?api_token=__api_key__`,
     {
       method: "POST",
       headers: {
@@ -666,13 +621,12 @@ export async function createNote(
 
 export async function createUser(
   client: IDeskproClient,
-  orgName: string,
   user: IPipedriveContact
 ) {
   const pFetch = await proxyFetch(client);
 
   const response = await pFetch(
-    `https://${orgName}.pipedrive.com/v1/users?api_token=__api_key__`,
+    `https://__instance_domain__.pipedrive.com/v1/users?api_token=__api_key__`,
     {
       method: "POST",
       headers: {
@@ -689,12 +643,10 @@ export async function createUser(
 
 export async function getContactByEmail(
   client: IDeskproClient,
-  orgName: string,
   email: string
 ): Promise<IPipedriveContact | null> {
   const pipedriveContactFromPrompt = await getContactByPrompt(
     client,
-    orgName,
     email
   );
 
@@ -707,7 +659,6 @@ export async function getContactByEmail(
 
   const pipedriveContact = await getContactById(
     client,
-    orgName,
     pipedriveContactFromPrompt.data.items[0]?.item.id ?? null
   );
 
@@ -720,43 +671,38 @@ export async function getContactByEmail(
 
 export async function getAllPipelines(
   client: IDeskproClient,
-  orgName: string
 ): Promise<PipedriveAPIResponse<IPipedrivePipeline[]>> {
-  return await pipedriveGet({ client, orgName, endpoint: `pipelines?api_token=__api_key__` });
+  return await pipedriveGet({ client, endpoint: `pipelines?api_token=__api_key__` });
 };
 
 export async function getAllStages(
   client: IDeskproClient,
-  orgName: string
 ): Promise<PipedriveAPIResponse<IPipedriveStage[]>> {
-  return await pipedriveGet({ client, orgName, endpoint: `stages?api_token=__api_key__` });
+  return await pipedriveGet({ client, endpoint: `stages?api_token=__api_key__` });
 };
 
 // Source: https://developers.pipedrive.com/docs/api/v1/Stages#getStages
 export async function getPipelineStages(
   client: IDeskproClient,
-  orgName: string,
   pipelineId: number
 ): Promise<PipedriveAPIResponse<IPipedriveStage[]>> {
-  return await pipedriveGet({ client, orgName, endpoint: `stages?pipeline_id=${pipelineId}&api_token=__api_key__` });
+  return await pipedriveGet({ client, endpoint: `stages?pipeline_id=${pipelineId}&api_token=__api_key__` });
 };
 
 export async function getAllContacts(
   client: IDeskproClient,
-  orgName: string
 ): Promise<PipedriveAPIResponse<IPipedriveContact[]>> {
-  return await pipedriveGet({ client, orgName, endpoint: `persons?api_token=__api_key__` });
+  return await pipedriveGet({ client, endpoint: `persons?api_token=__api_key__` });
 };
 
 export async function getAllDeals(
   client: IDeskproClient,
-  orgName: string
 ): Promise<PipedriveAPIResponse<IPipedriveDeal[]>> {
-  return await pipedriveGet({ client, orgName, endpoint: `deals?api_token=__api_key__` });
+  return await pipedriveGet({ client, endpoint: `deals?api_token=__api_key__` });
 };
 
-export async function getImage(client: IDeskproClient, orgName: string, imageId: string) {
+export async function getImage(client: IDeskproClient, imageId: string) {
   return proxyFetch(client)
-    .then((fetch) => fetch(`https://${orgName}.pipedrive.com/v1/files/${imageId}/download?api_token=__api_key__`))
+    .then((fetch) => fetch(`https://__instance_domain__.pipedrive.com/v1/files/${imageId}/download?api_token=__api_key__`))
     .then((res) => res.blob());
 };

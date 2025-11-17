@@ -51,7 +51,6 @@ export const EditContact = () => {
         (async () => {
           const contactRes = await getContactById(
             client,
-            deskproUser.orgName,
             contactId
           );
 
@@ -60,13 +59,12 @@ export const EditContact = () => {
         (async () => {
           const organizations = await getAllOrganizations(
             client,
-            deskproUser.orgName
           );
 
           setOrganizations(organizations.data ?? []);
         })(),
         (async () => {
-          const users = await getAllUsers(client, deskproUser.orgName);
+          const users = await getAllUsers(client);
 
           setUsers(users.data ?? []);
         })(),
@@ -128,7 +126,7 @@ export const EditContact = () => {
 
     setError(null);
 
-    return editContact(client, deskproUser?.orgName, pipedriveContact, contactId)
+    return editContact(client, pipedriveContact, contactId)
         .then(() => navigate("/"))
         .catch((err) => setError(err?.data?.error || "Error creating contact"));
   };

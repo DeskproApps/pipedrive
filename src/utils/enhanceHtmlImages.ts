@@ -4,7 +4,6 @@ import { IMAGE_PLACEHOLFER } from "../constants";
 
 const enhanceHtmlImages = (
   client: IDeskproClient,
-  orgName: string,
   htmlString: string,
 ): Promise<Document> => {
   const parser = new DOMParser();
@@ -22,7 +21,7 @@ const enhanceHtmlImages = (
     }
 
     if (id) {
-      return getImage(client, orgName, id)
+      return getImage(client, id)
         .then((blob) => img.setAttribute("src", URL.createObjectURL(blob)))
         .catch(() => {
           img.setAttribute("src", IMAGE_PLACEHOLFER);

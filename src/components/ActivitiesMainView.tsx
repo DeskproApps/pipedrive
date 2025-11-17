@@ -18,10 +18,8 @@ import { Spinner, Stack } from "@deskpro/deskpro-ui";
 
 export const ActivitiesMainView = ({
   contact,
-  orgName,
 }: {
   contact: IPipedriveContact;
-  orgName: string;
 }) => {
   const navigate = useNavigate();
   const deskproUser = useUser();
@@ -36,7 +34,7 @@ export const ActivitiesMainView = ({
     setIsFetchingActivities(true)
 
     try {
-      const activitiesReq = await getAllContactActivities(client, orgName, contact.id)
+      const activitiesReq = await getAllContactActivities(client, contact.id)
 
       if (!activitiesReq.success) {
         return
@@ -77,7 +75,7 @@ export const ActivitiesMainView = ({
         <Fragment key={activity.id}>
           <Title
             title={activity.subject}
-            link={`https://${deskproUser?.orgName}.pipedrive.com/activities/list/user/everyone?selected=${activity.id}`}
+            link={`https://__instance_domain__.pipedrive.com/activities/list/user/everyone?selected=${activity.id}`}
             icon={<PipedriveLogo />}
           />
           <TwoColumn

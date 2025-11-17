@@ -74,9 +74,9 @@ export const CreateNote = () => {
   };
 
   const submitNote = async () => {
-    if (!client || !deskproUser?.orgName || !contactId || !note) return;
+    if (!client || !contactId || !note) return;
 
-    await createNote(client, deskproUser.orgName, image, note, contactId);
+    await createNote(client, image, note, contactId);
 
     navigate("/");
   };

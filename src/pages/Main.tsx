@@ -52,7 +52,7 @@ export const Main = () => {
 
     // If a linked contact was found, fetch & set the data for the contact, navigate to the link page if the fetch fails.
     if (id) {
-      const contact = await getContactById(client, deskproUser.orgName, id)
+      const contact = await getContactById(client, id)
         .catch(asyncErrorHandler);
 
       if (!contact?.success) {
@@ -75,7 +75,6 @@ export const Main = () => {
     // Navigate to the link page if no contact is found.
     const contact = await getContactByEmail(
       client,
-      deskproUser.orgName,
       deskproUser.primaryEmail
     ).catch(asyncErrorHandler);
 
@@ -103,7 +102,6 @@ export const Main = () => {
 
     const pipedriveOrganization = await getOrganizationsById(
       client,
-      deskproUser.orgName,
       pipedriveContact.org_id.value
     ).catch(asyncErrorHandler);
 
@@ -238,15 +236,12 @@ export const Main = () => {
         <>
           <DealsMainView
             contact={pipedriveContact}
-            orgName={deskproUser?.orgName}
           />
           <ActivitiesMainView
             contact={pipedriveContact}
-            orgName={deskproUser?.orgName}
           />
           <NotesMainView
             contact={pipedriveContact}
-            orgName={deskproUser?.orgName}
           />
         </>
       )}

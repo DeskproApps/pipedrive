@@ -40,10 +40,10 @@ export const CreateContact = () => {
     async (client) => {
       if (!dpUser) return;
 
-      const orgs = await getAllOrganizations(client, dpUser?.orgName);
+      const orgs = await getAllOrganizations(client);
       setOrganizations(orgs.data ?? []);
 
-      const users = await getAllUsers(client, dpUser.orgName);
+      const users = await getAllUsers(client);
       setUsers(users.data ?? []);
     },
     [dpUser]
@@ -63,7 +63,7 @@ export const CreateContact = () => {
 
     setError(null);
 
-    return createContact(client, dpUser?.orgName, pipedriveContact)
+    return createContact(client, pipedriveContact)
         .then((response) => client
             ?.getEntityAssociation("linkedPipedriveContacts", dpUser.id)
             .set(response.data.id.toString())

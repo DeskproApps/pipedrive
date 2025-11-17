@@ -37,13 +37,13 @@ export const DealDetails = () => {
 
       client.registerElement("pipedriveLink", {
         type: "cta_external_link",
-        url: `https://${user?.orgName}.pipedrive.com/deal/${dealId}`,
+        url: `https://__instance_domain__.pipedrive.com/deal/${dealId}`,
         hasIcon: true,
       });
 
       client.setTitle("Deal Details");
 
-      const dealRes = await getDealById(client, user.orgName, Number(dealId));
+      const dealRes = await getDealById(client, Number(dealId));
 
       if (!dealRes.success) {
         return;
@@ -53,7 +53,6 @@ export const DealDetails = () => {
 
       const pipelineRes = await getPipelineById(
         client,
-        user.orgName,
         dealRes.data.pipeline_id
       );
 
@@ -63,7 +62,6 @@ export const DealDetails = () => {
 
       const stageRes = await getStageById(
         client,
-        user.orgName,
         dealRes.data.stage_id
       );
 

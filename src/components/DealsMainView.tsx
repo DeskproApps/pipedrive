@@ -18,10 +18,8 @@ import { Spinner, Stack } from "@deskpro/deskpro-ui";
 
 export const DealsMainView = ({
   contact,
-  orgName,
 }: {
   contact: IPipedriveContact;
-  orgName: string;
 }) => {
   const navigate = useNavigate();
   const deskproUser = useUser();
@@ -38,7 +36,7 @@ export const DealsMainView = ({
       setIsFetchingDeals(true)
 
       try {
-        const dealsReq = await getAllContactDeals(client, orgName, contact.id)
+        const dealsReq = await getAllContactDeals(client, contact.id)
         if (!dealsReq.success) {
           return
         }
